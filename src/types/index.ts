@@ -51,7 +51,10 @@ export interface Product {
   category: ProductCategory
   hsn: string
   unit: string
+  /** Printed on the box — what the customer compares against. */
   mrp: number
+  /** What the counter actually charges. Sivakasi shops sell well under MRP. */
+  rate: number
   gstRate: number
   stock: number
   lowStockThreshold: number
@@ -94,6 +97,8 @@ export interface Bill {
 }
 
 export interface BillTotals {
+  /** Sum of MRP × qty — only used to tell the customer what they saved. */
+  mrpValue: number
   gross: number
   billDiscountAmount: number
   taxable: number

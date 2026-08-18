@@ -62,7 +62,8 @@ export const ThermalReceipt = ({ bill, tendered, changeDue, showQr, showMrpSaved
       })}
       <Dash />
       <Row label="Items / Qty" value={`${totals.itemCount} / ${totals.qtyCount}`} />
-      <Row label="Sub-total" value={formatAmount(totals.gross)} />
+      <Row label="MRP value" value={formatAmount(totals.mrpValue)} />
+      <Row label="Counter rate" value={formatAmount(totals.gross)} />
       {totals.billDiscountAmount > 0 && <Row label="Bill discount" value={`-${formatAmount(totals.billDiscountAmount)}`} />}
       <Row label={gst ? 'Taxable' : 'Subtotal'} value={formatAmount(totals.taxable)} />
       {gst && <Row label={halfRate ? `CGST ${halfRate}` : 'CGST'} value={formatAmount(totals.cgst)} />}
@@ -80,7 +81,7 @@ export const ThermalReceipt = ({ bill, tendered, changeDue, showQr, showMrpSaved
       )}
       {showMrpSaved && (
         <Typography className={styles.savedLine}>
-          YOU SAVED {formatCurrency(totals.billDiscountAmount)}
+          YOU SAVED {formatCurrency(totals.mrpValue - totals.gross + totals.billDiscountAmount)}
         </Typography>
       )}
       {showQr && (

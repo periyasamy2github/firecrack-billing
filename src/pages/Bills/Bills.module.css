@@ -51,3 +51,9 @@
 .actionIcon {
   font-size: 15px;
 }
+
+.billNoCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

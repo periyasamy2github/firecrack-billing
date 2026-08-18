@@ -115,7 +115,7 @@ export const InvoicePrint = () => {
                   <div className={styles.toggleRow}>
                     <div className={styles.toggleRowText}>
                       <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
-                      <Typography variant="caption">"You saved ₹{Math.round(totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
+                      <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
                     </div>
                     <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
                   </div>

@@ -55,7 +55,7 @@ export const NewBill = () => {
   const [customerName, setCustomerName] = useState('')
   const [customerMobile, setCustomerMobile] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
-  const [gstApplicable, setGstApplicable] = useState(true)
+  const [gstApplicable, setGstApplicable] = useState(false)
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [billDiscountValue, setBillDiscountValue] = useState('')
   const [tendered, setTendered] = useState('')
@@ -92,7 +92,7 @@ export const NewBill = () => {
     setCustomerMobile('')
     setTendered('')
     setPaymentMethod('Cash')
-    setGstApplicable(true)
+    setGstApplicable(false)
     setBillDiscountType('percent')
     setBillDiscountValue('')
     resetErrors()
@@ -243,7 +243,8 @@ export const NewBill = () => {
                         </div>
                       </div>
                       <div className={styles.optionRight}>
-                        <Mono sx={{ fontSize: 14, fontWeight: 700 }}>₹{formatAmount(p.mrp)}</Mono>
+                        <Mono sx={{ fontSize: 14, fontWeight: 700 }}>₹{formatAmount(p.rate)}</Mono>
+                        <Mono sx={{ display: 'block', fontSize: 10, color: 'text.secondary', textDecoration: 'line-through' }}>₹{formatAmount(p.mrp)}</Mono>
                       </div>
                     </Box>
                   )

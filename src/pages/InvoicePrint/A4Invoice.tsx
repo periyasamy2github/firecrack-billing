@@ -19,8 +19,8 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
   const sgstLabel = halfRate ? `SGST ${halfRate}` : 'SGST'
 
   const columns = gst
-    ? ['#', 'Description of goods', 'HSN', 'Rate', 'Qty', 'Taxable', cgstLabel, sgstLabel, 'Amount']
-    : ['#', 'Description of goods', 'HSN', 'Rate', 'Qty', 'Amount']
+    ? ['#', 'Description of goods', 'HSN', 'MRP', 'Rate', 'Qty', 'Taxable', cgstLabel, sgstLabel, 'Amount']
+    : ['#', 'Description of goods', 'HSN', 'MRP', 'Rate', 'Qty', 'Amount']
 
   return (
     <div className={styles.sheet}>
@@ -90,6 +90,7 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
                 <TableCell>{idx + 1}</TableCell>
                 <TableCell>{item.product.name}</TableCell>
                 <TableCell align="right">{item.product.hsn}</TableCell>
+                <TableCell align="right">{formatAmount(item.product.mrp)}</TableCell>
                 <TableCell align="right">{formatAmount(rate)}</TableCell>
                 <TableCell align="right">{qtyLabel}</TableCell>
                 {gst && (
@@ -158,7 +159,8 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
           <Table size="small" className={styles.chargesTable}>
             <TableBody>
               {[
-                ['Sub-total', formatAmount(totals.gross)],
+                ['MRP value', formatAmount(totals.mrpValue)],
+                ['Counter rate', formatAmount(totals.gross)],
                 ...(totals.billDiscountAmount > 0 ? [['Bill discount', `− ${formatAmount(totals.billDiscountAmount)}`]] : []),
                 ['Taxable value', formatAmount(totals.taxable)],
                 [cgstLabel, formatAmount(totals.cgst)],
@@ -185,7 +187,8 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
         <div className={styles.noGstRow}>
           <Table size="small" className={`${styles.chargesTable} ${styles.chargesTableNoGst}`}>
             <TableBody>
-              <TableRow><TableCell>Sub-total</TableCell><TableCell align="right">{formatAmount(totals.gross)}</TableCell></TableRow>
+              <TableRow><TableCell>MRP value</TableCell><TableCell align="right">{formatAmount(totals.mrpValue)}</TableCell></TableRow>
+              <TableRow><TableCell>Counter rate</TableCell><TableCell align="right">{formatAmount(totals.gross)}</TableCell></TableRow>
               {totals.billDiscountAmount > 0 && (
                 <TableRow><TableCell>Bill discount</TableCell><TableCell align="right">− {formatAmount(totals.billDiscountAmount)}</TableCell></TableRow>
               )}

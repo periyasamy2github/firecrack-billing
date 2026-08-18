@@ -122,8 +122,6 @@ export const Bills = () => {
                   <TableCell>Customer</TableCell>
                   <TableCell align="right">Items</TableCell>
                   <TableCell align="right">Qty</TableCell>
-                  <TableCell align="right">Discount</TableCell>
-                  <TableCell align="right">GST</TableCell>
                   <TableCell align="right">Total</TableCell>
                   <TableCell>Payment</TableCell>
                   <TableCell>Status</TableCell>
@@ -135,10 +133,24 @@ export const Bills = () => {
               <TableBody>
                 {pageRows.map((bill) => {
                   const totals = getBillTotals(bill)
-                  const isFinalised = bill.status === 'Paid'
                   return (
                     <TableRow key={bill.billNo} hover>
-                      <TableCell><Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono></TableCell>
+                      <TableCell>
+                        <div className={styles.billNoCell}>
+                          <Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono>
+                          {/* Only the exceptions are worth a badge — most bills are a plain Bill of Supply. */}
+                          {bill.gstApplicable && (
+                            <Tooltip title={`GST ${formatCurrency(totals.cgst + totals.sgst)}`}>
+                              <span><StatusPill tone="paid" dot={false} label="GST" /></span>
+                            </Tooltip>
+                          )}
+                          {totals.billDiscountAmount > 0 && (
+                            <Tooltip title={`Bill discount ${formatCurrency(totals.billDiscountAmount)}`}>
+                              <span><StatusPill tone="hold" dot={false} label="Disc" /></span>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TableCell>
                       {viewingAll && <TableCell><Typography className={styles.counterCell}>{bill.counter}</Typography></TableCell>}
                       <TableCell>
                         <Typography className={styles.customerName}>{bill.customerName || 'Walk-in'}</Typography>
@@ -146,12 +158,6 @@ export const Bills = () => {
                       </TableCell>
                       <TableCell align="right"><Mono>{totals.itemCount}</Mono></TableCell>
                       <TableCell align="right"><Mono>{totals.qtyCount}</Mono></TableCell>
-                      <TableCell align="right">
-                        {isFinalised && totals.billDiscountAmount > 0 ? <Mono sx={{ color: 'warning.dark' }}>{formatCurrency(totals.billDiscountAmount)}</Mono> : <Typography className={styles.mutedCell}>—</Typography>}
-                      </TableCell>
-                      <TableCell align="right">
-                        {isFinalised && bill.gstApplicable ? <Mono>{formatCurrency(totals.cgst + totals.sgst)}</Mono> : <Typography className={styles.mutedCell}>—</Typography>}
-                      </TableCell>
                       <TableCell align="right">
                         <Mono sx={{ fontWeight: 600, textDecoration: bill.status === 'Cancelled' ? 'line-through' : 'none', color: bill.status === 'Cancelled' ? 'text.secondary' : 'text.primary' }}>
                           {formatCurrency(totals.grandTotal)}
@@ -163,7 +169,6 @@ export const Bills = () => {
                       <TableCell>
                         <div className={styles.statusRow}>
                           <StatusPill tone={BILL_STATUS_TONE[bill.status]} label={bill.status === 'Paid' && bill.reprintCount > 0 ? `Reprinted ×${bill.reprintCount}` : bill.status} />
-                          {bill.status === 'Paid' && !bill.gstApplicable && <StatusPill tone="mut" dot={false} label="No GST" />}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -197,7 +202,7 @@ export const Bills = () => {
                     </TableRow>
                   )
                 })}
-                {filtered.length === 0 && <TableEmptyRow colSpan={viewingAll ? 13 : 12} message="No bills match this search." />}
+                {filtered.length === 0 && <TableEmptyRow colSpan={viewingAll ? 11 : 10} message="No bills match this search." />}
               </TableBody>
             </Table>
         </TableCard>

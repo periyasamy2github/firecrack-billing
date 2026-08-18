@@ -119,6 +119,7 @@ export const Products = () => {
                   <TableCell>Item name</TableCell>
                   <TableCell>Category</TableCell>
                   <TableCell>Unit</TableCell>
+                  <TableCell align="right">MRP</TableCell>
                   <TableCell align="right">Rate</TableCell>
                   <TableCell align="right">Stock</TableCell>
                   <TableCell>Status</TableCell>
@@ -134,7 +135,8 @@ export const Products = () => {
                       <TableCell><Typography className={styles.itemName}>{p.name}</Typography></TableCell>
                       <TableCell>{p.category}</TableCell>
                       <TableCell className={styles.unitCell}>{p.unit}</TableCell>
-                      <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(p.mrp)}</Mono></TableCell>
+                      <TableCell align="right"><Mono sx={{ color: 'text.secondary' }}>{formatAmount(p.mrp)}</Mono></TableCell>
+                      <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(p.rate)}</Mono></TableCell>
                       <TableCell align="right">
                         <Mono sx={{ fontWeight: 650, color: status.tone === 'due' ? 'var(--due)' : status.tone === 'hold' ? 'var(--ember-ink)' : 'var(--ink)' }}>
                           {p.stock}
@@ -154,7 +156,7 @@ export const Products = () => {
                     </TableRow>
                   )
                 })}
-                {filtered.length === 0 && <TableEmptyRow colSpan={8} message="No products match this search." />}
+                {filtered.length === 0 && <TableEmptyRow colSpan={9} message="No products match this search." />}
               </TableBody>
             </Table>
         </TableCard>
@@ -188,7 +190,8 @@ export const Products = () => {
             <DetailRow label="Barcode" value={viewingProduct.code} />
             <DetailRow label="Category" value={viewingProduct.category} />
             <DetailRow label="Unit" value={viewingProduct.unit} />
-            <DetailRow label="Rate" value={formatAmount(viewingProduct.mrp)} />
+            <DetailRow label="MRP" value={formatAmount(viewingProduct.mrp)} />
+            <DetailRow label="Rate" value={formatAmount(viewingProduct.rate)} />
             <DetailRow label="Stock" value={String(viewingProduct.stock)} />
             <DetailRow label="Status" value={stockStatus(viewingProduct).label} />
           </DialogContent>

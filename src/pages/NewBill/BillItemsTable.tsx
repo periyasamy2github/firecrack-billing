@@ -21,6 +21,7 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
         <TableCell>Item</TableCell>
         <TableCell>HSN</TableCell>
         <TableCell align="right">MRP</TableCell>
+        <TableCell align="right">Rate</TableCell>
         <TableCell align="right" className={styles.qtyCol}>Qty</TableCell>
         {gstApplicable && <TableCell align="right">Taxable</TableCell>}
         {gstApplicable && <TableCell align="right">GST</TableCell>}
@@ -43,7 +44,8 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
             <TableCell>
               <Mono sx={{ fontSize: 11, color: 'text.secondary' }}>{item.product.hsn}</Mono>
             </TableCell>
-            <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{formatAmount(rate)}</Mono></TableCell>
+            <TableCell align="right"><Mono sx={{ fontSize: 12, color: 'text.secondary', textDecoration: 'line-through' }}>{formatAmount(item.product.mrp)}</Mono></TableCell>
+            <TableCell align="right"><Mono sx={{ fontSize: 12, fontWeight: 600 }}>{formatAmount(rate)}</Mono></TableCell>
             <TableCell align="right">
               <TextField
                 type="number"

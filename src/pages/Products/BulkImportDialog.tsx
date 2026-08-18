@@ -11,7 +11,7 @@ import styles from './BulkImportDialog.module.css'
 
 const CATEGORIES: ProductCategory[] = ['Sparklers', 'Flower Pots', 'Chakkar', 'Rockets', 'Bombs', 'Fancy', 'Gift Boxes']
 
-const TEMPLATE_COLUMNS = ['barcode', 'name', 'category', 'hsn', 'unit', 'mrp', 'gstRate', 'stock', 'lowStockThreshold']
+const TEMPLATE_COLUMNS = ['barcode', 'name', 'category', 'hsn', 'unit', 'mrp', 'rate', 'gstRate', 'stock', 'lowStockThreshold']
 
 const HEADER_ALIASES: Record<string, string> = {
   barcode: 'code', code: 'code', 'product code': 'code', sku: 'code',
@@ -20,6 +20,7 @@ const HEADER_ALIASES: Record<string, string> = {
   hsn: 'hsn', 'hsn code': 'hsn',
   unit: 'unit',
   mrp: 'mrp',
+  rate: 'rate', 'sale rate': 'rate', 'selling price': 'rate', 'counter rate': 'rate',
   gst: 'gstRate', gstrate: 'gstRate', 'gst rate': 'gstRate', 'gst%': 'gstRate', 'gst %': 'gstRate',
   stock: 'stock', qty: 'stock', quantity: 'stock',
   'low stock threshold': 'lowStockThreshold', 'lowstockthreshold': 'lowStockThreshold', 'reorder level': 'lowStockThreshold', threshold: 'lowStockThreshold',
@@ -34,12 +35,14 @@ const importRowSchema = z.object({
   hsn: z.string().trim().min(1, 'HSN is required'),
   unit: z.string().trim().min(1, 'Unit is required'),
   mrp: z.coerce.number(),
+  rate: z.coerce.number(),
   gstRate: z.coerce.number(),
   stock: z.coerce.number(),
   lowStockThreshold: z.coerce.number(),
 })
   .refine((v) => CATEGORIES.includes(v.category as ProductCategory), { message: `Category must be one of: ${CATEGORIES.join(', ')}`, path: ['category'] })
   .refine((v) => Number.isFinite(v.mrp) && v.mrp > 0, { message: 'MRP must be a positive number', path: ['mrp'] })
+  .refine((v) => Number.isFinite(v.rate) && v.rate > 0, { message: 'Rate must be a positive number', path: ['rate'] })
   .refine((v) => Number.isFinite(v.gstRate) && v.gstRate >= 0, { message: 'GST rate must be 0 or more', path: ['gstRate'] })
   .refine((v) => Number.isFinite(v.stock) && v.stock >= 0, { message: 'Stock must be 0 or more', path: ['stock'] })
 
@@ -49,6 +52,7 @@ interface ImportRow {
   name: string
   category: string
   mrp: string
+  rate: string
   stock: string
   product: Product | null
   errors: string[]
@@ -72,6 +76,7 @@ const buildRow = (raw: Record<string, unknown>, index: number, existingCodes: Se
     name: displayField(mapped, 'name'),
     category: displayField(mapped, 'category'),
     mrp: displayField(mapped, 'mrp'),
+    rate: displayField(mapped, 'rate'),
     stock: displayField(mapped, 'stock'),
   }
 
@@ -97,6 +102,7 @@ const buildRow = (raw: Record<string, unknown>, index: number, existingCodes: Se
       hsn: result.data.hsn,
       unit: result.data.unit,
       mrp: result.data.mrp,
+      rate: result.data.rate,
       gstRate: result.data.gstRate,
       stock: result.data.stock,
       lowStockThreshold: result.data.lowStockThreshold,
@@ -109,7 +115,7 @@ const downloadTemplate = () => {
   const wb = XLSX.utils.book_new()
   const ws = XLSX.utils.aoa_to_sheet([
     TEMPLATE_COLUMNS,
-    ['SKY-100', 'Sky Shot 10 Shots', 'Rockets', '36049000', 'box', 450, 18, 120, 20],
+    ['SKY-100', 'Sky Shot 10 Shots', 'Rockets', '36049000', 'box', 450, 99, 18, 120, 20],
   ])
   XLSX.utils.book_append_sheet(wb, ws, 'Products')
   XLSX.writeFile(wb, 'sparkline-product-import-template.xlsx')
@@ -177,7 +183,7 @@ export const BulkImportDialog = ({ open, onClose, existingCodes, onImport }: Bul
         {stage === 'upload' ? (
           <div className={styles.uploadStage}>
             <Typography variant="body2" color="text.secondary">
-              Columns expected: barcode, name, category, hsn, unit, mrp, gstRate, stock. lowStockThreshold is optional (defaults to 15).
+              Columns expected: barcode, name, category, hsn, unit, mrp, rate, gstRate, stock. lowStockThreshold is optional (defaults to 15).
             </Typography>
             <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={downloadTemplate}>
               Download template
@@ -216,6 +222,7 @@ export const BulkImportDialog = ({ open, onClose, existingCodes, onImport }: Bul
                     <TableCell>Name</TableCell>
                     <TableCell>Category</TableCell>
                     <TableCell align="right">MRP</TableCell>
+                    <TableCell align="right">Rate</TableCell>
                     <TableCell align="right">Stock</TableCell>
                     <TableCell>Status</TableCell>
                   </TableRow>
@@ -228,6 +235,7 @@ export const BulkImportDialog = ({ open, onClose, existingCodes, onImport }: Bul
                       <TableCell>{r.name}</TableCell>
                       <TableCell>{r.category}</TableCell>
                       <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{r.mrp}</Mono></TableCell>
+                      <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{r.rate}</Mono></TableCell>
                       <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{r.stock}</Mono></TableCell>
                       <TableCell>
                         {r.product ? (

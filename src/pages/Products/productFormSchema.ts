@@ -18,6 +18,7 @@ export const productFormSchema = (takenCodes: Set<string>, excludeCode: string |
     category: z.string().trim().min(1, 'Pick a category'),
     unit: z.string().trim().min(1, 'Unit is required'),
     mrp: positiveNumber('MRP must be a positive number'),
+    rate: positiveNumber('Rate must be a positive number'),
     stock: nonNegativeNumber('Stock must be 0 or more'),
   })
     .refine((v) => (productCategories as string[]).includes(v.category), { message: 'Pick a category', path: ['category'] })
@@ -32,11 +33,12 @@ export interface ProductFormValues {
   category: string
   unit: string
   mrp: string
+  rate: string
   stock: string
 }
 
 export const emptyProductForm = (): ProductFormValues => ({
-  code: '', name: '', category: '', unit: '', mrp: '', stock: '',
+  code: '', name: '', category: '', unit: '', mrp: '', rate: '', stock: '',
 })
 
 export const toProductFormValues = (p: Product): ProductFormValues => ({
@@ -45,6 +47,7 @@ export const toProductFormValues = (p: Product): ProductFormValues => ({
   category: p.category,
   unit: p.unit,
   mrp: String(p.mrp),
+  rate: String(p.rate),
   stock: String(p.stock),
 })
 
@@ -56,6 +59,7 @@ export const fromProductFormValues = (v: ProductFormValues, existing?: Product |
   category: v.category as ProductCategory,
   unit: v.unit.trim(),
   mrp: Number(v.mrp),
+  rate: Number(v.rate),
   stock: Number(v.stock),
   hsn: existing?.hsn ?? DEFAULT_HSN,
   gstRate: existing?.gstRate ?? DEFAULT_GST_RATE,

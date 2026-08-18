@@ -5,7 +5,7 @@ import { branches as seedBranches, shop as seedShop } from './shop'
 import { users as seedUsers } from './users'
 
 export interface AppData {
-  version: 3
+  version: 4
   shop: Shop
   branches: Branch[]
   users: User[]
@@ -13,10 +13,10 @@ export interface AppData {
   bills: Bill[]
 }
 
-const STORAGE_KEY = 'sparkline-billing:data:v3'
+const STORAGE_KEY = 'sparkline-billing:data:v4'
 
 const seedAppData = (): AppData => structuredClone({
-  version: 3 as const,
+  version: 4 as const,
   shop: seedShop,
   branches: seedBranches,
   users: seedUsers,
@@ -27,7 +27,7 @@ const seedAppData = (): AppData => structuredClone({
 const isAppData = (value: unknown): value is AppData => {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Partial<AppData>
-  return candidate.version === 3
+  return candidate.version === 4
     && Array.isArray(candidate.branches)
     && Array.isArray(candidate.users)
     && Array.isArray(candidate.products)
