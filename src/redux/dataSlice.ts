@@ -17,7 +17,15 @@ const dataSlice = createSlice({
       else state.products[index] = action.payload
     },
     importProducts: (state, action: PayloadAction<Product[]>) => {
-      state.products.push(...action.payload)
+      // Upsert: a barcode already in the catalogue is updated, not added twice.
+      for (const incoming of action.payload) {
+        const index = state.products.findIndex((item) => item.code.toUpperCase() === incoming.code.toUpperCase())
+        if (index === -1) state.products.push(incoming)
+        else state.products[index] = incoming
+      }
+    },
+    deleteProduct: (state, action: PayloadAction<string>) => {
+      state.products = state.products.filter((item) => item.code !== action.payload)
     },
     saveUser: (state, action: PayloadAction<User>) => {
       const index = state.users.findIndex((item) => item.id === action.payload.id)
@@ -51,5 +59,5 @@ const dataSlice = createSlice({
   },
 })
 
-export const { saveShop, saveProduct, importProducts, saveUser, saveBranch, billCreated, cancelBill } = dataSlice.actions
+export const { saveShop, saveProduct, importProducts, deleteProduct, saveUser, saveBranch, billCreated, cancelBill } = dataSlice.actions
 export default dataSlice.reducer

@@ -39,6 +39,11 @@
   color: var(--paid-ink);
 }
 
+.due {
+  background-color: var(--due-soft);
+  color: var(--due-ink);
+}
+
 .text {
   min-width: 0;
 }

@@ -38,7 +38,7 @@ export const Bills = () => {
     const billNo = cancellingBill.billNo
     // Cancelling also puts the stock back — that lives in the store, not here.
     cancelBill(billNo)
-    showToast(`Bill ${billNo} cancelled`, 'info')
+    showToast(`Bill ${billNo} cancelled`, 'warning')
     setCancellingBill(null)
   }
 

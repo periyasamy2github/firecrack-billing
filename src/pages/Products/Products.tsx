@@ -1,9 +1,10 @@
 ﻿import { useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { Mono } from '../../components/Mono'
@@ -11,34 +12,27 @@ import { StatusPill } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { TablePaginationBar } from '../../components/TablePaginationBar'
-import { BulkImportDialog } from './BulkImportDialog'
 import { ProductDialog } from './ProductDialog'
 import { productCategories, stockStatus } from '../../data/mockProducts'
 import { formatAmount } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { usePagination } from '../../hooks/usePagination'
+import { ROUTES } from '../../utils/routes'
 import { useToast } from '../../hooks/useToast'
 import type { Product, ProductCategory } from '../../types'
 import styles from './Products.module.css'
 
 const CATEGORY_KEYS = ['All', ...productCategories] as const
 
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className={styles.detailRow}>
-    <Typography className={styles.detailLabel}>{label}</Typography>
-    <Typography className={styles.detailValue}>{value}</Typography>
-  </div>
-)
-
 export const Products = () => {
-  const { branches, isSuperAdmin, products, importProducts, saveProduct } = useStoreScope()
+  const navigate = useNavigate()
+  const { branches, isSuperAdmin, products, importProducts, saveProduct, deleteProduct } = useStoreScope()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<ProductCategory | 'All'>('All')
-  const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const showToast = useToast()
 
@@ -68,9 +62,11 @@ export const Products = () => {
 
   const existingCodes = useMemo(() => new Set(products.map((p) => p.code.toUpperCase())), [products])
 
-  const handleImport = (rows: Product[]) => {
-    importProducts(rows)
-    showToast(`${rows.length} product${rows.length === 1 ? '' : 's'} imported`)
+  const confirmDelete = () => {
+    if (!deletingProduct) return
+    deleteProduct(deletingProduct.code)
+    showToast(`${deletingProduct.name} deleted`, 'warning')
+    setDeletingProduct(null)
   }
 
   const handleProductSubmit = (rows: Product[]) => {
@@ -91,7 +87,7 @@ export const Products = () => {
         crumb={isSuperAdmin ? `${products.length} items · shared catalog across ${branches.length} counters` : `${products.length} items · ${lowStockCount} running low`}
         actions={
           <>
-            {isSuperAdmin && <Button size="small" startIcon={<FileUploadOutlinedIcon />} onClick={() => setImportOpen(true)}>Import from Excel</Button>}
+            {isSuperAdmin && <Button size="small" startIcon={<FileUploadOutlinedIcon />} onClick={() => navigate(ROUTES.productImport)}>Import from Excel</Button>}
             {isSuperAdmin && <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setAddOpen(true)}>Add item</Button>}
           </>
         }
@@ -144,13 +140,15 @@ export const Products = () => {
                       </TableCell>
                       <TableCell><StatusPill tone={status.tone} label={status.label} /></TableCell>
                       <TableCell align="right">
-                        <Tooltip title="View">
-                          <IconButton size="small" onClick={() => setViewingProduct(p)}><VisibilityOutlinedIcon className={styles.actionIcon} /></IconButton>
-                        </Tooltip>
                         {isSuperAdmin && (
-                          <Tooltip title="Edit">
-                            <IconButton size="small" onClick={() => setEditingProduct(p)}><EditOutlinedIcon className={styles.actionIcon} /></IconButton>
-                          </Tooltip>
+                          <>
+                            <Tooltip title="Edit">
+                              <IconButton size="small" onClick={() => setEditingProduct(p)}><EditOutlinedIcon className={styles.actionIcon} /></IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <IconButton size="small" onClick={() => setDeletingProduct(p)}><DeleteOutlineRoundedIcon className={styles.actionIcon} /></IconButton>
+                            </Tooltip>
+                          </>
                         )}
                       </TableCell>
                     </TableRow>
@@ -164,12 +162,6 @@ export const Products = () => {
 
       {isSuperAdmin && (
         <>
-          <BulkImportDialog
-            open={importOpen}
-            onClose={() => setImportOpen(false)}
-            existingCodes={existingCodes}
-            onImport={handleImport}
-          />
           <ProductDialog
             key={editingProduct ? `edit-${editingProduct.code}` : 'add'}
             mode={editingProduct ? 'edit' : 'add'}
@@ -182,22 +174,19 @@ export const Products = () => {
         </>
       )}
 
-      <Dialog open={Boolean(viewingProduct)} onClose={() => setViewingProduct(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Product details</DialogTitle>
-        {viewingProduct && (
-          <DialogContent className={styles.dialogContentTop}>
-            <DetailRow label="Name" value={viewingProduct.name} />
-            <DetailRow label="Barcode" value={viewingProduct.code} />
-            <DetailRow label="Category" value={viewingProduct.category} />
-            <DetailRow label="Unit" value={viewingProduct.unit} />
-            <DetailRow label="MRP" value={formatAmount(viewingProduct.mrp)} />
-            <DetailRow label="Rate" value={formatAmount(viewingProduct.rate)} />
-            <DetailRow label="Stock" value={String(viewingProduct.stock)} />
-            <DetailRow label="Status" value={stockStatus(viewingProduct).label} />
+      <Dialog open={Boolean(deletingProduct)} onClose={() => setDeletingProduct(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Delete product?</DialogTitle>
+        {deletingProduct && (
+          <DialogContent>
+            <Typography color="text.secondary">
+              Remove <b>{deletingProduct.name}</b> ({deletingProduct.code}) from the catalogue? Bills already raised keep
+              their copy of the item.
+            </Typography>
           </DialogContent>
         )}
         <DialogActions className={styles.dialogActions}>
-          <Button onClick={() => setViewingProduct(null)}>Close</Button>
+          <Button onClick={() => setDeletingProduct(null)}>Keep product</Button>
+          <Button variant="contained" color="error" onClick={confirmDelete}>Delete</Button>
         </DialogActions>
       </Dialog>
     </>

@@ -2,7 +2,7 @@ import { Card, Typography } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import styles from './KpiCard.module.css'
 
-export type KpiTone = 'primary' | 'info' | 'ember' | 'paid'
+export type KpiTone = 'primary' | 'info' | 'ember' | 'paid' | 'due'
 
 interface KpiCardProps {
   label: string

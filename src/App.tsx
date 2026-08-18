@@ -14,6 +14,7 @@ const Bills = lazy(() => import('./pages/Bills/Bills'))
 const InvoicePrint = lazy(() => import('./pages/InvoicePrint/InvoicePrint'))
 const Reports = lazy(() => import('./pages/Reports/Reports'))
 const Products = lazy(() => import('./pages/Products/Products'))
+const ProductImport = lazy(() => import('./pages/ProductImport/ProductImport'))
 const Users = lazy(() => import('./pages/Users/Users'))
 const Counters = lazy(() => import('./pages/Counters/Counters'))
 const Settings = lazy(() => import('./pages/Settings/Settings'))
@@ -38,6 +39,7 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/unauthorized" element={<AccessDenied />} />
               <Route element={<RequireSuperAdmin />}>
+                <Route path="/products/import" element={<ProductImport />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/counters" element={<Counters />} />
                 <Route path="/settings" element={<Settings />} />
