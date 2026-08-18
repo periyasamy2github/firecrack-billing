@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
-import { Button, Chip, LinearProgress, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, LinearProgress, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
@@ -13,8 +13,7 @@ import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { Mono } from '../../components/Mono'
 import { KpiCard } from '../../components/KpiCard'
-import { StatusPill } from '../../components/StatusPill'
-import { TableCard, TableEmptyRow } from '../../components/TableCard'
+import { TableCard } from '../../components/TableCard'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useToast } from '../../hooks/useToast'
 import { formatInt } from '../../utils/format'
@@ -74,9 +73,6 @@ interface ImportRow {
   product: Product | null
   errors: string[]
 }
-
-const ROW_FILTERS = ['All', 'New', 'Updated', 'Errors'] as const
-type RowFilter = (typeof ROW_FILTERS)[number]
 
 const displayField = (mapped: Record<string, unknown>, key: string): string => {
   const v = mapped[key]
@@ -148,11 +144,6 @@ const downloadTemplate = () => {
 
 const STEPS = ['Choose file', 'Review rows', 'Import'] as const
 
-const OUTCOME_PILL: Record<Outcome, { label: string; tone: 'paid' | 'hold' | 'due' }> = {
-  new: { label: 'New', tone: 'paid' },
-  update: { label: 'Update', tone: 'hold' },
-  error: { label: 'Fix', tone: 'due' },
-}
 
 export const ProductImport = () => {
   const navigate = useNavigate()
@@ -162,10 +153,8 @@ export const ProductImport = () => {
   const [stage, setStage] = useState<'upload' | 'review' | 'importing' | 'done'>('upload')
   const [fileName, setFileName] = useState('')
   const [rows, setRows] = useState<ImportRow[]>([])
-  const [skipped, setSkipped] = useState(0)
   const [parseError, setParseError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<RowFilter>('All')
-  const [result, setResult] = useState<{ created: number; updated: number } | null>(null)
+  const [result, setResult] = useState<{ created: number; updated: number; skipped: number } | null>(null)
   const [processed, setProcessed] = useState(0)
   const importTimer = useRef<number | null>(null)
 
@@ -177,28 +166,22 @@ export const ProductImport = () => {
 
   const counts = useMemo(
     () => ({
-      New: rows.filter((r) => r.outcome === 'new').length,
-      Updated: rows.filter((r) => r.outcome === 'update').length,
-      Errors: rows.filter((r) => r.outcome === 'error').length,
-      All: rows.length,
+      created: rows.filter((r) => r.outcome === 'new').length,
+      updated: rows.filter((r) => r.outcome === 'update').length,
+      skipped: rows.filter((r) => r.outcome === 'error').length,
     }),
     [rows],
   )
 
-  const visibleRows = useMemo(() => {
-    if (filter === 'All') return rows
-    if (filter === 'New') return rows.filter((r) => r.outcome === 'new')
-    if (filter === 'Updated') return rows.filter((r) => r.outcome === 'update')
-    return rows.filter((r) => r.outcome === 'error')
-  }, [rows, filter])
+  // Review is a validation step: it reports what is wrong, nothing else.
+  const errorRows = useMemo(() => rows.filter((r) => r.outcome === 'error'), [rows])
+  const readyCount = counts.created + counts.updated
 
   const resetToUpload = () => {
     setStage('upload')
     setFileName('')
     setRows([])
-    setSkipped(0)
     setParseError(null)
-    setFilter('All')
     setResult(null)
     setProcessed(0)
   }
@@ -216,25 +199,19 @@ export const ProductImport = () => {
       const existingCodes = new Set(products.map((p) => p.code.toUpperCase()))
       const seenCodes = new Set<string>()
       const parsed: ImportRow[] = []
-      let blanks = 0
       raw.forEach((r, i) => {
         const row = buildRow(r, i, existingCodes, seenCodes)
         if (row) parsed.push({ ...row, index: parsed.length })
-        else blanks += 1
       })
       if (parsed.length === 0) throw new Error('Every row in this file is empty — check the column headings.')
 
       setFileName(file.name)
       setRows(parsed)
-      setSkipped(blanks)
-      setFilter('All')
       setStage('review')
     } catch (err) {
       setParseError(err instanceof Error ? err.message : 'Could not read this file.')
     }
   }
-
-  const queueLength = counts.New + counts.Updated
 
   /** Imports in batches so the bar tracks rows actually written, not a timer. */
   const startImport = () => {
@@ -258,26 +235,18 @@ export const ProductImport = () => {
       if (done >= queue.length) {
         if (importTimer.current) window.clearInterval(importTimer.current)
         importTimer.current = null
-        setResult({ created: counts.New, updated: counts.Updated })
+        setResult(counts)
         setStage('done')
-        showToast(`${counts.New} added · ${counts.Updated} updated`, 'success')
+        showToast(`${counts.created} added · ${counts.updated} updated`, 'success')
       }
     }, interval)
   }
-
-  const summary = (
-    <div className={styles.summaryGrid}>
-      <KpiCard label="New products" value={formatInt(result ? result.created : counts.New)} icon={AddCircleOutlineRoundedIcon} tone="paid" />
-      <KpiCard label="Updated products" value={formatInt(result ? result.updated : counts.Updated)} icon={AutorenewRoundedIcon} tone="info" />
-      <KpiCard label="Rows to fix" value={formatInt(counts.Errors)} icon={ErrorOutlineRoundedIcon} tone="due" />
-    </div>
-  )
 
   return (
     <>
       <PageHeader
         title="Import products"
-        crumb={fileName ? `${fileName} · ${counts.All} rows read${skipped > 0 ? ` · ${skipped} blank rows skipped` : ''}` : 'Bulk upload from an Excel or CSV file'}
+        crumb={fileName ? `${fileName} · ${formatInt(rows.length)} rows read` : 'Bulk upload from an Excel or CSV file'}
         actions={
           <>
             <Button size="small" disabled={stage === 'importing'} onClick={() => navigate(ROUTES.products)}>
@@ -316,7 +285,7 @@ export const ProductImport = () => {
               />
               <FileUploadOutlinedIcon className={styles.dropZoneIcon} />
               <Typography className={styles.dropZoneTitle}>Choose an Excel or CSV file</Typography>
-              <Typography variant="caption">.xlsx, .xls or .csv — nothing is saved until you review it</Typography>
+              <Typography variant="caption">.xlsx, .xls or .csv — nothing is saved until you start the import</Typography>
             </label>
 
             <div className={styles.helpPanel}>
@@ -338,75 +307,58 @@ export const ProductImport = () => {
 
         {stage === 'review' && (
           <>
-            {summary}
-
-            <div className={styles.filterRow}>
-              {ROW_FILTERS.map((key) => (
-                <Chip
-                  key={key}
-                  label={`${key} ${formatInt(counts[key])}`}
-                  size="small"
-                  onClick={() => setFilter(key)}
-                  color={filter === key ? 'primary' : undefined}
-                  variant={filter === key ? 'filled' : 'outlined'}
-                />
-              ))}
-              <div className={styles.filterSpacer} />
-              <Button size="small" onClick={resetToUpload}>Choose a different file</Button>
+            <div className={`${styles.reviewBanner} ${errorRows.length === 0 ? styles.reviewBannerOk : styles.reviewBannerWarn}`}>
+              {errorRows.length === 0
+                ? <CheckCircleOutlineRoundedIcon className={styles.reviewIcon} />
+                : <ErrorOutlineRoundedIcon className={styles.reviewIcon} />}
+              <div>
+                <Typography className={styles.reviewTitle}>
+                  {errorRows.length === 0
+                    ? 'Every row is ready to import'
+                    : `${formatInt(errorRows.length)} row${errorRows.length === 1 ? '' : 's'} need fixing`}
+                </Typography>
+                <Typography className={styles.reviewBody}>
+                  {errorRows.length === 0
+                    ? `${formatInt(rows.length)} rows checked, nothing to fix.`
+                    : `Listed below and skipped on import. The other ${formatInt(readyCount)} row${readyCount === 1 ? '' : 's'} go through.`}
+                </Typography>
+              </div>
             </div>
 
-            <TableCard>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell>Barcode</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell align="right">MRP</TableCell>
-                    <TableCell align="right">Rate</TableCell>
-                    <TableCell align="right">Stock</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {visibleRows.map((row) => {
-                    const pill = OUTCOME_PILL[row.outcome]
-                    return (
+            {errorRows.length > 0 && (
+              <TableCard>
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Row</TableCell>
+                      <TableCell>Barcode</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>What needs fixing</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {errorRows.map((row) => (
                       <TableRow key={row.index} hover>
                         <TableCell className={styles.rowIndex}>{row.index + 1}</TableCell>
                         <TableCell><Mono sx={{ fontSize: 12 }}>{row.code}</Mono></TableCell>
                         <TableCell>{row.name}</TableCell>
-                        <TableCell>{row.category}</TableCell>
-                        <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{row.mrp}</Mono></TableCell>
-                        <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{row.rate}</Mono></TableCell>
-                        <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{row.stock}</Mono></TableCell>
-                        <TableCell>
-                          {row.errors.length > 0 ? (
-                            <Tooltip title={row.errors.join(', ')}>
-                              <span><StatusPill tone={pill.tone} dot={false} label={pill.label} /></span>
-                            </Tooltip>
-                          ) : (
-                            <StatusPill tone={pill.tone} dot={false} label={pill.label} />
-                          )}
-                        </TableCell>
+                        <TableCell><Typography className={styles.errorReason}>{row.errors.join(' · ')}</Typography></TableCell>
                       </TableRow>
-                    )
-                  })}
-                  {visibleRows.length === 0 && <TableEmptyRow colSpan={8} message={`No ${filter.toLowerCase()} rows in this file.`} />}
-                </TableBody>
-              </Table>
-            </TableCard>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableCard>
+            )}
 
             <div className={styles.actionBar}>
               <Typography variant="caption" className={styles.actionNote}>
-                {queueLength > 0
-                  ? `${formatInt(counts.New)} will be added and ${formatInt(counts.Updated)} updated. Rows to fix are skipped.`
+                {readyCount > 0
+                  ? `${formatInt(readyCount)} row${readyCount === 1 ? '' : 's'} will be imported from ${fileName}.`
                   : 'Nothing can be imported until at least one row is fixed.'}
               </Typography>
               <div className={styles.filterSpacer} />
               <Button onClick={resetToUpload}>Choose a different file</Button>
-              <Button variant="contained" size="large" disabled={queueLength === 0} onClick={startImport}>
+              <Button variant="contained" size="large" disabled={readyCount === 0} onClick={startImport}>
                 Start import
               </Button>
             </div>
@@ -418,16 +370,16 @@ export const ProductImport = () => {
             <div className={styles.progressHead}>
               <Typography className={styles.progressTitle}>Importing products</Typography>
               <div className={styles.filterSpacer} />
-              <Mono sx={{ fontSize: 13, fontWeight: 700 }}>{Math.round((processed / Math.max(queueLength, 1)) * 100)}%</Mono>
+              <Mono sx={{ fontSize: 13, fontWeight: 700 }}>{Math.round((processed / Math.max(readyCount, 1)) * 100)}%</Mono>
             </div>
             <LinearProgress
               variant="determinate"
-              value={(processed / Math.max(queueLength, 1)) * 100}
+              value={(processed / Math.max(readyCount, 1)) * 100}
               className={styles.progressBar}
               aria-label="Import progress"
             />
             <Typography variant="caption" role="status" aria-live="polite" className={styles.progressMeta}>
-              {formatInt(processed)} of {formatInt(queueLength)} rows written · {fileName}
+              {formatInt(processed)} of {formatInt(readyCount)} rows written · {fileName}
             </Typography>
           </div>
         )}
@@ -438,17 +390,18 @@ export const ProductImport = () => {
               <CheckCircleOutlineRoundedIcon className={styles.doneIcon} />
               <div>
                 <Typography className={styles.doneTitle}>Import finished</Typography>
-                <Typography className={styles.doneBody}>
-                  {fileName} · {formatInt(result.created)} added, {formatInt(result.updated)} updated
-                  {counts.Errors > 0 ? `, ${formatInt(counts.Errors)} skipped for fixing` : ''}.
-                </Typography>
+                <Typography className={styles.doneBody}>{fileName} · {formatInt(rows.length)} rows read</Typography>
               </div>
               <div className={styles.filterSpacer} />
               <Button variant="contained" onClick={() => navigate(ROUTES.products)}>View products</Button>
               <Button onClick={resetToUpload}>Import another file</Button>
             </div>
 
-            {summary}
+            <div className={styles.summaryGrid}>
+              <KpiCard label="New products" value={formatInt(result.created)} icon={AddCircleOutlineRoundedIcon} tone="paid" />
+              <KpiCard label="Updated products" value={formatInt(result.updated)} icon={AutorenewRoundedIcon} tone="info" />
+              <KpiCard label="Rows skipped" value={formatInt(result.skipped)} icon={ErrorOutlineRoundedIcon} tone="due" />
+            </div>
           </>
         )}
       </PageContent>
