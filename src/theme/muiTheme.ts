@@ -6,10 +6,10 @@ export const buildMuiTheme = (): Theme =>
     palette: {
       mode: 'light',
       primary: { main: t.primary, contrastText: t.onPrimary },
-      secondary: { main: t.secondary, contrastText: '#241905' },
-      success: { main: t.paid, contrastText: '#04210F' },
+      secondary: { main: t.secondary, contrastText: '#FFFFFF' },
+      success: { main: t.paid, contrastText: '#FFFFFF' },
       error: { main: t.due, contrastText: '#FFFFFF' },
-      warning: { main: t.ember, contrastText: '#2A1503' },
+      warning: { main: t.ember, contrastText: '#FFFFFF' },
       info: { main: t.info, contrastText: '#FFFFFF' },
       background: { default: t.bg, paper: t.card },
       text: { primary: t.ink, secondary: t.muted },

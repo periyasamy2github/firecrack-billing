@@ -113,10 +113,10 @@ export const AppLayout = () => {
             size="small"
             className={styles.branchSelect}
             sx={{
-              '& .MuiOutlinedInput-notchedOutline': { borderColor: `${t.secondary}55` },
-              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'secondary.main' },
-              '& .MuiSelect-select': { py: 0.85 },
-              '& .MuiSvgIcon-root': { color: 'secondary.main' },
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: t.railLine },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.35)' },
+              '& .MuiSelect-select': { py: 0.85, color: '#fff' },
+              '& .MuiSvgIcon-root': { color: t.railFg },
             }}
             MenuProps={{ PaperProps: { sx: { bgcolor: 'background.paper', color: 'text.primary' } } }}
           >
