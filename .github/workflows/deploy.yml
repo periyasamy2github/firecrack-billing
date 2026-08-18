@@ -1,21 +1,23 @@
 name: Deploy to GitHub Pages
 
+# Publishes the built site to the gh-pages branch, which GitHub Pages serves.
+# (actions/configure-pages can't turn Pages on with the default token, so the
+# branch route is the one that works without changing repository settings.)
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,24 +31,12 @@ jobs:
 
       - run: npm run build
 
-      # GitHub Pages has no SPA rewrite rule, so a deep link like /bills would 404.
+      # Pages has no SPA rewrite rule, so a deep link like /bills would 404.
       # Serving the same app as 404.html lets the client-side router take over.
       - run: cp dist/index.html dist/404.html
 
-      - uses: actions/configure-pages@v5
+      - uses: peaceiris/actions-gh-pages@v4
         with:
-          enablement: true
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
