@@ -119,7 +119,6 @@ export const Bills = () => {
                 <TableRow>
                   <TableCell>Bill no.</TableCell>
                   {viewingAll && <TableCell>Counter</TableCell>}
-                  <TableCell>Time</TableCell>
                   <TableCell>Customer</TableCell>
                   <TableCell align="right">Items</TableCell>
                   <TableCell align="right">Qty</TableCell>
@@ -128,6 +127,8 @@ export const Bills = () => {
                   <TableCell align="right">Total</TableCell>
                   <TableCell>Payment</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Created</TableCell>
+                  <TableCell>Created by</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -139,7 +140,6 @@ export const Bills = () => {
                     <TableRow key={bill.billNo} hover>
                       <TableCell><Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono></TableCell>
                       {viewingAll && <TableCell><Typography className={styles.counterCell}>{bill.counter}</Typography></TableCell>}
-                      <TableCell><Mono sx={{ color: 'text.secondary' }}>{bill.time}</Mono></TableCell>
                       <TableCell>
                         <Typography className={styles.customerName}>{bill.customerName || 'Walk-in'}</Typography>
                         {bill.customerMobile && <Mono sx={{ fontSize: 10.5, color: 'text.secondary' }}>{bill.customerMobile}</Mono>}
@@ -166,6 +166,11 @@ export const Bills = () => {
                           {bill.status === 'Paid' && !bill.gstApplicable && <StatusPill tone="mut" dot={false} label="No GST" />}
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <Mono sx={{ fontSize: 11.5 }}>{bill.date}</Mono>
+                        <Mono sx={{ display: 'block', fontSize: 10.5, color: 'text.secondary' }}>{bill.time}</Mono>
+                      </TableCell>
+                      <TableCell><Typography className={styles.counterCell}>{bill.billedBy}</Typography></TableCell>
                       <TableCell align="right">
                         <div className={styles.actionsRow}>
                           <Tooltip title="View">
@@ -192,7 +197,7 @@ export const Bills = () => {
                     </TableRow>
                   )
                 })}
-                {filtered.length === 0 && <TableEmptyRow colSpan={viewingAll ? 12 : 11} message="No bills match this search." />}
+                {filtered.length === 0 && <TableEmptyRow colSpan={viewingAll ? 13 : 12} message="No bills match this search." />}
               </TableBody>
             </Table>
         </TableCard>

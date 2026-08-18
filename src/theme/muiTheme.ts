@@ -69,6 +69,17 @@ export const buildMuiTheme = (): Theme =>
           },
         },
       },
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            fontFamily: fontFamily.heading,
+            fontSize: 18,
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+            padding: '16px 20px 13px',
+          },
+        },
+      },
       MuiChip: {
         styleOverrides: {
           root: { fontWeight: 700, fontSize: 10.5 },

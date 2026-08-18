@@ -1,4 +1,4 @@
-﻿import { Dialog, IconButton, Typography } from '@mui/material'
+﻿import { Dialog, DialogTitle, IconButton, Typography } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined'
 import { KeyBadge } from './KeyBadge'
@@ -23,14 +23,14 @@ interface ShortcutsDialogProps {
 
 export const ShortcutsDialog = ({ open, onClose, groups }: ShortcutsDialogProps) => (
   <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
-    <div className={styles.header}>
+    <DialogTitle className={styles.header}>
       <KeyboardOutlinedIcon className={styles.headerIcon} />
-      <Typography className={styles.title}>Keyboard shortcuts</Typography>
+      Keyboard shortcuts
       <div className={styles.spacer} />
       <IconButton size="small" onClick={onClose} aria-label="Close shortcuts">
-        <CloseRoundedIcon sx={{ fontSize: 18 }} />
+        <CloseRoundedIcon sx={{ fontSize: 19 }} />
       </IconButton>
-    </div>
+    </DialogTitle>
 
     <div className={styles.body}>
       {/* Columns rather than one tall list, so every shortcut is on screen at once. */}
