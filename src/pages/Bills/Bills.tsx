@@ -12,7 +12,6 @@ import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { TablePaginationBar } from '../../components/TablePaginationBar'
-import { Toast } from '../../components/Toast'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { BILL_FILTERS, matchesFilter, matchesSearch, type BillFilter } from '../../utils/billFilters'
@@ -20,6 +19,7 @@ import { ROUTES, billPrintPath } from '../../utils/routes'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { usePagination } from '../../hooks/usePagination'
+import { useToast } from '../../hooks/useToast'
 import type { Bill } from '../../types'
 import styles from './Bills.module.css'
 
@@ -30,7 +30,7 @@ export const Bills = () => {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<BillFilter>('All')
   const [cancellingBill, setCancellingBill] = useState<Bill | null>(null)
-  const [snackbar, setSnackbar] = useState('')
+  const showToast = useToast()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const confirmCancel = () => {
@@ -38,7 +38,7 @@ export const Bills = () => {
     const billNo = cancellingBill.billNo
     // Cancelling also puts the stock back — that lives in the store, not here.
     cancelBill(billNo)
-    setSnackbar(`Bill ${billNo} cancelled`)
+    showToast(`Bill ${billNo} cancelled`, 'info')
     setCancellingBill(null)
   }
 
@@ -217,7 +217,6 @@ export const Bills = () => {
           <Button variant="contained" color="error" onClick={confirmCancel}>Cancel bill</Button>
         </DialogActions>
       </Dialog>
-      <Toast open={Boolean(snackbar)} severity="info" message={snackbar} onClose={() => setSnackbar('')} />
     </>
   )
 }

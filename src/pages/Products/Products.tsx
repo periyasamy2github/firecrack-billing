@@ -13,12 +13,12 @@ import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { TablePaginationBar } from '../../components/TablePaginationBar'
 import { BulkImportDialog } from './BulkImportDialog'
 import { ProductDialog } from './ProductDialog'
-import { Toast } from '../../components/Toast'
 import { productCategories, stockStatus, netRate } from '../../data/mockProducts'
 import { formatAmount } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { usePagination } from '../../hooks/usePagination'
+import { useToast } from '../../hooks/useToast'
 import type { Product, ProductCategory } from '../../types'
 import styles from './Products.module.css'
 
@@ -39,8 +39,8 @@ export const Products = () => {
   const [addOpen, setAddOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
-  const [snackbar, setSnackbar] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const showToast = useToast()
 
   useKeyShortcuts({
     '/': () => searchInputRef.current?.focus(),
@@ -70,17 +70,17 @@ export const Products = () => {
 
   const handleImport = (rows: Product[]) => {
     importProducts(rows)
-    setSnackbar(`${rows.length} product${rows.length === 1 ? '' : 's'} imported`)
+    showToast(`${rows.length} product${rows.length === 1 ? '' : 's'} imported`)
   }
 
   const handleProductSubmit = (rows: Product[]) => {
     if (editingProduct) {
       saveProduct(rows[0])
-      setSnackbar(`${rows[0].name} updated`)
+      showToast(`${rows[0].name} updated`)
       setEditingProduct(null)
     } else {
       importProducts(rows)
-      setSnackbar(`${rows.length} product${rows.length === 1 ? '' : 's'} added`)
+      showToast(`${rows.length} product${rows.length === 1 ? '' : 's'} added`)
     }
   }
 
@@ -200,7 +200,6 @@ export const Products = () => {
           <Button onClick={() => setViewingProduct(null)}>Close</Button>
         </DialogActions>
       </Dialog>
-      <Toast open={Boolean(snackbar)} message={snackbar} onClose={() => setSnackbar('')} />
     </>
   )
 }

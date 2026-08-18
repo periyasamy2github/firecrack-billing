@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
 import { RouteProgress, PageLoader } from './components/RouteProgress'
 import { RequireAuth, RequireSuperAdmin } from './components/RouteGuards'
+import { GlobalToast } from './components/GlobalToast'
 
 // Each page loads as its own chunk — the top bar shows while it downloads.
 const Login = lazy(() => import('./pages/Login/Login'))
@@ -46,6 +47,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      <GlobalToast />
     </BrowserRouter>
   )
 }

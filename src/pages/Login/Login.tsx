@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { Autocomplete, Button, Divider, TextField, Typography } from '@mui/material'
 import { AuthShell } from '../../components/AuthShell'
-import { Toast } from '../../components/Toast'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../hooks/useToast'
 import type { User } from '../../types'
 import { ROUTES } from '../../utils/routes'
 import styles from './Login.module.css'
@@ -20,8 +20,8 @@ export const Login = () => {
   const [staffUser, setStaffUser] = useState<User | null>(null)
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
-  const [helpOpen, setHelpOpen] = useState(false)
   const { errors, validate, clearError } = useFormValidation(loginSchema)
+  const showToast = useToast()
   const findBranchByName = (name: string) => branches.find((branch) => branch.name === name)
 
   const handleSignIn = (e: React.FormEvent) => {
@@ -111,11 +111,10 @@ export const Login = () => {
         </Button>
 
         <div className={styles.footerRow}>
-          <Button type="button" variant="text" size="small" onClick={() => setHelpOpen(true)} className={styles.footerLink}>Forgot password?</Button>
+          <Button type="button" variant="text" size="small" onClick={() => showToast('Ask a Super Admin to reset your password.', 'info')} className={styles.footerLink}>Forgot password?</Button>
           <Typography className={styles.footerVersion}>v1.0 · Season 2026</Typography>
         </div>
       </form>
-      <Toast open={helpOpen} severity="info" message="Ask a Super Admin to reset your password." onClose={() => setHelpOpen(false)} />
     </AuthShell>
   )
 }

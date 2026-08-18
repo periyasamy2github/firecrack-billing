@@ -63,8 +63,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
+  padding: 6px !important;
 }
 
 .optionLeft {
@@ -79,8 +78,9 @@
 .optionMetaRow {
   display: flex;
   align-items: center;
-  gap: 4.8px;
-  margin-top: 1.6px;
+  gap: 1px;
+  margin: 0 1.6px;
+  cursor: pointer;
 }
 
 .optionUnit {

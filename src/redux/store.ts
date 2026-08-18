@@ -3,11 +3,13 @@ import { useDispatch as useReduxDispatch, useSelector as useReduxSelector, type 
 import { saveAppData } from '../data/appData'
 import dataReducer from './dataSlice'
 import sessionReducer, { saveSession } from './sessionSlice'
+import uiReducer from './uiSlice'
 
 export const store = configureStore({
   reducer: {
     data: dataReducer,
     session: sessionReducer,
+    ui: uiReducer,
   },
 })
 

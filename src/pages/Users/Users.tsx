@@ -14,11 +14,11 @@ import { StatusPill } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { TablePaginationBar } from '../../components/TablePaginationBar'
-import { Toast } from '../../components/Toast'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { usePagination } from '../../hooks/usePagination'
 import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../hooks/useToast'
 import type { User, UserRole } from '../../types'
 import styles from './Users.module.css'
 
@@ -77,8 +77,8 @@ export const Users = () => {
   const [resettingUser, setResettingUser] = useState<User | null>(null)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [snackbar, setSnackbar] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const showToast = useToast()
 
   useKeyShortcuts({ '/': () => searchInputRef.current?.focus() })
 
@@ -156,7 +156,7 @@ export const Users = () => {
         counters: form.role === 'Super Admin' ? [] : form.counters,
         active: form.active,
       })
-      setSnackbar(`${form.name.trim()} updated`)
+      showToast(`${form.name.trim()} updated`)
     } else {
       persistUser({
         id: `U${Date.now()}`,
@@ -171,7 +171,7 @@ export const Users = () => {
         active: true,
         joinedOn: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
       })
-      setSnackbar(`${form.name.trim()} added`)
+      showToast(`${form.name.trim()} added`)
     }
     closeForm()
   }
@@ -188,7 +188,7 @@ export const Users = () => {
   const saveNewPassword = () => {
     if (!resettingUser || !validateResetPw({ newPassword, confirmPassword })) return
     persistUser({ ...resettingUser, password: newPassword })
-    setSnackbar(`Password reset for ${resettingUser.name}`)
+    showToast(`Password reset for ${resettingUser.name}`)
     closeReset()
   }
 
@@ -447,7 +447,6 @@ export const Users = () => {
         </DialogActions>
       </Dialog>
 
-      <Toast open={Boolean(snackbar)} message={snackbar} onClose={() => setSnackbar('')} />
     </>
   )
 }

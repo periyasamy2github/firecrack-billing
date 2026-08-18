@@ -9,7 +9,6 @@ import { PageContent } from '../../components/PageContent'
 import { Panel } from '../../components/Panel'
 import { Mono } from '../../components/Mono'
 import { KeyBadge } from '../../components/KeyBadge'
-import { Toast } from '../../components/Toast'
 import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
 import type { BillDiscountType, BillLineItem, PaymentMethod } from '../../types'
@@ -22,6 +21,7 @@ import { billPrintPath } from '../../utils/routes'
 import { useStoreScope, type NewBillInput } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../hooks/useToast'
 import styles from './NewBill.module.css'
 
 // The discount bound depends on whether it's a % or a flat ₹ amount, so the schema
@@ -59,12 +59,12 @@ export const NewBill = () => {
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [billDiscountValue, setBillDiscountValue] = useState('')
   const [tendered, setTendered] = useState('')
-  const [snackbar, setSnackbar] = useState<{ message: string; severity: 'success' | 'error' }>({ message: '', severity: 'success' })
   const [nowTick, setNowTick] = useState(Date.now())
 
   const billDiscount = billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined
   const totals = computeBillTotals(items, gstApplicable, billDiscount)
   const { errors, validate, clearError, reset: resetErrors } = useFormValidation(newBillSchema(billDiscountType))
+  const showToast = useToast()
 
   useEffect(() => {
     const id = window.setInterval(() => setNowTick(Date.now()), 1000)
@@ -120,7 +120,7 @@ export const NewBill = () => {
   }
 
   const failed = (err: unknown) =>
-    setSnackbar({ message: err instanceof Error ? err.message : 'Could not save this bill', severity: 'error' })
+    showToast(err instanceof Error ? err.message : 'Could not save this bill', 'error')
 
   const saveAndPrint = () => {
     if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
@@ -144,7 +144,7 @@ export const NewBill = () => {
     if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
     try {
       const bill = createBill(buildBillInput())
-      setSnackbar({ message: `Bill ${bill.billNo} saved without printing`, severity: 'success' })
+      showToast(`Bill ${bill.billNo} saved without printing`)
       clearBill()
     } catch (err) {
       failed(err)
@@ -323,12 +323,6 @@ export const NewBill = () => {
         <Typography className={styles.shortcutLabel}>Elapsed on this bill {elapsedLabel()}</Typography>
       </div>
 
-      <Toast
-        open={Boolean(snackbar.message)}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar((prev) => ({ ...prev, message: '' }))}
-      />
     </>
   )
 }

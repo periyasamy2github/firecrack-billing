@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { Button, Card, TextField, Typography } from '@mui/material'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
-import { Toast } from '../../components/Toast'
 import { useStoreScope } from '../../hooks/useStoreScope'
+import { useToast } from '../../hooks/useToast'
 import styles from './Settings.module.css'
 
 const SettingsSection = ({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) => (
@@ -40,7 +40,7 @@ export const Settings = () => {
     seasonTarget: String(shop.seasonTarget),
   })
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({})
-  const [snackbar, setSnackbar] = useState('')
+  const showToast = useToast()
 
   const setField = (key: keyof typeof form, value: string) => {
     setForm((f) => ({ ...f, [key]: value }))
@@ -67,7 +67,7 @@ export const Settings = () => {
       declaration: form.declaration,
       seasonTarget: Number(result.data.seasonTarget),
     })
-    setSnackbar('Settings saved')
+    showToast('Settings saved')
   }
 
   return (
@@ -127,7 +127,6 @@ export const Settings = () => {
         </Card>
       </PageContent>
 
-      <Toast open={Boolean(snackbar)} message={snackbar} onClose={() => setSnackbar('')} />
     </>
   )
 }
