@@ -9,7 +9,7 @@ export interface SessionState {
   currentBranchId: BranchScope
 }
 
-const SESSION_KEY = 'sparkline-billing:session:v2'
+const SESSION_KEY = 'sparkbill:session:v1'
 
 const emptySession = (): SessionState => ({
   currentUserId: null,

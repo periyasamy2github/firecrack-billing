@@ -13,7 +13,7 @@ export interface AppData {
   bills: Bill[]
 }
 
-const STORAGE_KEY = 'sparkline-billing:data:v4'
+const STORAGE_KEY = 'sparkbill:data:v1'
 
 const seedAppData = (): AppData => structuredClone({
   version: 4 as const,

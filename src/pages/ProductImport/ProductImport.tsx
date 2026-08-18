@@ -143,7 +143,7 @@ const downloadTemplate = () => {
     ['SKY-100', 'Sky Shot 10 Shots', 'Rockets', '36049000', 'box', 450, 99, 18, 120, 20],
   ])
   XLSX.utils.book_append_sheet(wb, ws, 'Products')
-  XLSX.writeFile(wb, 'sparkline-product-import-template.xlsx')
+  XLSX.writeFile(wb, 'sparkbill-product-import-template.xlsx')
 }
 
 const STEPS = ['Choose file', 'Review rows', 'Import'] as const

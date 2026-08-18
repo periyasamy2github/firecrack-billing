@@ -89,7 +89,7 @@ export const Login = () => {
             <TextField
               {...params}
               label="Email address"
-              placeholder="you@sparkline.app"
+              placeholder="you@sparkbill.app"
               size="medium"
               autoFocus
               required

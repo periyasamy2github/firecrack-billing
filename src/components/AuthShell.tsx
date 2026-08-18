@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material'
-import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import type { ReactNode } from 'react'
+import { BrandMark } from './BrandMark'
 import { FireworksArt } from './FireworksArt'
 import { useStoreScope } from '../hooks/useStoreScope'
 import styles from './AuthShell.module.css'
@@ -37,9 +37,9 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
 
         <div className={styles.brandRow}>
           <div className={styles.logo}>
-            <AutoAwesomeRoundedIcon className={styles.logoIcon} />
+            <BrandMark className={styles.logoIcon} />
           </div>
-          <Typography className={styles.brandName}>Sparkline</Typography>
+          <Typography className={styles.brandName}>SparkBill</Typography>
         </div>
 
         <div className={styles.pitch}>
@@ -75,9 +75,9 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
           {/* Stands in for the brand panel once it is hidden on narrow screens. */}
           <div className={styles.compactBrand}>
             <div className={styles.logo}>
-              <AutoAwesomeRoundedIcon className={styles.logoIcon} />
+              <BrandMark className={styles.logoIcon} />
             </div>
-            <Typography className={styles.compactBrandName}>Sparkline</Typography>
+            <Typography className={styles.compactBrandName}>SparkBill</Typography>
           </div>
 
           {children}

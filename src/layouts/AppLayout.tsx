@@ -1,7 +1,6 @@
 ﻿import { Suspense, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Avatar, IconButton, MenuItem, Select, Tooltip, Typography } from '@mui/material'
-import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined'
@@ -14,6 +13,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined'
 import type { SvgIconComponent } from '@mui/icons-material'
+import { BrandMark } from '../components/BrandMark'
 import { useTokens } from '../theme/ThemeModeContext'
 import { useStoreScope } from '../hooks/useStoreScope'
 import { ShortcutsDialog } from '../components/ShortcutsDialog'
@@ -98,10 +98,10 @@ export const AppLayout = () => {
       <aside className={`${styles.aside} no-print`}>
         <div className={isSuperAdmin ? `${styles.brandRow} ${styles.brandRowCompact}` : styles.brandRow}>
           <div className={styles.logo}>
-            <AutoAwesomeRoundedIcon className={styles.logoIcon} />
+            <BrandMark className={styles.logoIcon} />
           </div>
           <div className={styles.brandText}>
-            <Typography className={styles.brandName}>Sparkline</Typography>
+            <Typography className={styles.brandName}>SparkBill</Typography>
             <Typography noWrap className={styles.brandSubtitle}>{brandSubtitle}</Typography>
           </div>
         </div>
