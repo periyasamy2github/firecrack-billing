@@ -1,0 +1,1 @@
+import{o as e,r as t}from"./useStoreScope-BnCWMCfd.js";var n=()=>{let n=t();return(t,r=`success`)=>n(e({message:t,severity:r}))};export{n as t};
