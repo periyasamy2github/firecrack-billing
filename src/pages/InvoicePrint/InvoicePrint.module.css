@@ -1,0 +1,106 @@
+.grid {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.sidebarStack {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarTitle {
+  padding: 0 2px 2px;
+}
+
+.formatRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8.8px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8.8px;
+}
+
+.formatRowActive {
+  border-color: var(--primary);
+  background-color: var(--primary-soft);
+}
+
+.formatIcon {
+  font-size: 16px;
+  color: var(--primary);
+  margin-top: 1.6px;
+}
+
+.formatTitle {
+  font-size: 12px;
+  font-weight: 640;
+}
+
+.printerSection {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.printerStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8.8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggleRowText {
+  flex: 1;
+}
+
+.toggleRowLabel {
+  font-size: 12px;
+}
+
+.downloadButton {
+  margin-top: 4px;
+}
+
+.previewCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.previewCaption {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.previewCaptionThermal {
+  max-width: 290px;
+}
+
+.formatNote {
+  color: var(--muted);
+  padding: 2px 4px 4px;
+  line-height: 1.4;
+}
+
+.previewCaptionA4 {
+  max-width: 820px;
+}
+
+.a4Wrap {
+  width: 100%;
+  max-width: 820px;
+}

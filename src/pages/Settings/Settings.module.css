@@ -1,0 +1,35 @@
+.section {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section:last-child {
+  border-bottom: 0;
+}
+
+.sectionDesc {
+  display: block;
+  /* Clears the floating label of the first field in each section. */
+  margin-bottom: 22px;
+}
+
+.fieldsGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.addressField {
+  grid-column: 1 / -1;
+}
+
+.numberGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.targetField {
+  max-width: 260px;
+}

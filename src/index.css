@@ -1,0 +1,87 @@
+/* Mirrors src/theme/tokens.ts — CSS Modules read colors/fonts from here instead of sx. */
+:root {
+  --ink: #171a21;
+  --muted: #5b6270;
+  --muted-soft: #8890a0;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --surface: #f1f3f6;
+  --inset: #eceff3;
+  --line: #e1e5eb;
+  --line-soft: #eaedf1;
+  --primary: #2e56b0;
+  --primary-soft: #e8eefa;
+  --on-primary: #ffffff;
+  --secondary: #9c7423;
+  --secondary-soft: #faf0dc;
+  --ember: #96591f;
+  --ember-soft: #faeede;
+  --ember-ink: #6b3f14;
+  --paid: #1e7f52;
+  --paid-soft: #e3f4ec;
+  --paid-ink: #155c3b;
+  --due: #a93c36;
+  --due-soft: #fae7e5;
+  --due-ink: #7a2823;
+  --info: #35529c;
+  --rail-bg: #12151b;
+  --rail-fg: #a7adbc;
+  --rail-active: #1c212b;
+  --rail-line: #262c37;
+  --glow-primary: 0 0 14px rgba(46, 86, 176, 0.18);
+  --gradient-brand: linear-gradient(135deg, #4a73cc 0%, #1f3d82 100%);
+
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-heading: 'Space Grotesk', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+
+  /* MUI's default palette.action tints (light theme) — used by hover rows, footers, etc. */
+  --action-hover: rgba(0, 0, 0, 0.04);
+  --action-selected: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Top loading bar — brand sapphire-to-amber, above every MUI layer */
+#nprogress .bar {
+  background: linear-gradient(90deg, #4a73cc, #d9a94e);
+  height: 3px;
+  z-index: 2000;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px rgba(74, 115, 204, 0.7), 0 0 5px rgba(217, 169, 78, 0.7);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body,
+  html,
+  #root {
+    background: #fff !important;
+    height: auto !important;
+  }
+}

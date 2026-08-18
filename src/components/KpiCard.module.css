@@ -1,0 +1,19 @@
+.card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2px;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  /* Indian-format lakh figures are long — let the number shrink rather than clip. */
+  font-size: clamp(17px, 2.1vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

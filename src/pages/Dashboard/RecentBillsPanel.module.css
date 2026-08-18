@@ -1,0 +1,9 @@
+.viewAll {
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.counterCaption {
+  display: block;
+}

@@ -1,0 +1,32 @@
+.idCol {
+  width: 28px;
+}
+
+.qtyCol {
+  width: 76px;
+}
+
+.actionCol {
+  width: 32px;
+}
+
+.itemName {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.numberField {
+  width: 64px;
+}
+
+.numberInput {
+  text-align: right;
+  font-size: 12.5px;
+  padding: 5px 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.removeIcon {
+  font-size: 15px;
+  color: var(--muted);
+}

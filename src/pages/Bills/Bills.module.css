@@ -1,0 +1,53 @@
+.filterCard {
+  padding: 12px;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.footerBar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  background-color: var(--action-hover);
+}
+
+.footerSpacer {
+  flex: 1;
+}
+
+.counterCell {
+  font-size: 12px;
+}
+
+.customerName {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.mutedCell {
+  color: var(--muted);
+}
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.actionIcon {
+  font-size: 15px;
+}

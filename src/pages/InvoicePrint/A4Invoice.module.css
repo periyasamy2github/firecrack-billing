@@ -1,0 +1,236 @@
+.sheet {
+  background-color: #fff;
+  color: #15202e;
+  border: 1px solid #c9d2de;
+  box-shadow: 0 2px 4px rgba(16, 26, 43, 0.05), 0 18px 40px -18px rgba(16, 26, 43, 0.28);
+  padding: 22px;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1.5px solid #15202e;
+  padding-bottom: 10px;
+}
+
+.shopName {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: 2px;
+}
+
+.shopAddress {
+  font-size: 9.5px;
+  color: #4a5768;
+}
+
+.copyLabel {
+  font-size: 8.5px;
+  color: #66748a;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+
+.invoiceTitle {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 7.2px 0;
+  border-bottom: 1px solid #c9d2de;
+}
+
+.cancelledBanner {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #a93c36;
+  border: 2px solid #a93c36;
+  padding: 4.8px 0;
+  margin-top: 8px;
+}
+
+.partyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #c9d2de;
+}
+
+.partyCell {
+  padding: 10px;
+}
+
+.partyCellRight {
+  padding: 10px;
+  border-left: 1px solid #c9d2de;
+}
+
+.partyLabel {
+  font-size: 8.5px;
+  color: #66748a;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.partyName {
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.partyMeta {
+  font-size: 9.5px;
+  color: #4a5768;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metaValue {
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.itemsTable td,
+.itemsTable th {
+  font-size: 9.5px;
+  padding: 4px 6px;
+  border: 1px solid #dde4ec !important;
+}
+
+.headCell {
+  background-color: #eef2f7;
+  color: #3a4658;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.footCell {
+  background-color: #f6f8fb;
+}
+
+.footCellBold {
+  background-color: #f6f8fb;
+  font-weight: 700;
+}
+
+.summaryGrid {
+  display: grid;
+  gap: 12px;
+  margin-top: 8.8px;
+}
+
+.summaryGridGst {
+  grid-template-columns: 1fr 210px;
+}
+
+.summaryGridNoGst {
+  grid-template-columns: 1fr;
+}
+
+.hsnTable {
+  margin-top: 4px;
+}
+
+.hsnTable td,
+.hsnTable th {
+  font-size: 9px;
+  padding: 3px 6px;
+  border: 1px solid #dde4ec !important;
+}
+
+.hsnHeadCell {
+  background-color: #eef2f7;
+  color: #3a4658;
+}
+
+.wordsBox {
+  border: 1px solid #c9d2de;
+  padding: 4.8px 8px;
+  font-size: 9.5px;
+}
+
+.wordsBoxGstTop {
+  margin-top: 8px;
+}
+
+.wordsBoxNoGstTop {
+  margin-top: 0;
+}
+
+.wordsValue {
+  font-weight: 700;
+  font-size: 9.5px;
+}
+
+.chargesTable td {
+  font-size: 9.5px;
+  padding: 3px 6px;
+  border: 1px solid #dde4ec !important;
+}
+
+.chargesTableNoGst {
+  width: 260px;
+}
+
+.grandTotalLabelCell {
+  background-color: #f6f8fb;
+  font-weight: 700;
+}
+
+.grandTotalValueCell {
+  background-color: #f6f8fb;
+  font-weight: 700;
+  font-size: 11.5px !important;
+}
+
+.noGstRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 8.8px;
+  border-top: 1px solid #c9d2de;
+  font-size: 8.5px;
+  color: #4a5768;
+}
+
+.declaration {
+  font-size: 8.5px;
+  max-width: 56%;
+}
+
+.signatureBlock {
+  text-align: right;
+  min-width: 150px;
+}
+
+.forShopLabel {
+  font-size: 8.5px;
+  color: #66748a;
+  text-transform: uppercase;
+}
+
+.signatureGap {
+  height: 34px;
+}
+
+.signatureText {
+  font-size: 9px;
+  font-weight: 700;
+}

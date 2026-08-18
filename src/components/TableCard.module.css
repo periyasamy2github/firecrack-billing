@@ -1,0 +1,12 @@
+.card {
+  overflow: hidden;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.emptyCell {
+  padding: 32px 0;
+  color: var(--muted);
+}

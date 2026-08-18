@@ -1,0 +1,40 @@
+.dialogContentTop {
+  padding-top: 8px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rowCard {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.rowLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.removeIcon {
+  font-size: 15px;
+}
+
+.addRowButton {
+  align-self: flex-start;
+}
+
+.dialogActions {
+  padding: 0 24px 20px;
+}
