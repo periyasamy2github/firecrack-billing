@@ -42,13 +42,13 @@
   font-weight: 640;
 }
 
-.printerSection {
+.optionsSection {
   border-top: 1px solid var(--line);
   margin-top: 8px;
   padding-top: 10px;
 }
 
-.printerStack {
+.optionsStack {
   display: flex;
   flex-direction: column;
   gap: 8.8px;

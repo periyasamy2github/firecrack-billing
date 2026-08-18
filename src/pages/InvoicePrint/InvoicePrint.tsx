@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, MenuItem, Switch, TextField, Typography } from '@mui/material'
+import { Button, Card, Switch, Typography } from '@mui/material'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
@@ -103,16 +103,8 @@ export const InvoicePrint = () => {
                 </Typography>
               )}
 
-              <div className={styles.printerSection}>
-                <div className={styles.printerStack}>
-                  <TextField label="Copies" select size="small" defaultValue="original">
-                    <MenuItem value="original">Original for Recipient</MenuItem>
-                    <MenuItem value="duplicate">Duplicate</MenuItem>
-                  </TextField>
-                  <TextField label="Printer" select size="small" defaultValue="tvs">
-                    <MenuItem value="tvs">TVS RP 3230 (80mm)</MenuItem>
-                    {bill.gstApplicable && <MenuItem value="laser">Office Laser (A4)</MenuItem>}
-                  </TextField>
+              <div className={styles.optionsSection}>
+                <div className={styles.optionsStack}>
                   <div className={styles.toggleRow}>
                     <div className={styles.toggleRowText}>
                       <Typography className={styles.toggleRowLabel}>Include UPI QR</Typography>
