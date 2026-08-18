@@ -1,18 +1,66 @@
 .card {
-  padding: 14px;
+  padding: 15px 17px;
   display: flex;
-  flex-direction: column;
-  gap: 3.2px;
+  align-items: center;
+  gap: 14px;
 }
 
-.value {
+.iconTile {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+/* Nested so MUI's own SvgIcon sizing doesn't win the specificity tie. */
+.iconTile .icon {
+  font-size: 21px;
+}
+
+.primary {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+}
+
+.info {
+  background-color: var(--primary-soft);
+  color: var(--info);
+}
+
+.ember {
+  background-color: var(--ember-soft);
+  color: var(--ember-ink);
+}
+
+.paid {
+  background-color: var(--paid-soft);
+  color: var(--paid-ink);
+}
+
+.text {
+  min-width: 0;
+}
+
+/* Parent-scoped: MUI ships font sizes on .MuiTypography-* and is injected later. */
+.text .label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-soft);
+  line-height: 1.2;
+}
+
+.text .value {
+  margin-top: 3px;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  /* Indian-format lakh figures are long — let the number shrink rather than clip. */
-  font-size: clamp(17px, 2.1vw, 24px);
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

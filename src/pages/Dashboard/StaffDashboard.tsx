@@ -1,5 +1,9 @@
 ﻿import { Button } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined'
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
 import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
@@ -31,10 +35,10 @@ export const StaffDashboard = () => {
       />
       <PageContent>
         <div className={styles.kpiGrid}>
-          <KpiCard label="Sales today" value={formatCurrency(data.kpis.salesToday)} />
-          <KpiCard label="Bills today" value={formatInt(data.kpis.billsToday)} />
-          <KpiCard label="Average bill" value={formatCurrency(data.kpis.avgBill)} />
-          <KpiCard label="GST collected" value={formatCurrency(data.kpis.gstCollected)} />
+          <KpiCard label="Sales today" value={formatCurrency(data.kpis.salesToday)} icon={PaymentsOutlinedIcon} />
+          <KpiCard label="Bills today" value={formatInt(data.kpis.billsToday)} icon={ReceiptLongOutlinedIcon} tone="info" />
+          <KpiCard label="Average bill" value={formatCurrency(data.kpis.avgBill)} icon={ShoppingBagOutlinedIcon} tone="ember" />
+          <KpiCard label="GST collected" value={formatCurrency(data.kpis.gstCollected)} icon={AccountBalanceOutlinedIcon} tone="paid" />
         </div>
 
         <RecentBillsPanel bills={recentBills} showCounter={false} />

@@ -1,5 +1,9 @@
 ﻿import { Button, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined'
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -44,10 +48,10 @@ export const SuperAdminDashboard = () => {
       />
       <PageContent>
         <div className={styles.kpiGrid}>
-          <KpiCard label={viewingAll ? 'Total sales today' : 'Sales today'} value={formatCurrency(data.kpis.salesToday)} />
-          <KpiCard label="Bills today" value={formatInt(data.kpis.billsToday)} />
-          <KpiCard label="Average bill" value={formatCurrency(data.kpis.avgBill)} />
-          <KpiCard label="GST collected" value={formatCurrency(data.kpis.gstCollected)} />
+          <KpiCard label={viewingAll ? 'Total sales today' : 'Sales today'} value={formatCurrency(data.kpis.salesToday)} icon={PaymentsOutlinedIcon} />
+          <KpiCard label="Bills today" value={formatInt(data.kpis.billsToday)} icon={ReceiptLongOutlinedIcon} tone="info" />
+          <KpiCard label="Average bill" value={formatCurrency(data.kpis.avgBill)} icon={ShoppingBagOutlinedIcon} tone="ember" />
+          <KpiCard label="GST collected" value={formatCurrency(data.kpis.gstCollected)} icon={AccountBalanceOutlinedIcon} tone="paid" />
         </div>
 
         {viewingAll && (
