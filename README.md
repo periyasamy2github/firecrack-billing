@@ -6,19 +6,19 @@ A counter billing app for a single fireworks shop: GST tax invoices and bills of
 
 ## Demo logins
 
-Pick the account from the dropdown on the sign-in screen — the password fills in for you, and any password is accepted (there is no backend yet).
+Pick the account from the email dropdown on the sign-in screen — the password fills in for you, and any password is accepted (there is no backend yet).
 
-| Staff ID | Password | Role | What you see |
+| Email | Password | Role | What you see |
 |---|---|---|---|
-| `ADMIN` | `admin123` | Super Admin | Everything — all counters, Users, Counters, Settings |
-| `USER` | `user123` | Counter Staff | Counter 1 only, straight to the dashboard |
-| `MULTI` | `multi123` | Counter Staff | Two counters, so the counter picker appears after sign-in |
-| `WHOLESALE` | `wholesale123` | Counter Staff | Counter 3 (wholesale desk) |
-| `INACTIVE` | — | Counter Staff | Deactivated — hidden from the sign-in list, visible on the Users page |
+| `admin@sparkline.app` | `admin123` | Super Admin | Everything — all counters, Users, Counters, Settings |
+| `user@sparkline.app` | `user123` | Counter Staff | Counter 1 only, straight to the dashboard |
+| `multi@sparkline.app` | `multi123` | Counter Staff | Two counters, so the counter picker appears after sign-in |
+| `jhone.doe@sparkline.app` | `wholesale123` | Counter Staff | Counter 3 (wholesale desk) |
+| `inactive@sparkline.app` | — | Counter Staff | Deactivated — kept out of the sign-in list, visible on the Users page |
 
 ## What to try
 
-1. Sign in as `ADMIN`, open **New Bill**, type an item code (`SPK-30`, `FLP-07S`, …) or use the barcode-scanner-friendly search, then `Enter` to add a line.
+1. Sign in as `admin@sparkline.app`, open **New Bill**, type an item code (`SPK-30`, `FLP-07S`, …) or use the barcode-scanner-friendly search, then `Enter` to add a line.
 2. `F9` saves and prints, `F10` saves without printing. `F1` lists every shortcut.
 3. Check **Bills** — the bill is there, the invoice number has advanced, and **Products** shows stock reduced by what you sold.
 4. Cancel a bill from the Bills list — the stock goes back.

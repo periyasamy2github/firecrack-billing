@@ -27,6 +27,7 @@ import styles from './Users.module.css'
 const userSchema = (users: User[], editingId: string | null, isNew: boolean) =>
   z.object({
     name: z.string().trim().min(1, 'Name is required'),
+    email: z.string().trim().min(1, 'Email is required').email('Enter a valid email'),
     staffId: z.string().trim().min(1, 'Staff ID is required'),
     mobile: z.string().trim().min(1, 'Mobile is required'),
     password: z.string(),
@@ -38,6 +39,7 @@ const userSchema = (users: User[], editingId: string | null, isNew: boolean) =>
     .refine((v) => !isNew || v.password.length >= 4, { message: 'At least 4 characters', path: ['password'] })
     .refine((v) => !isNew || v.password === v.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
     .refine((v) => !users.some((u) => u.staffId.toLowerCase() === v.staffId.toLowerCase() && u.id !== editingId), { message: 'That staff ID is already in use', path: ['staffId'] })
+    .refine((v) => !users.some((u) => u.email.toLowerCase() === v.email.trim().toLowerCase() && u.id !== editingId), { message: 'That email is already in use', path: ['email'] })
 
 const resetPasswordSchema = z.object({
   newPassword: z.string().min(4, 'At least 4 characters'),
@@ -107,7 +109,7 @@ export const Users = () => {
       name: u.name,
       staffId: u.staffId,
       mobile: u.mobile,
-      email: u.email ?? '',
+      email: u.email,
       password: '',
       confirmPassword: '',
       role: u.role,
@@ -135,6 +137,7 @@ export const Users = () => {
   const saveUser = () => {
     const valid = validate({
       name: form.name,
+      email: form.email,
       staffId: form.staffId,
       mobile: form.mobile,
       password: form.password,
@@ -151,7 +154,7 @@ export const Users = () => {
         initials: initialsFrom(form.name),
         staffId: form.staffId.trim(),
         mobile: form.mobile.trim(),
-        email: form.email.trim() || undefined,
+        email: form.email.trim(),
         role: form.role,
         counters: form.role === 'Super Admin' ? [] : form.counters,
         active: form.active,
@@ -164,7 +167,7 @@ export const Users = () => {
         initials: initialsFrom(form.name),
         staffId: form.staffId.trim(),
         mobile: form.mobile.trim(),
-        email: form.email.trim() || undefined,
+        email: form.email.trim(),
         password: form.password,
         role: form.role,
         counters: form.role === 'Super Admin' ? [] : form.counters,
@@ -302,7 +305,15 @@ export const Users = () => {
               error={Boolean(errors.mobile)}
               helperText={errors.mobile || ' '}
             />
-            <TextField label="Email — optional" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} fullWidth />
+            <TextField
+              label="Email — used to sign in"
+              value={form.email}
+              onChange={(e) => { setForm((f) => ({ ...f, email: e.target.value })); clearError('email') }}
+              fullWidth
+              required
+              error={Boolean(errors.email)}
+              helperText={errors.email || ' '}
+            />
             {!editingUser && (
               <>
                 <TextField
@@ -402,7 +413,7 @@ export const Users = () => {
             <DetailRow label="Name" value={viewingUser.name} />
             <DetailRow label="Staff ID" value={viewingUser.staffId} />
             <DetailRow label="Mobile" value={viewingUser.mobile} />
-            <DetailRow label="Email" value={viewingUser.email || '—'} />
+            <DetailRow label="Email" value={viewingUser.email} />
             <DetailRow label="Role" value={viewingUser.role} />
             <DetailRow label="Counters" value={viewingUser.role === 'Super Admin' ? 'All counters' : viewingUser.counters.join(', ') || '—'} />
             <DetailRow label="Joined on" value={viewingUser.joinedOn} />

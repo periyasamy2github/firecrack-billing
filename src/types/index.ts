@@ -36,7 +36,8 @@ export interface User {
   initials: string
   staffId: string
   mobile: string
-  email?: string
+  /** The sign-in credential. */
+  email: string
   password: string
   role: UserRole
   /** Counters this user can bill from. Empty for Super Admin — they aren't tied to one. */

@@ -1,0 +1,51 @@
+.art {
+  position: absolute;
+  top: 84px;
+  right: 24px;
+  width: min(56%, 380px);
+  height: auto;
+  /* Behind the panel text, above the panel background. */
+  z-index: -1;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.burst {
+  opacity: 0.85;
+}
+
+.spark {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+.spark:nth-of-type(2n) {
+  animation-delay: 0.8s;
+}
+
+.spark:nth-of-type(3n) {
+  animation-delay: 1.6s;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 1100px) {
+  .art {
+    top: 70px;
+    width: 62%;
+  }
+}

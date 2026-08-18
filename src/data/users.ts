@@ -2,7 +2,6 @@ import type { User } from '../types'
 import { counters } from './shop'
 
 // Demo logins. Names and staff IDs say plainly what each account is for.
-// There is no backend yet, so any password is accepted at sign-in.
 export const users: User[] = [
   { id: 'U1', name: 'Admin User', initials: 'AU', staffId: 'ADMIN', mobile: '9000000001', email: 'admin@sparkline.app', password: 'admin123', role: 'Super Admin', counters: [], active: true, joinedOn: '02 Jan 2023' },
   { id: 'U2', name: 'Counter User', initials: 'CU', staffId: 'USER', mobile: '9000000002', email: 'user@sparkline.app', password: 'user123', role: 'Counter Staff', counters: [counters[0]], active: true, joinedOn: '14 Jun 2023' },

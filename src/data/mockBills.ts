@@ -250,7 +250,7 @@ const counter3Specs: BillSpec[] = [
 ]
 
 export const bills: Bill[] = [
-  ...buildBills(counter1Specs, { branchId: 'c1', date: DATE, counter: 'Counter 1 — Entrance', billedBy: 'Counter User' }),
-  ...buildBills(counter2Specs, { branchId: 'c2', date: DATE, counter: 'Counter 2 — Main hall', billedBy: 'Multi Counter User' }),
-  ...buildBills(counter3Specs, { branchId: 'c3', date: DATE, counter: 'Counter 3 — Wholesale desk', billedBy: 'Wholesale User' }),
+  ...buildBills(counter1Specs, { branchId: 'c1', date: DATE, counter: 'Erode', billedBy: 'Counter User' }),
+  ...buildBills(counter2Specs, { branchId: 'c2', date: DATE, counter: 'Chennai', billedBy: 'Multi Counter User' }),
+  ...buildBills(counter3Specs, { branchId: 'c3', date: DATE, counter: 'Kovai', billedBy: 'Wholesale User' }),
 ]
