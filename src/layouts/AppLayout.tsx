@@ -166,7 +166,7 @@ export const AppLayout = () => {
               onClick={() => { signOut(); navigate(ROUTES.login) }}
               className={styles.signOutButton}
             >
-              <LogoutOutlinedIcon sx={{ fontSize: 18 }} />
+              <LogoutOutlinedIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Tooltip>
         </div>

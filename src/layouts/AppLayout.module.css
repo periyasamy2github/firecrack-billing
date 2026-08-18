@@ -131,22 +131,28 @@
 .userRow {
   display: flex;
   align-items: center;
-  gap: 8.8px;
+  gap: 8px;
   border-top: 1px solid var(--rail-line);
-  padding: 10px 4.8px 0;
+  padding: 10px 2px 0;
+  overflow: hidden;
 }
 
-.avatarRing {
-  padding: 2px;
-  border-radius: 50%;
-  background-image: var(--gradient-brand);
-  flex: 0 0 30px;
-}
-
-.avatar {
+/* Nested selectors on purpose: MUI injects its Avatar and IconButton styles after
+   this stylesheet, so a single class ties on specificity and loses — which sized
+   the avatar to MUI's 40px default and pushed the sign-out button off the rail. */
+.userRow .avatarRing {
   width: 26px;
   height: 26px;
-  font-size: 10.5px;
+  flex: 0 0 26px;
+  padding: 1.5px;
+  border-radius: 50%;
+  background-image: var(--gradient-brand);
+}
+
+.userRow .avatar {
+  width: 23px;
+  height: 23px;
+  font-size: 9.5px;
   font-weight: 700;
   background-color: var(--rail-bg);
   color: #fff;
@@ -196,17 +202,19 @@
   text-overflow: ellipsis;
 }
 
-/* Icon-only control on a dark rail — needs a real hit area and enough contrast to be seen. */
-.signOutButton {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+/* Icon-only control on a dark rail — needs contrast to be seen, and a fixed box
+   so it always sits inside the 220px rail. */
+.userRow .signOutButton {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
   color: #fff;
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-.signOutButton:hover {
+.userRow .signOutButton:hover {
   background-color: var(--due);
   border-color: var(--due);
   color: #fff;
