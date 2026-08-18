@@ -1,4 +1,4 @@
-﻿import { Dialog, IconButton, Stack, Typography } from '@mui/material'
+﻿import { Dialog, IconButton, Typography } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined'
 import { KeyBadge } from './KeyBadge'
@@ -22,7 +22,7 @@ interface ShortcutsDialogProps {
 }
 
 export const ShortcutsDialog = ({ open, onClose, groups }: ShortcutsDialogProps) => (
-  <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
+  <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
     <div className={styles.header}>
       <KeyboardOutlinedIcon className={styles.headerIcon} />
       <Typography className={styles.title}>Keyboard shortcuts</Typography>
@@ -33,24 +33,25 @@ export const ShortcutsDialog = ({ open, onClose, groups }: ShortcutsDialogProps)
     </div>
 
     <div className={styles.body}>
-      <Stack spacing={2}>
+      {/* Columns rather than one tall list, so every shortcut is on screen at once. */}
+      <div className={styles.columns}>
         {groups.map((group) => (
-          <div key={group.title}>
+          <div key={group.title} className={styles.group}>
             <Typography variant="subtitle2" className={styles.groupTitle}>{group.title}</Typography>
-            <Stack spacing={1}>
+            <div className={styles.items}>
               {group.items.map((item) => (
-                <Stack key={item.key} direction="row" alignItems="center" spacing={1.5}>
+                <div key={item.key} className={styles.item}>
                   <KeyBadge label={item.key} />
                   <div className={styles.itemLabel}>
                     <Typography className={styles.itemText}>{item.label}</Typography>
                     {item.hint && <Typography variant="caption">{item.hint}</Typography>}
                   </div>
-                </Stack>
+                </div>
               ))}
-            </Stack>
+            </div>
           </div>
         ))}
-      </Stack>
+      </div>
     </div>
   </Dialog>
 )
