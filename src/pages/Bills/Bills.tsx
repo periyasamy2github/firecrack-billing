@@ -66,7 +66,7 @@ export const Bills = () => {
   const paidTotals = filtered.filter((b) => b.status === 'Paid').reduce(
     (acc, b) => {
       const t = getBillTotals(b)
-      acc.discount += t.discount
+      acc.discount += t.billDiscountAmount
       acc.gst += t.cgst + t.sgst
       acc.grand += t.grandTotal
       return acc
@@ -147,7 +147,7 @@ export const Bills = () => {
                       <TableCell align="right"><Mono>{totals.itemCount}</Mono></TableCell>
                       <TableCell align="right"><Mono>{totals.qtyCount}</Mono></TableCell>
                       <TableCell align="right">
-                        {isFinalised ? <Mono sx={{ color: 'warning.dark' }}>{formatCurrency(totals.discount)}</Mono> : <Typography className={styles.mutedCell}>—</Typography>}
+                        {isFinalised && totals.billDiscountAmount > 0 ? <Mono sx={{ color: 'warning.dark' }}>{formatCurrency(totals.billDiscountAmount)}</Mono> : <Typography className={styles.mutedCell}>—</Typography>}
                       </TableCell>
                       <TableCell align="right">
                         {isFinalised && bill.gstApplicable ? <Mono>{formatCurrency(totals.cgst + totals.sgst)}</Mono> : <Typography className={styles.mutedCell}>—</Typography>}

@@ -13,7 +13,7 @@ import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { TablePaginationBar } from '../../components/TablePaginationBar'
 import { BulkImportDialog } from './BulkImportDialog'
 import { ProductDialog } from './ProductDialog'
-import { productCategories, stockStatus, netRate } from '../../data/mockProducts'
+import { productCategories, stockStatus } from '../../data/mockProducts'
 import { formatAmount } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
@@ -119,8 +119,7 @@ export const Products = () => {
                   <TableCell>Item name</TableCell>
                   <TableCell>Category</TableCell>
                   <TableCell>Unit</TableCell>
-                  <TableCell align="right">MRP</TableCell>
-                  <TableCell align="right">Net rate</TableCell>
+                  <TableCell align="right">Rate</TableCell>
                   <TableCell align="right">Stock</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell align="right" />
@@ -135,8 +134,7 @@ export const Products = () => {
                       <TableCell><Typography className={styles.itemName}>{p.name}</Typography></TableCell>
                       <TableCell>{p.category}</TableCell>
                       <TableCell className={styles.unitCell}>{p.unit}</TableCell>
-                      <TableCell align="right"><Mono>{formatAmount(p.mrp)}</Mono></TableCell>
-                      <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(netRate(p))}</Mono></TableCell>
+                      <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(p.mrp)}</Mono></TableCell>
                       <TableCell align="right">
                         <Mono sx={{ fontWeight: 650, color: status.tone === 'due' ? 'var(--due)' : status.tone === 'hold' ? 'var(--ember-ink)' : 'var(--ink)' }}>
                           {p.stock}
@@ -156,7 +154,7 @@ export const Products = () => {
                     </TableRow>
                   )
                 })}
-                {filtered.length === 0 && <TableEmptyRow colSpan={9} message="No products match this search." />}
+                {filtered.length === 0 && <TableEmptyRow colSpan={8} message="No products match this search." />}
               </TableBody>
             </Table>
         </TableCard>
@@ -190,8 +188,7 @@ export const Products = () => {
             <DetailRow label="Barcode" value={viewingProduct.code} />
             <DetailRow label="Category" value={viewingProduct.category} />
             <DetailRow label="Unit" value={viewingProduct.unit} />
-            <DetailRow label="MRP" value={formatAmount(viewingProduct.mrp)} />
-            <DetailRow label="Net rate" value={formatAmount(netRate(viewingProduct))} />
+            <DetailRow label="Rate" value={formatAmount(viewingProduct.mrp)} />
             <DetailRow label="Stock" value={String(viewingProduct.stock)} />
             <DetailRow label="Status" value={stockStatus(viewingProduct).label} />
           </DialogContent>

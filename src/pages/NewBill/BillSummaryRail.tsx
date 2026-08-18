@@ -77,8 +77,7 @@ export const BillSummaryRail = ({
       </div>
 
       <div className={styles.sumList}>
-        <SumRow label="Gross (MRP value)" value={formatAmount(totals.gross)} />
-        <SumRow label={`Item discount · ${totals.avgDiscountPct.toFixed(1)}%`} value={`− ${formatAmount(totals.discount)}`} negative />
+        <SumRow label="Sub-total" value={formatAmount(totals.gross)} />
 
         <div className={styles.billDiscountRow}>
           <Typography className={styles.billDiscountLabel}>Bill discount</Typography>

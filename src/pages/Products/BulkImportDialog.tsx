@@ -11,7 +11,7 @@ import styles from './BulkImportDialog.module.css'
 
 const CATEGORIES: ProductCategory[] = ['Sparklers', 'Flower Pots', 'Chakkar', 'Rockets', 'Bombs', 'Fancy', 'Gift Boxes']
 
-const TEMPLATE_COLUMNS = ['barcode', 'name', 'category', 'hsn', 'unit', 'mrp', 'gstRate', 'defaultDiscountPct', 'stock', 'lowStockThreshold']
+const TEMPLATE_COLUMNS = ['barcode', 'name', 'category', 'hsn', 'unit', 'mrp', 'gstRate', 'stock', 'lowStockThreshold']
 
 const HEADER_ALIASES: Record<string, string> = {
   barcode: 'code', code: 'code', 'product code': 'code', sku: 'code',
@@ -21,8 +21,6 @@ const HEADER_ALIASES: Record<string, string> = {
   unit: 'unit',
   mrp: 'mrp',
   gst: 'gstRate', gstrate: 'gstRate', 'gst rate': 'gstRate', 'gst%': 'gstRate', 'gst %': 'gstRate',
-  discount: 'defaultDiscountPct', 'default discount': 'defaultDiscountPct', 'defaultdiscountpct': 'defaultDiscountPct',
-  'discount%': 'defaultDiscountPct', 'discount %': 'defaultDiscountPct', 'suggested disc': 'defaultDiscountPct',
   stock: 'stock', qty: 'stock', quantity: 'stock',
   'low stock threshold': 'lowStockThreshold', 'lowstockthreshold': 'lowStockThreshold', 'reorder level': 'lowStockThreshold', threshold: 'lowStockThreshold',
 }
@@ -37,14 +35,12 @@ const importRowSchema = z.object({
   unit: z.string().trim().min(1, 'Unit is required'),
   mrp: z.coerce.number(),
   gstRate: z.coerce.number(),
-  defaultDiscountPct: z.coerce.number(),
   stock: z.coerce.number(),
   lowStockThreshold: z.coerce.number(),
 })
   .refine((v) => CATEGORIES.includes(v.category as ProductCategory), { message: `Category must be one of: ${CATEGORIES.join(', ')}`, path: ['category'] })
   .refine((v) => Number.isFinite(v.mrp) && v.mrp > 0, { message: 'MRP must be a positive number', path: ['mrp'] })
   .refine((v) => Number.isFinite(v.gstRate) && v.gstRate >= 0, { message: 'GST rate must be 0 or more', path: ['gstRate'] })
-  .refine((v) => Number.isFinite(v.defaultDiscountPct) && v.defaultDiscountPct >= 0 && v.defaultDiscountPct <= 100, { message: 'Discount must be between 0 and 100', path: ['defaultDiscountPct'] })
   .refine((v) => Number.isFinite(v.stock) && v.stock >= 0, { message: 'Stock must be 0 or more', path: ['stock'] })
 
 interface ImportRow {
@@ -102,7 +98,6 @@ const buildRow = (raw: Record<string, unknown>, index: number, existingCodes: Se
       unit: result.data.unit,
       mrp: result.data.mrp,
       gstRate: result.data.gstRate,
-      defaultDiscountPct: result.data.defaultDiscountPct,
       stock: result.data.stock,
       lowStockThreshold: result.data.lowStockThreshold,
     },
@@ -114,7 +109,7 @@ const downloadTemplate = () => {
   const wb = XLSX.utils.book_new()
   const ws = XLSX.utils.aoa_to_sheet([
     TEMPLATE_COLUMNS,
-    ['SKY-100', 'Sky Shot 10 Shots', 'Rockets', '36049000', 'box', 450, 18, 10, 120, 20],
+    ['SKY-100', 'Sky Shot 10 Shots', 'Rockets', '36049000', 'box', 450, 18, 120, 20],
   ])
   XLSX.utils.book_append_sheet(wb, ws, 'Products')
   XLSX.writeFile(wb, 'sparkline-product-import-template.xlsx')
@@ -182,7 +177,7 @@ export const BulkImportDialog = ({ open, onClose, existingCodes, onImport }: Bul
         {stage === 'upload' ? (
           <div className={styles.uploadStage}>
             <Typography variant="body2" color="text.secondary">
-              Columns expected: barcode, name, category, hsn, unit, mrp, gstRate, defaultDiscountPct, stock. lowStockThreshold is optional (defaults to 15).
+              Columns expected: barcode, name, category, hsn, unit, mrp, gstRate, stock. lowStockThreshold is optional (defaults to 15).
             </Typography>
             <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={downloadTemplate}>
               Download template

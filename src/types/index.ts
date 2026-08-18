@@ -53,7 +53,6 @@ export interface Product {
   unit: string
   mrp: number
   gstRate: number
-  defaultDiscountPct: number
   stock: number
   lowStockThreshold: number
 }
@@ -62,7 +61,6 @@ export interface BillLineItem {
   lineId: string
   product: Product
   qty: number
-  discountPct: number
 }
 
 export type PaymentMethod = 'Cash' | 'UPI' | 'Card'
@@ -91,13 +89,12 @@ export interface Bill {
   reprintCount: number
   /** Off produces a plain Bill of Supply — no CGST/SGST, no tax columns. */
   gstApplicable: boolean
-  /** Extra discount on top of each item's own discount — e.g. a loyalty or festival offer. */
+  /** The one discount on a bill — the shop's flat festival offer, percent or rupees. */
   billDiscount?: BillDiscount
 }
 
 export interface BillTotals {
   gross: number
-  discount: number
   billDiscountAmount: number
   taxable: number
   cgst: number
@@ -106,5 +103,4 @@ export interface BillTotals {
   grandTotal: number
   itemCount: number
   qtyCount: number
-  avgDiscountPct: number
 }

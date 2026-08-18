@@ -63,7 +63,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 6px !important;
+  cursor: pointer;
+  padding-left: 6px !important;
+  padding-top: 6px !important;
+  border-bottom: 1px solid var(--line);
 }
 
 .optionLeft {
@@ -76,11 +79,11 @@
 }
 
 .optionMetaRow {
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 1px;
-  margin: 0 1.6px;
-  cursor: pointer;
+  gap: 0px;
+  margin-top: 1px;
 }
 
 .optionUnit {

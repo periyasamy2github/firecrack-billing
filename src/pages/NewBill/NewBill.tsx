@@ -13,7 +13,7 @@ import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
 import type { BillDiscountType, BillLineItem, PaymentMethod } from '../../types'
 import type { Product } from '../../types'
-import { netRate, stockStatus } from '../../data/mockProducts'
+import { stockStatus } from '../../data/mockProducts'
 import { formatAmount, formatBillDate, formatBillTime } from '../../utils/format'
 import { newBillShortcuts } from '../../data/shortcuts'
 import { computeBillTotals } from '../../utils/billing'
@@ -76,7 +76,7 @@ export const NewBill = () => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.code === product.code)
       if (existing) return prev.map((i) => (i.lineId === existing.lineId ? { ...i, qty: i.qty + 1 } : i))
-      return [...prev, { lineId: `L${nextLineId.current++}`, product, qty: 1, discountPct: product.defaultDiscountPct }]
+      return [...prev, { lineId: `L${nextLineId.current++}`, product, qty: 1 }]
     })
     setQuery('')
   }
@@ -84,7 +84,6 @@ export const NewBill = () => {
   // Never let a line exceed what's on the shelf — createBill rejects the whole bill otherwise.
   const updateQty = (lineId: string, qty: number) =>
     setItems((prev) => prev.map((i) => (i.lineId === lineId ? { ...i, qty: Math.min(qty, i.product.stock) } : i)))
-  const updateDiscount = (lineId: string, discountPct: number) => setItems((prev) => prev.map((i) => (i.lineId === lineId ? { ...i, discountPct } : i)))
   const removeItem = (lineId: string) => setItems((prev) => prev.filter((i) => i.lineId !== lineId))
 
   const clearBill = () => {
@@ -244,8 +243,7 @@ export const NewBill = () => {
                         </div>
                       </div>
                       <div className={styles.optionRight}>
-                        <Mono sx={{ fontSize: 14, fontWeight: 700 }}>₹{formatAmount(netRate(p))}</Mono>
-                        <Mono sx={{ display: 'block', fontSize: 10, color: 'text.secondary', textDecoration: 'line-through' }}>₹{formatAmount(p.mrp)}</Mono>
+                        <Mono sx={{ fontSize: 14, fontWeight: 700 }}>₹{formatAmount(p.mrp)}</Mono>
                       </div>
                     </Box>
                   )
@@ -285,7 +283,7 @@ export const NewBill = () => {
                   <Typography className={styles.emptyStateText}>No items yet — type above, or scan with your barcode scanner.</Typography>
                 </div>
               ) : (
-                <BillItemsTable items={items} gstApplicable={gstApplicable} onQtyChange={updateQty} onDiscountChange={updateDiscount} onRemove={removeItem} />
+                <BillItemsTable items={items} gstApplicable={gstApplicable} onQtyChange={updateQty} onRemove={removeItem} />
               )}
             </Panel>
           </div>

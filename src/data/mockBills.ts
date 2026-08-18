@@ -2,11 +2,11 @@ import type { Bill, BillLineItem, PaymentMethod } from '../types'
 import { findProduct } from './mockProducts'
 
 let lineSeq = 0
-const line = (code: string, qty: number, discountPct?: number): BillLineItem => {
+const line = (code: string, qty: number): BillLineItem => {
   const product = findProduct(code)
   if (!product) throw new Error(`Unknown product code: ${code}`)
   lineSeq += 1
-  return { lineId: `L${lineSeq}`, product, qty, discountPct: discountPct ?? product.defaultDiscountPct }
+  return { lineId: `L${lineSeq}`, product, qty }
 }
 
 interface BillSpec {
@@ -54,7 +54,7 @@ const counter1Specs: BillSpec[] = [
     time: '20:38',
     customerName: 'Murugan A.',
     customerMobile: '98431 20055',
-    items: [line('LKD-BG', 5), line('FLP-07S', 10), line('BJL-100', 4, 75), line('CHK-15', 6), line('SPK-30', 12, 70), line('RKT-F5', 3)],
+    items: [line('LKD-BG', 5), line('FLP-07S', 10), line('BJL-100', 4), line('CHK-15', 6), line('SPK-30', 12), line('RKT-F5', 3)],
     paymentMethod: 'Cash',
     status: 'Paid',
   },

@@ -10,19 +10,16 @@ interface BillItemsTableProps {
   items: BillLineItem[]
   gstApplicable: boolean
   onQtyChange: (lineId: string, qty: number) => void
-  onDiscountChange: (lineId: string, pct: number) => void
   onRemove: (lineId: string) => void
 }
 
-export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onDiscountChange, onRemove }: BillItemsTableProps) => (
+export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: BillItemsTableProps) => (
   <Table size="small">
     <TableHead>
       <TableRow>
         <TableCell className={styles.idCol}>#</TableCell>
         <TableCell>Item</TableCell>
         <TableCell>HSN</TableCell>
-        <TableCell align="right">MRP</TableCell>
-        <TableCell align="right">Disc%</TableCell>
         <TableCell align="right">Rate</TableCell>
         <TableCell align="right" className={styles.qtyCol}>Qty</TableCell>
         {gstApplicable && <TableCell align="right">Taxable</TableCell>}
@@ -45,17 +42,6 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onDiscountCh
             </TableCell>
             <TableCell>
               <Mono sx={{ fontSize: 11, color: 'text.secondary' }}>{item.product.hsn}</Mono>
-            </TableCell>
-            <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{formatAmount(item.product.mrp)}</Mono></TableCell>
-            <TableCell align="right">
-              <TextField
-                type="number"
-                size="small"
-                value={item.discountPct}
-                onChange={(e) => onDiscountChange(item.lineId, Math.min(100, Math.max(0, Number(e.target.value) || 0)))}
-                inputProps={{ min: 0, max: 100, className: styles.numberInput }}
-                className={styles.numberField}
-              />
             </TableCell>
             <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{formatAmount(rate)}</Mono></TableCell>
             <TableCell align="right">

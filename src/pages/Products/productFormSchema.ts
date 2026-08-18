@@ -2,11 +2,10 @@ import { z } from 'zod'
 import { productCategories } from '../../data/mockProducts'
 import type { Product, ProductCategory } from '../../types'
 
-// These aren't editable per-product anymore (kept simple on purpose), but the Product type
-// still needs them for tax invoices and billing, so new products get sensible fixed defaults.
+// Not editable per product (kept simple on purpose), but the Product type still needs
+// them for tax invoices, so new products get sensible fixed defaults.
 const DEFAULT_HSN = '3604 90 00'
 const DEFAULT_GST_RATE = 18
-const DEFAULT_DISCOUNT_PCT = 0
 const DEFAULT_LOW_STOCK_THRESHOLD = 15
 
 const positiveNumber = (message: string) => z.string().refine((v) => /^\d+(\.\d+)?$/.test(v.trim()) && Number(v) > 0, message)
@@ -60,6 +59,5 @@ export const fromProductFormValues = (v: ProductFormValues, existing?: Product |
   stock: Number(v.stock),
   hsn: existing?.hsn ?? DEFAULT_HSN,
   gstRate: existing?.gstRate ?? DEFAULT_GST_RATE,
-  defaultDiscountPct: existing?.defaultDiscountPct ?? DEFAULT_DISCOUNT_PCT,
   lowStockThreshold: existing?.lowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD,
 })
