@@ -132,28 +132,5 @@ export const buildMuiTheme = (): Theme =>
           root: { textTransform: 'none', fontWeight: 700, fontSize: 13, fontFamily: fontFamily.heading },
         },
       },
-      MuiAlert: {
-        styleOverrides: {
-          root: {
-            borderRadius: radius.md,
-            padding: '10px 14px',
-            fontSize: 12.5,
-            fontWeight: 560,
-            alignItems: 'center',
-            boxShadow: '0 8px 24px -14px rgba(30,50,90,0.35)',
-            '&.MuiAlert-standardSuccess .MuiAlert-icon': { color: t.paid },
-            '&.MuiAlert-standardError .MuiAlert-icon': { color: t.due },
-            '&.MuiAlert-standardWarning .MuiAlert-icon': { color: t.ember },
-            '&.MuiAlert-standardInfo .MuiAlert-icon': { color: t.info },
-          },
-          icon: { fontSize: 18, opacity: 1, marginRight: 10, padding: 0 },
-          message: { padding: 0 },
-          action: { paddingTop: 0, marginRight: -4 },
-          standardSuccess: { backgroundColor: t.paidSoft, color: t.paidInk, borderLeft: `3px solid ${t.paid}` },
-          standardError: { backgroundColor: t.dueSoft, color: t.dueInk, borderLeft: `3px solid ${t.due}` },
-          standardWarning: { backgroundColor: t.emberSoft, color: t.emberInk, borderLeft: `3px solid ${t.ember}` },
-          standardInfo: { backgroundColor: t.primarySoft, color: t.ink, borderLeft: `3px solid ${t.info}` },
-        },
-      },
     },
   })

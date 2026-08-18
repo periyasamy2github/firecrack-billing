@@ -1,12 +1,31 @@
-import { Alert, Snackbar } from '@mui/material'
+import { Snackbar } from '@mui/material'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded'
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded'
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import type { SvgIconComponent } from '@mui/icons-material'
 import { useDispatch, useSelector } from '../redux/store'
-import { hideToast } from '../redux/uiSlice'
+import { hideToast, type ToastSeverity } from '../redux/uiSlice'
+import styles from './GlobalToast.module.css'
 
-/** The one toast for the whole app. Pages raise messages through useToast(). */
+const TOAST_ICON: Record<ToastSeverity, SvgIconComponent> = {
+  success: CheckCircleRoundedIcon,
+  error: ErrorRoundedIcon,
+  warning: WarningRoundedIcon,
+  info: InfoRoundedIcon,
+}
+
+/**
+ * The one toast for the whole app, in the toastr look: a solid colour block
+ * with white text. Snackbar handles timing and placement only — the styling is
+ * ours, not MUI's Alert.
+ */
 export const GlobalToast = () => {
   const dispatch = useDispatch()
   const { toastId, toastOpen, toastMessage, toastSeverity } = useSelector((state) => state.ui)
   const close = () => dispatch(hideToast())
+  const Icon = TOAST_ICON[toastSeverity]
 
   return (
     <Snackbar
@@ -16,9 +35,13 @@ export const GlobalToast = () => {
       onClose={close}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     >
-      <Alert onClose={close} severity={toastSeverity}>
-        {toastMessage}
-      </Alert>
+      <div className={`${styles.toast} ${styles[toastSeverity]}`} role="alert">
+        <Icon className={styles.icon} />
+        <span className={styles.message}>{toastMessage}</span>
+        <button type="button" className={styles.close} onClick={close} aria-label="Close notification">
+          <CloseRoundedIcon className={styles.closeIcon} />
+        </button>
+      </div>
     </Snackbar>
   )
 }

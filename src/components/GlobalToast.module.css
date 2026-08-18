@@ -1,0 +1,70 @@
+/* toastr look: solid colour, white text, square-ish corners, soft drop shadow. */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 288px;
+  max-width: 440px;
+  padding: 13px 14px;
+  border-radius: 3px;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+}
+
+.success {
+  background-color: #51a351;
+}
+
+.error {
+  background-color: #bd362f;
+}
+
+/* toastr's #f89406 leaves white text at 2.3:1, so this one is darkened to pass. */
+.warning {
+  background-color: #b45309;
+}
+
+.info {
+  background-color: #2f96b4;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  opacity: 0.75;
+  cursor: pointer;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.18);
+}
+
+.closeIcon {
+  width: 16px;
+  height: 16px;
+}
