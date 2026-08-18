@@ -1,3 +1,8 @@
+.stepper {
+  padding: 4px 0 6px;
+  max-width: 560px;
+}
+
 .uploadStage {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -98,6 +103,52 @@
 
 .rowIndex {
   color: var(--muted-soft);
+}
+
+/* One primary action, at the end of the review the user just read. */
+.actionBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+}
+
+.actionBar .actionNote {
+  color: var(--muted);
+}
+
+.progressPanel {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+}
+
+.progressHead {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progressHead .progressTitle {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.progressBar {
+  height: 8px;
+  border-radius: 999px;
+}
+
+.progressPanel .progressMeta {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
 }
 
 .doneBanner {

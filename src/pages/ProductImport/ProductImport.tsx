@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import * as XLSX from 'xlsx'
-import { Button, Chip, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, Chip, LinearProgress, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
@@ -146,6 +146,8 @@ const downloadTemplate = () => {
   XLSX.writeFile(wb, 'sparkline-product-import-template.xlsx')
 }
 
+const STEPS = ['Choose file', 'Review rows', 'Import'] as const
+
 const OUTCOME_PILL: Record<Outcome, { label: string; tone: 'paid' | 'hold' | 'due' }> = {
   new: { label: 'New', tone: 'paid' },
   update: { label: 'Update', tone: 'hold' },
@@ -157,13 +159,21 @@ export const ProductImport = () => {
   const { products, importProducts } = useStoreScope()
   const showToast = useToast()
 
-  const [stage, setStage] = useState<'upload' | 'preview' | 'done'>('upload')
+  const [stage, setStage] = useState<'upload' | 'review' | 'importing' | 'done'>('upload')
   const [fileName, setFileName] = useState('')
   const [rows, setRows] = useState<ImportRow[]>([])
   const [skipped, setSkipped] = useState(0)
   const [parseError, setParseError] = useState<string | null>(null)
   const [filter, setFilter] = useState<RowFilter>('All')
   const [result, setResult] = useState<{ created: number; updated: number } | null>(null)
+  const [processed, setProcessed] = useState(0)
+  const importTimer = useRef<number | null>(null)
+
+  useEffect(() => () => {
+    if (importTimer.current) window.clearInterval(importTimer.current)
+  }, [])
+
+  const activeStep = stage === 'upload' ? 0 : stage === 'review' ? 1 : stage === 'importing' ? 2 : STEPS.length
 
   const counts = useMemo(
     () => ({
@@ -190,6 +200,7 @@ export const ProductImport = () => {
     setParseError(null)
     setFilter('All')
     setResult(null)
+    setProcessed(0)
   }
 
   const handleFile = async (file: File) => {
@@ -217,19 +228,41 @@ export const ProductImport = () => {
       setRows(parsed)
       setSkipped(blanks)
       setFilter('All')
-      setStage('preview')
+      setStage('review')
     } catch (err) {
       setParseError(err instanceof Error ? err.message : 'Could not read this file.')
     }
   }
 
-  const handleImport = () => {
-    const importable = rows.filter((r) => r.product).map((r) => r.product as Product)
-    if (importable.length === 0) return
-    importProducts(importable)
-    setResult({ created: counts.New, updated: counts.Updated })
-    setStage('done')
-    showToast(`${counts.New} added · ${counts.Updated} updated`, 'success')
+  const queueLength = counts.New + counts.Updated
+
+  /** Imports in batches so the bar tracks rows actually written, not a timer. */
+  const startImport = () => {
+    const queue = rows.filter((r) => r.product).map((r) => r.product as Product)
+    if (queue.length === 0) return
+
+    setStage('importing')
+    setProcessed(0)
+    // At most 20 ticks, paced so even a handful of rows shows the bar for ~1s
+    // instead of flashing — a progress bar nobody can read is worse than none.
+    const ticks = Math.min(20, queue.length)
+    const batchSize = Math.max(1, Math.ceil(queue.length / ticks))
+    const interval = Math.round(900 / ticks)
+    let done = 0
+
+    importTimer.current = window.setInterval(() => {
+      importProducts(queue.slice(done, done + batchSize))
+      done = Math.min(done + batchSize, queue.length)
+      setProcessed(done)
+
+      if (done >= queue.length) {
+        if (importTimer.current) window.clearInterval(importTimer.current)
+        importTimer.current = null
+        setResult({ created: counts.New, updated: counts.Updated })
+        setStage('done')
+        showToast(`${counts.New} added · ${counts.Updated} updated`, 'success')
+      }
+    }, interval)
   }
 
   const summary = (
@@ -247,15 +280,12 @@ export const ProductImport = () => {
         crumb={fileName ? `${fileName} · ${counts.All} rows read${skipped > 0 ? ` · ${skipped} blank rows skipped` : ''}` : 'Bulk upload from an Excel or CSV file'}
         actions={
           <>
-            <Button size="small" onClick={() => navigate(ROUTES.products)}>Back to products</Button>
+            <Button size="small" disabled={stage === 'importing'} onClick={() => navigate(ROUTES.products)}>
+              Back to products
+            </Button>
             {stage === 'upload' && (
               <Button size="small" startIcon={<FileDownloadOutlinedIcon />} onClick={downloadTemplate}>
                 Download template
-              </Button>
-            )}
-            {stage === 'preview' && (
-              <Button variant="contained" disabled={counts.New + counts.Updated === 0} onClick={handleImport}>
-                Import {formatInt(counts.New + counts.Updated)} product{counts.New + counts.Updated === 1 ? '' : 's'}
               </Button>
             )}
           </>
@@ -263,6 +293,14 @@ export const ProductImport = () => {
       />
 
       <PageContent>
+        <Stepper activeStep={activeStep} className={styles.stepper}>
+          {STEPS.map((step) => (
+            <Step key={step}>
+              <StepLabel>{step}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
         {stage === 'upload' && (
           <div className={styles.uploadStage}>
             <label className={styles.dropZone}>
@@ -298,7 +336,7 @@ export const ProductImport = () => {
           </div>
         )}
 
-        {stage === 'preview' && (
+        {stage === 'review' && (
           <>
             {summary}
 
@@ -359,7 +397,39 @@ export const ProductImport = () => {
                 </TableBody>
               </Table>
             </TableCard>
+
+            <div className={styles.actionBar}>
+              <Typography variant="caption" className={styles.actionNote}>
+                {queueLength > 0
+                  ? `${formatInt(counts.New)} will be added and ${formatInt(counts.Updated)} updated. Rows to fix are skipped.`
+                  : 'Nothing can be imported until at least one row is fixed.'}
+              </Typography>
+              <div className={styles.filterSpacer} />
+              <Button onClick={resetToUpload}>Choose a different file</Button>
+              <Button variant="contained" size="large" disabled={queueLength === 0} onClick={startImport}>
+                Start import
+              </Button>
+            </div>
           </>
+        )}
+
+        {stage === 'importing' && (
+          <div className={styles.progressPanel}>
+            <div className={styles.progressHead}>
+              <Typography className={styles.progressTitle}>Importing products</Typography>
+              <div className={styles.filterSpacer} />
+              <Mono sx={{ fontSize: 13, fontWeight: 700 }}>{Math.round((processed / Math.max(queueLength, 1)) * 100)}%</Mono>
+            </div>
+            <LinearProgress
+              variant="determinate"
+              value={(processed / Math.max(queueLength, 1)) * 100}
+              className={styles.progressBar}
+              aria-label="Import progress"
+            />
+            <Typography variant="caption" role="status" aria-live="polite" className={styles.progressMeta}>
+              {formatInt(processed)} of {formatInt(queueLength)} rows written · {fileName}
+            </Typography>
+          </div>
         )}
 
         {stage === 'done' && result && (
