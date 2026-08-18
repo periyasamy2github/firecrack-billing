@@ -14,7 +14,7 @@ export const GlobalToast = () => {
       open={toastOpen}
       autoHideDuration={3000}
       onClose={close}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <Alert onClose={close} severity={toastSeverity}>
         {toastMessage}
