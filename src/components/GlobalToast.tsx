@@ -33,7 +33,7 @@ export const GlobalToast = () => {
       open={toastOpen}
       autoHideDuration={3000}
       onClose={close}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <div className={`${styles.toast} ${styles[toastSeverity]}`} role="alert">
         <Icon className={styles.icon} />
