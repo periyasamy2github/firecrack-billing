@@ -34,8 +34,19 @@ const dataSlice = createSlice({
     },
     saveBranch: (state, action: PayloadAction<Branch>) => {
       const index = state.branches.findIndex((item) => item.id === action.payload.id)
-      if (index === -1) state.branches.push(action.payload)
-      else state.branches[index] = action.payload
+      if (index === -1) {
+        state.branches.push(action.payload)
+        return
+      }
+      // Users map to counters by name, so a rename has to travel with them or
+      // their mapping silently points at a counter that no longer exists.
+      const previousName = state.branches[index].name
+      state.branches[index] = action.payload
+      if (previousName !== action.payload.name) {
+        for (const user of state.users) {
+          user.counters = user.counters.map((counter) => (counter === previousName ? action.payload.name : counter))
+        }
+      }
     },
     billCreated: (state, action: PayloadAction<Bill>) => {
       const bill = action.payload
@@ -45,6 +56,10 @@ const dataSlice = createSlice({
         const product = state.products.find((p) => p.code === item.product.code)
         if (product) product.stock -= item.qty
       })
+    },
+    billReprinted: (state, action: PayloadAction<string>) => {
+      const bill = state.bills.find((item) => item.billNo === action.payload)
+      if (bill) bill.reprintCount += 1
     },
     cancelBill: (state, action: PayloadAction<string>) => {
       const bill = state.bills.find((item) => item.billNo === action.payload)
@@ -59,5 +74,5 @@ const dataSlice = createSlice({
   },
 })
 
-export const { saveShop, saveProduct, importProducts, deleteProduct, saveUser, saveBranch, billCreated, cancelBill } = dataSlice.actions
+export const { saveShop, saveProduct, importProducts, deleteProduct, saveUser, saveBranch, billCreated, billReprinted, cancelBill } = dataSlice.actions
 export default dataSlice.reducer

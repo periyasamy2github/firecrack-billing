@@ -7,6 +7,7 @@ import {
   saveUser as saveUserAction,
   saveBranch as saveBranchAction,
   billCreated,
+  billReprinted as billReprintedAction,
   cancelBill as cancelBillAction,
 } from '../redux/dataSlice'
 import {
@@ -84,5 +85,6 @@ export const useStoreScope = () => {
     saveBranch: (branch: Branch) => dispatch(saveBranchAction(branch)),
     createBill,
     cancelBill: (billNo: string) => dispatch(cancelBillAction(billNo)),
+    billReprinted: (billNo: string) => dispatch(billReprintedAction(billNo)),
   }
 }

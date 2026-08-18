@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { productCategories } from '../../data/mockProducts'
 import type { Product, ProductCategory } from '../../types'
 
-// Not editable per product (kept simple on purpose), but the Product type still needs
-// them for tax invoices, so new products get sensible fixed defaults.
+// HSN and the reorder threshold are still fixed defaults; the GST rate is on the form,
+// because it follows the HSN and a shop stocks goods at more than one rate.
 const DEFAULT_HSN = '3604 90 00'
 const DEFAULT_GST_RATE = 18
 const DEFAULT_LOW_STOCK_THRESHOLD = 15
@@ -19,6 +19,7 @@ export const productFormSchema = (takenCodes: Set<string>, excludeCode: string |
     unit: z.string().trim().min(1, 'Unit is required'),
     mrp: positiveNumber('MRP must be a positive number'),
     rate: positiveNumber('Rate must be a positive number'),
+    gstRate: nonNegativeNumber('GST % must be 0 or more'),
     stock: nonNegativeNumber('Stock must be 0 or more'),
   })
     .refine((v) => (productCategories as string[]).includes(v.category), { message: 'Pick a category', path: ['category'] })
@@ -34,11 +35,12 @@ export interface ProductFormValues {
   unit: string
   mrp: string
   rate: string
+  gstRate: string
   stock: string
 }
 
 export const emptyProductForm = (): ProductFormValues => ({
-  code: '', name: '', category: '', unit: '', mrp: '', rate: '', stock: '',
+  code: '', name: '', category: '', unit: '', mrp: '', rate: '', gstRate: String(DEFAULT_GST_RATE), stock: '',
 })
 
 export const toProductFormValues = (p: Product): ProductFormValues => ({
@@ -48,6 +50,7 @@ export const toProductFormValues = (p: Product): ProductFormValues => ({
   unit: p.unit,
   mrp: String(p.mrp),
   rate: String(p.rate),
+  gstRate: String(p.gstRate),
   stock: String(p.stock),
 })
 
@@ -60,8 +63,8 @@ export const fromProductFormValues = (v: ProductFormValues, existing?: Product |
   unit: v.unit.trim(),
   mrp: Number(v.mrp),
   rate: Number(v.rate),
+  gstRate: Number(v.gstRate),
   stock: Number(v.stock),
   hsn: existing?.hsn ?? DEFAULT_HSN,
-  gstRate: existing?.gstRate ?? DEFAULT_GST_RATE,
   lowStockThreshold: existing?.lowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD,
 })

@@ -46,7 +46,4 @@ React 19 · TypeScript · Vite · MUI 6 · Redux Toolkit · React Router 7 · Re
 This is a front-end build; no backend is wired up yet.
 
 - **Sign-in does not verify the password** — choosing the account is enough.
-- **Dashboard KPIs and charts are sample figures**, not derived from the bills you create, so a new bill won't move "Sales today".
-- Reprinting a bill does not increment its reprint counter.
-- Renaming a counter does not rename it inside users already mapped to it.
 - There is no test suite.

@@ -25,7 +25,7 @@ import styles from './Bills.module.css'
 
 export const Bills = () => {
   const navigate = useNavigate()
-  const { currentBranchId, scopedBills, cancelBill } = useStoreScope()
+  const { currentBranchId, scopedBills, cancelBill, billReprinted } = useStoreScope()
   const viewingAll = currentBranchId === 'all'
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<BillFilter>('All')
@@ -185,7 +185,10 @@ export const Bills = () => {
                           </Tooltip>
                           {bill.status === 'Paid' && (
                             <Tooltip title="Reprint">
-                              <IconButton size="small" onClick={() => navigate(billPrintPath(bill.billNo))}>
+                              <IconButton
+                                size="small"
+                                onClick={() => { billReprinted(bill.billNo); navigate(billPrintPath(bill.billNo)) }}
+                              >
                                 <PrintOutlinedIcon className={styles.actionIcon} />
                               </IconButton>
                             </Tooltip>

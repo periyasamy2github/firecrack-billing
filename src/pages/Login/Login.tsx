@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { Autocomplete, Avatar, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
@@ -154,7 +154,7 @@ export const Login = () => {
           >
             Forgot password?
           </Button>
-          <Typography className={styles.footerVersion}>v1.0 · Season 2026</Typography>
+          <Typography className={styles.footerVersion}>v1.0 · Season {new Date().getFullYear()}</Typography>
         </div>
       </form>
     </AuthShell>

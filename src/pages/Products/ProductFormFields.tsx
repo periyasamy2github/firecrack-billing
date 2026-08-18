@@ -29,6 +29,7 @@ export const ProductFormFields = ({ values, errors, onChange }: ProductFormField
       <TextField label="Unit" {...field('unit')} placeholder="packet, box of 10…" />
       <TextField label="MRP (₹)" {...field('mrp')} />
       <TextField label="Rate (₹)" {...field('rate')} />
+      <TextField label="GST %" {...field('gstRate')} />
       <TextField label="Stock" {...field('stock')} />
     </div>
   )
