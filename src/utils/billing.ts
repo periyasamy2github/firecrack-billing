@@ -57,6 +57,17 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   }
 }
 
+/**
+ * The half-rate to print beside CGST/SGST — '9%' when every line is taxed alike,
+ * null on a mixed-rate bill, where a single heading would be a lie.
+ */
+export const halfGstRateLabel = (items: BillLineItem[]): string | null => {
+  const rates = new Set(items.map((item) => item.product.gstRate))
+  if (rates.size !== 1) return null
+  const [rate] = [...rates]
+  return `${Number((rate / 2).toFixed(2))}%`
+}
+
 export const getBillTotals = (bill: Bill): BillTotals => computeBillTotals(bill.items, bill.gstApplicable, bill.billDiscount)
 
 export const hsnSummary = (items: BillLineItem[], gstApplicable = true, billDiscount?: BillDiscount) => {

@@ -1,6 +1,6 @@
 ﻿import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
 import type { Bill } from '../../types'
-import { computeLineAmounts, getBillTotals, hsnSummary } from '../../utils/billing'
+import { computeLineAmounts, getBillTotals, halfGstRateLabel, hsnSummary } from '../../utils/billing'
 import { amountToWordsIndian, formatAmount, formatCurrency } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import styles from './A4Invoice.module.css'
@@ -14,9 +14,12 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
   const gst = bill.gstApplicable
   const totals = getBillTotals(bill)
   const hsn = gst ? hsnSummary(bill.items, true, bill.billDiscount) : []
+  const halfRate = halfGstRateLabel(bill.items)
+  const cgstLabel = halfRate ? `CGST ${halfRate}` : 'CGST'
+  const sgstLabel = halfRate ? `SGST ${halfRate}` : 'SGST'
 
   const columns = gst
-    ? ['#', 'Description of goods', 'HSN', 'Rate', 'Qty', 'Taxable', 'CGST', 'SGST', 'Amount']
+    ? ['#', 'Description of goods', 'HSN', 'Rate', 'Qty', 'Taxable', cgstLabel, sgstLabel, 'Amount']
     : ['#', 'Description of goods', 'HSN', 'Rate', 'Qty', 'Amount']
 
   return (
@@ -125,7 +128,7 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
               <Table size="small" className={styles.hsnTable}>
                 <TableHead>
                   <TableRow>
-                    {['HSN', 'Taxable', 'CGST', 'SGST', 'Total tax'].map((h) => (
+                    {['HSN', 'GST%', 'Taxable', 'CGST', 'SGST', 'Total tax'].map((h) => (
                       <TableCell key={h} align={h === 'HSN' ? 'left' : 'right'} className={styles.hsnHeadCell}>{h}</TableCell>
                     ))}
                   </TableRow>
@@ -134,6 +137,7 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
                   {hsn.map((row) => (
                     <TableRow key={row.hsn}>
                       <TableCell>{row.hsn}</TableCell>
+                      <TableCell align="right">{row.rate}%</TableCell>
                       <TableCell align="right">{formatAmount(row.taxable)}</TableCell>
                       <TableCell align="right">{formatAmount(row.cgst)}</TableCell>
                       <TableCell align="right">{formatAmount(row.sgst)}</TableCell>
@@ -157,8 +161,8 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
                 ['Sub-total', formatAmount(totals.gross)],
                 ...(totals.billDiscountAmount > 0 ? [['Bill discount', `− ${formatAmount(totals.billDiscountAmount)}`]] : []),
                 ['Taxable value', formatAmount(totals.taxable)],
-                ['CGST 9%', formatAmount(totals.cgst)],
-                ['SGST 9%', formatAmount(totals.sgst)],
+                [cgstLabel, formatAmount(totals.cgst)],
+                [sgstLabel, formatAmount(totals.sgst)],
                 ['Round off', formatAmount(totals.roundOff)],
               ].map(([label, value]) => (
                 <TableRow key={label}>

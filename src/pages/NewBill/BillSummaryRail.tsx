@@ -24,6 +24,8 @@ const popIn = keyframes`
 interface BillSummaryRailProps {
   totals: BillTotals
   gstApplicable: boolean
+  /** '9%' when every line shares a rate, null on a mixed-rate bill. */
+  halfGstRate: string | null
   paymentMethod: PaymentMethod
   onPaymentMethodChange: (method: PaymentMethod) => void
   billDiscountType: BillDiscountType
@@ -42,6 +44,7 @@ interface BillSummaryRailProps {
 export const BillSummaryRail = ({
   totals,
   gstApplicable,
+  halfGstRate,
   paymentMethod,
   onPaymentMethodChange,
   billDiscountType,
@@ -108,8 +111,8 @@ export const BillSummaryRail = ({
         <SumRow label="Taxable value" value={formatAmount(totals.taxable)} />
         {gstApplicable && (
           <>
-            <SumRow label="CGST @ 9%" value={formatAmount(totals.cgst)} />
-            <SumRow label="SGST @ 9%" value={formatAmount(totals.sgst)} />
+            <SumRow label={halfGstRate ? `CGST @ ${halfGstRate}` : 'CGST'} value={formatAmount(totals.cgst)} />
+            <SumRow label={halfGstRate ? `SGST @ ${halfGstRate}` : 'SGST'} value={formatAmount(totals.sgst)} />
           </>
         )}
         <SumRow label="Round off" value={formatSignedAmount(totals.roundOff)} />

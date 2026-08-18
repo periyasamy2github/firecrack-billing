@@ -1,7 +1,7 @@
 ﻿import { Typography } from '@mui/material'
 import QrCode2OutlinedIcon from '@mui/icons-material/QrCode2Outlined'
 import type { Bill } from '../../types'
-import { computeLineAmounts, getBillTotals } from '../../utils/billing'
+import { computeLineAmounts, getBillTotals, halfGstRateLabel } from '../../utils/billing'
 import { formatAmount, formatCurrency } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
 import styles from './ThermalReceipt.module.css'
@@ -27,6 +27,7 @@ export const ThermalReceipt = ({ bill, tendered, changeDue, showQr, showMrpSaved
   const { shop } = useStoreScope()
   const gst = bill.gstApplicable
   const totals = getBillTotals(bill)
+  const halfRate = halfGstRateLabel(bill.items)
 
   return (
     <div className={styles.sheet}>
@@ -64,8 +65,8 @@ export const ThermalReceipt = ({ bill, tendered, changeDue, showQr, showMrpSaved
       <Row label="Sub-total" value={formatAmount(totals.gross)} />
       {totals.billDiscountAmount > 0 && <Row label="Bill discount" value={`-${formatAmount(totals.billDiscountAmount)}`} />}
       <Row label={gst ? 'Taxable' : 'Subtotal'} value={formatAmount(totals.taxable)} />
-      {gst && <Row label="CGST 9%" value={formatAmount(totals.cgst)} />}
-      {gst && <Row label="SGST 9%" value={formatAmount(totals.sgst)} />}
+      {gst && <Row label={halfRate ? `CGST ${halfRate}` : 'CGST'} value={formatAmount(totals.cgst)} />}
+      {gst && <Row label={halfRate ? `SGST ${halfRate}` : 'SGST'} value={formatAmount(totals.sgst)} />}
       <Row label="Round off" value={formatAmount(totals.roundOff)} />
       <Dash />
       <Row label="TOTAL" value={formatCurrency(totals.grandTotal)} bold />

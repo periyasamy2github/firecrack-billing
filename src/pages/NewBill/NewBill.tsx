@@ -16,7 +16,7 @@ import type { Product } from '../../types'
 import { stockStatus } from '../../data/mockProducts'
 import { formatAmount, formatBillDate, formatBillTime } from '../../utils/format'
 import { newBillShortcuts } from '../../data/shortcuts'
-import { computeBillTotals } from '../../utils/billing'
+import { computeBillTotals, halfGstRateLabel } from '../../utils/billing'
 import { billPrintPath } from '../../utils/routes'
 import { useStoreScope, type NewBillInput } from '../../hooks/useStoreScope'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
@@ -291,6 +291,7 @@ export const NewBill = () => {
           <BillSummaryRail
             totals={totals}
             gstApplicable={gstApplicable}
+            halfGstRate={halfGstRateLabel(items)}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
             billDiscountType={billDiscountType}
