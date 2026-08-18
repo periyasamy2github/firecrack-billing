@@ -75,13 +75,50 @@ body {
 }
 
 @media print {
+  /* Page margins come from the sheet's own padding, so thermal and A4 can differ. */
+  @page {
+    margin: 0;
+  }
+
   .no-print {
     display: none !important;
   }
-  body,
+
   html,
+  body,
   #root {
     background: #fff !important;
     height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* On screen the shell is a fixed-height grid that scrolls internally. Left alone
+     it clips the printout to a single page and leaves a gap where the sidebar was. */
+  .print-shell,
+  .print-main {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  /* The page wrapper's own padding would inset the sheet on top of its margin. */
+  .print-main > * {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* The sheet is the page — no preview padding, centring or card shadow. */
+  .print-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-area * {
+    box-shadow: none !important;
   }
 }

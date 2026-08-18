@@ -104,3 +104,22 @@
   width: 100%;
   max-width: 820px;
 }
+
+@media print {
+  .grid {
+    display: block;
+  }
+
+  .previewCol {
+    display: block;
+  }
+
+  .previewCaption {
+    display: none;
+  }
+
+  .a4Wrap {
+    max-width: none;
+    width: 100%;
+  }
+}

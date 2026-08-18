@@ -94,7 +94,7 @@ export const AppLayout = () => {
   })
 
   return (
-    <div className={styles.shell}>
+    <div className={`${styles.shell} print-shell`}>
       <aside className={`${styles.aside} no-print`}>
         <div className={isSuperAdmin ? `${styles.brandRow} ${styles.brandRowCompact}` : styles.brandRow}>
           <div className={styles.logo}>
@@ -172,7 +172,7 @@ export const AppLayout = () => {
         </div>
       </aside>
 
-      <main className={styles.main}>
+      <main className={`${styles.main} print-main`}>
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>

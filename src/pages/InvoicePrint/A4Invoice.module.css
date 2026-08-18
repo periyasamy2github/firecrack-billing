@@ -234,3 +234,13 @@
   font-size: 9px;
   font-weight: 700;
 }
+
+@media print {
+  .sheet {
+    border: 0;
+    box-shadow: none;
+    /* Stands in for the @page margin, which is zeroed so thermal can print tight. */
+    padding: 12mm;
+    font-size: 10pt;
+  }
+}

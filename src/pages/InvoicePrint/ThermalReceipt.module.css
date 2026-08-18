@@ -105,3 +105,14 @@
   font-size: 9px;
   font-family: inherit;
 }
+
+@media print {
+  .sheet {
+    /* 80mm roll minus the printer's own edge margin. */
+    width: 72mm;
+    margin: 0;
+    padding: 3mm 2mm;
+    border: 0;
+    box-shadow: none;
+  }
+}

@@ -20,7 +20,7 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
         <TableCell className={styles.idCol}>#</TableCell>
         <TableCell>Item</TableCell>
         <TableCell>HSN</TableCell>
-        <TableCell align="right">Rate</TableCell>
+        <TableCell align="right">MRP</TableCell>
         <TableCell align="right" className={styles.qtyCol}>Qty</TableCell>
         {gstApplicable && <TableCell align="right">Taxable</TableCell>}
         {gstApplicable && <TableCell align="right">GST</TableCell>}

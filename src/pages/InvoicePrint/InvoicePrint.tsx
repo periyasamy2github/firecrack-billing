@@ -136,7 +136,7 @@ export const InvoicePrint = () => {
             </div>
           </Card>
 
-          <div className={styles.previewCol}>
+          <div className={`${styles.previewCol} print-area`}>
             <Typography variant="caption" className={`${styles.previewCaption} ${PREVIEW_CAPTION_CLASS[activeFormat]}`}>
               {activeFormat === 'thermal' ? '80mm — Customer receipt' : 'A4 — Tax Invoice'}
             </Typography>
