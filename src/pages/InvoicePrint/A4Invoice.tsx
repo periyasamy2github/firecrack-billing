@@ -107,7 +107,8 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
         </TableBody>
         <tfoot>
           <TableRow>
-            <TableCell colSpan={6} className={styles.footCell} />
+            {/* Spans #, description, HSN, MRP and rate so the totals land under Qty onward. */}
+            <TableCell colSpan={5} className={styles.footCell} />
             <TableCell align="right" className={styles.footCellBold}>{totals.qtyCount}</TableCell>
             {gst && (
               <>
