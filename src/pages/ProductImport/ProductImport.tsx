@@ -228,7 +228,7 @@ export const ProductImport = () => {
     let done = 0
 
     importTimer.current = window.setInterval(() => {
-      importProducts(queue.slice(done, done + batchSize))
+      void importProducts(queue.slice(done, done + batchSize))
       done = Math.min(done + batchSize, queue.length)
       setProcessed(done)
 

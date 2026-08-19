@@ -134,7 +134,7 @@ export const Users = () => {
     }))
   }
 
-  const saveUser = () => {
+  const saveUser = async () => {
     const valid = validate({
       name: form.name,
       email: form.email,
@@ -148,7 +148,7 @@ export const Users = () => {
     if (!valid) return
 
     if (editingUser) {
-      persistUser({
+      await persistUser({
         ...editingUser,
         name: form.name.trim(),
         initials: initialsFrom(form.name),
@@ -161,7 +161,7 @@ export const Users = () => {
       })
       showToast(`${form.name.trim()} updated`)
     } else {
-      persistUser({
+      await persistUser({
         id: `U${Date.now()}`,
         name: form.name.trim(),
         initials: initialsFrom(form.name),
@@ -188,9 +188,9 @@ export const Users = () => {
 
   const closeReset = () => setResettingUser(null)
 
-  const saveNewPassword = () => {
+  const saveNewPassword = async () => {
     if (!resettingUser || !validateResetPw({ newPassword, confirmPassword })) return
-    persistUser({ ...resettingUser, password: newPassword })
+    await persistUser({ ...resettingUser, password: newPassword })
     showToast(`Password reset for ${resettingUser.name}`)
     closeReset()
   }

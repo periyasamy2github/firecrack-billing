@@ -47,7 +47,7 @@ export const Settings = () => {
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const result = settingsSchema.safeParse(form)
     if (!result.success) {
       const next: typeof errors = {}
@@ -56,7 +56,7 @@ export const Settings = () => {
       return
     }
     setErrors({})
-    saveShop({
+    await saveShop({
       ...shop,
       name: result.data.name.trim(),
       phone: result.data.phone.trim(),

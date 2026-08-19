@@ -43,7 +43,7 @@ const newBillSchema = (discountType: BillDiscountType) =>
 
 export const NewBill = () => {
   const navigate = useNavigate()
-  const { shop, products, createBill, activeBranch, currentBranchId, isSuperAdmin, currentUser, activeCounter } = useStoreScope()
+  const { products, createBill, nextBillNo, activeBranch, currentBranchId, isSuperAdmin, currentUser, activeCounter } = useStoreScope()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const customerNameInputRef = useRef<HTMLInputElement>(null)
   const billDiscountInputRef = useRef<HTMLInputElement>(null)
@@ -99,8 +99,6 @@ export const NewBill = () => {
     startedAt.current = Date.now()
   }
 
-  const buildBillNo = () => `${shop.invoicePrefix}${shop.nextInvoiceNumber}`
-
   const buildBillInput = (): NewBillInput => {
     const now = new Date()
     return {
@@ -121,12 +119,12 @@ export const NewBill = () => {
   const failed = (err: unknown) =>
     showToast(err instanceof Error ? err.message : 'Could not save this bill', 'error')
 
-  const saveAndPrint = () => {
+  const saveAndPrint = async () => {
     if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
     const tenderedNum = Number(tendered) || 0
     try {
       // Saves the bill, deducts stock and advances the invoice number.
-      const bill = createBill(buildBillInput())
+      const bill = await createBill(buildBillInput())
       navigate(billPrintPath(bill.billNo), {
         state: {
           bill,
@@ -139,10 +137,10 @@ export const NewBill = () => {
     }
   }
 
-  const saveOnly = () => {
+  const saveOnly = async () => {
     if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
     try {
-      const bill = createBill(buildBillInput())
+      const bill = await createBill(buildBillInput())
       showToast(`Bill ${bill.billNo} saved without printing`)
       clearBill()
     } catch (err) {
@@ -170,7 +168,7 @@ export const NewBill = () => {
     <>
       <PageHeader
         title="New Bill"
-        crumb={`${buildBillNo()} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${activeCounter ?? activeBranch.name}`}
+        crumb={`${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${activeCounter ?? activeBranch.name}`}
         actions={
           <>
             {isSuperAdmin && currentBranchId === 'all' && (

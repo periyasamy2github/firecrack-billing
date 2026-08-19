@@ -1,15 +1,9 @@
 import { useDispatch, useSelector } from '../redux/store'
-import {
-  saveShop as saveShopAction,
-  saveProduct as saveProductAction,
-  importProducts as importProductsAction,
-  deleteProduct as deleteProductAction,
-  saveUser as saveUserAction,
-  saveBranch as saveBranchAction,
-  billCreated,
-  billReprinted as billReprintedAction,
-  cancelBill as cancelBillAction,
-} from '../redux/dataSlice'
+import { cancelBill as cancelBillThunk, createBill as createBillThunk, reprintBill as reprintBillThunk, type NewBillInput } from '../redux/billsSlice'
+import { saveCounter as saveCounterThunk } from '../redux/countersSlice'
+import { deleteProduct as deleteProductThunk, importProducts as importProductsThunk, saveProduct as saveProductThunk } from '../redux/productsSlice'
+import { saveShop as saveShopThunk } from '../redux/shopSlice'
+import { saveUser as saveUserThunk } from '../redux/usersSlice'
 import {
   setCurrentUserId,
   setActiveCounter as setActiveCounterAction,
@@ -19,21 +13,25 @@ import {
 } from '../redux/sessionSlice'
 import type { Bill, Branch, Product, Shop, User, UserRole } from '../types'
 
-export type { BranchScope }
-export type NewBillInput = Omit<Bill, 'billNo' | 'status' | 'reprintCount'>
+export type { BranchScope, NewBillInput }
 
 const findBranch = (branches: Branch[], id: string): Branch | undefined => branches.find((branch) => branch.id === id)
 
+/** A thunk rejection carries a string; pages expect an Error they can read. */
+const asError = (reason: unknown, fallback: string): Error =>
+  new Error(typeof reason === 'string' ? reason : reason instanceof Error ? reason.message : fallback)
+
 export const useStoreScope = () => {
   const dispatch = useDispatch()
-  
+
   // By using individual selectors, Redux can optimize re-renders
   // better than Context could.
-  const shop = useSelector((state) => state.data.shop)
-  const users = useSelector((state) => state.data.users)
-  const products = useSelector((state) => state.data.products)
-  const bills = useSelector((state) => state.data.bills)
-  const branches = useSelector((state) => state.data.branches)
+  const shop = useSelector((state) => state.shop.shop)
+  const users = useSelector((state) => state.users.items)
+  const products = useSelector((state) => state.products.items)
+  const bills = useSelector((state) => state.bills.items)
+  const nextBillNumber = useSelector((state) => state.bills.nextNumber)
+  const branches = useSelector((state) => state.counters.items)
   const currentUserId = useSelector((state) => state.session.currentUserId)
   const activeCounter = useSelector((state) => state.session.activeCounter)
   const currentBranchId = useSelector((state) => state.session.currentBranchId)
@@ -45,18 +43,6 @@ export const useStoreScope = () => {
 
   // Every list page shows the counter you're scoped to, so the filter lives here once.
   const scopedBills = currentBranchId === 'all' ? bills : bills.filter((bill) => bill.branchId === currentBranchId)
-
-  const createBill = (input: NewBillInput): Bill => {
-    const requiredByCode = new Map<string, number>()
-    input.items.forEach((item) => requiredByCode.set(item.product.code, (requiredByCode.get(item.product.code) ?? 0) + item.qty))
-    const shortage = [...requiredByCode].find(([code, qty]) => (products.find((product) => product.code === code)?.stock ?? 0) < qty)
-    if (shortage) throw new Error(`${shortage[0]} does not have enough stock`)
-
-    const billNo = `${shop.invoicePrefix}${shop.nextInvoiceNumber}`
-    const bill: Bill = { ...input, billNo, status: 'Paid', reprintCount: 0 }
-    dispatch(billCreated(bill))
-    return bill
-  }
 
   return {
     shop,
@@ -76,15 +62,27 @@ export const useStoreScope = () => {
     currentBranch,
     activeBranch,
     isSuperAdmin: role === 'Super Admin',
-    nextBillNo: `${shop.invoicePrefix}${shop.nextInvoiceNumber}`,
-    saveShop: (nextShop: Shop) => dispatch(saveShopAction(nextShop)),
-    saveProduct: (product: Product) => dispatch(saveProductAction(product)),
-    importProducts: (list: Product[]) => dispatch(importProductsAction(list)),
-    deleteProduct: (code: string) => dispatch(deleteProductAction(code)),
-    saveUser: (user: User) => dispatch(saveUserAction(user)),
-    saveBranch: (branch: Branch) => dispatch(saveBranchAction(branch)),
-    createBill,
-    cancelBill: (billNo: string) => dispatch(cancelBillAction(billNo)),
-    billReprinted: (billNo: string) => dispatch(billReprintedAction(billNo)),
+    nextBillNo: `${shop.invoicePrefix}${nextBillNumber}`,
+    saveShop: (nextShop: Shop) => dispatch(saveShopThunk(nextShop)).unwrap(),
+    saveProduct: (product: Product) => dispatch(saveProductThunk(product)).unwrap(),
+    importProducts: (list: Product[]) => dispatch(importProductsThunk(list)).unwrap(),
+    deleteProduct: (code: string) => dispatch(deleteProductThunk(code)).unwrap(),
+    saveUser: (user: User) => dispatch(saveUserThunk(user)).unwrap(),
+    saveBranch: (branch: Branch) => dispatch(saveCounterThunk(branch)).unwrap(),
+    createBill: async (input: NewBillInput): Promise<Bill> => {
+      try {
+        return await dispatch(createBillThunk(input)).unwrap()
+      } catch (reason) {
+        throw asError(reason, 'Could not save this bill')
+      }
+    },
+    cancelBill: async (billNo: string): Promise<void> => {
+      try {
+        await dispatch(cancelBillThunk(billNo)).unwrap()
+      } catch (reason) {
+        throw asError(reason, 'Could not cancel this bill')
+      }
+    },
+    billReprinted: (billNo: string) => dispatch(reprintBillThunk(billNo)).unwrap(),
   }
 }

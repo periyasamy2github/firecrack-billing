@@ -39,18 +39,18 @@ export const Counters = () => {
 
   const closeDialog = () => setOpen(false)
 
-  const save = () => {
+  const save = async () => {
     if (!validate({ name })) return
-    if (editing) {
-      saveBranch({ ...editing, name: name.trim() })
-    } else {
-      saveBranch({ id: `c${Date.now()}`, name: name.trim(), active: true })
-    }
     closeDialog()
+    if (editing) {
+      await saveBranch({ ...editing, name: name.trim() })
+    } else {
+      await saveBranch({ id: `c${Date.now()}`, name: name.trim(), active: true })
+    }
   }
 
   const toggleActive = (counter: Branch) => {
-    saveBranch({ ...counter, active: !counter.active })
+    void saveBranch({ ...counter, active: !counter.active })
   }
 
   return (

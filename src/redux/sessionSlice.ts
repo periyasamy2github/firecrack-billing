@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import { loadAppData } from '../data/appData'
+import { branches } from '../data/shop'
 
 export type BranchScope = 'all' | string
 
@@ -14,7 +14,7 @@ const SESSION_KEY = 'sparkbill:session:v1'
 const emptySession = (): SessionState => ({
   currentUserId: null,
   activeCounter: null,
-  currentBranchId: loadAppData().branches[0]?.id ?? 'all',
+  currentBranchId: branches[0]?.id ?? 'all',
 })
 
 /** Keeps you signed in across a refresh — the guard still re-checks the user is active. */

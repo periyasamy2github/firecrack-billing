@@ -33,13 +33,12 @@ export const Bills = () => {
   const showToast = useToast()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const confirmCancel = () => {
+  const confirmCancel = async () => {
     if (!cancellingBill) return
     const billNo = cancellingBill.billNo
-    // Cancelling also puts the stock back — that lives in the store, not here.
-    cancelBill(billNo)
-    showToast(`Bill ${billNo} cancelled`, 'warning')
     setCancellingBill(null)
+    await cancelBill(billNo)
+    showToast(`Bill ${billNo} cancelled`, 'warning')
   }
 
   useKeyShortcuts({
@@ -187,7 +186,7 @@ export const Bills = () => {
                             <Tooltip title="Reprint">
                               <IconButton
                                 size="small"
-                                onClick={() => { billReprinted(bill.billNo); navigate(billPrintPath(bill.billNo)) }}
+                                onClick={async () => { await billReprinted(bill.billNo); navigate(billPrintPath(bill.billNo)) }}
                               >
                                 <PrintOutlinedIcon className={styles.actionIcon} />
                               </IconButton>

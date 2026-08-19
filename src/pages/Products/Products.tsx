@@ -62,20 +62,21 @@ export const Products = () => {
 
   const existingCodes = useMemo(() => new Set(products.map((p) => p.code.toUpperCase())), [products])
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deletingProduct) return
-    deleteProduct(deletingProduct.code)
-    showToast(`${deletingProduct.name} deleted`, 'warning')
+    const { code, name } = deletingProduct
     setDeletingProduct(null)
+    await deleteProduct(code)
+    showToast(`${name} deleted`, 'warning')
   }
 
-  const handleProductSubmit = (rows: Product[]) => {
+  const handleProductSubmit = async (rows: Product[]) => {
     if (editingProduct) {
-      saveProduct(rows[0])
-      showToast(`${rows[0].name} updated`)
       setEditingProduct(null)
+      await saveProduct(rows[0])
+      showToast(`${rows[0].name} updated`)
     } else {
-      importProducts(rows)
+      await importProducts(rows)
       showToast(`${rows.length} product${rows.length === 1 ? '' : 's'} added`)
     }
   }
