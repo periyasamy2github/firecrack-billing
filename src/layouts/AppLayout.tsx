@@ -76,8 +76,6 @@ export const AppLayout = () => {
 
   const brandSubtitle = isSuperAdmin ? (currentBranchId === 'all' ? 'All counters' : currentBranch?.name) : (activeCounter ?? shop.name)
 
-  // One letter per page — the shortcut hook matches either case. Super-Admin-only
-  // pages are left unbound for staff so a keypress can't land them on Access denied.
   const navKeys: Record<string, string> = {
     n: ROUTES.newBill,
     d: ROUTES.dashboard,

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+﻿import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { Autocomplete, Box, Button, Switch, TextField, Typography } from '@mui/material'
@@ -11,6 +11,7 @@ import { Mono } from '../../components/Mono'
 import { KeyBadge } from '../../components/KeyBadge'
 import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
+import { ElapsedTimer } from './ElapsedTimer'
 import type { BillDiscountType, BillLineItem, PaymentMethod } from '../../types'
 import type { Product } from '../../types'
 import { stockStatus } from '../../data/mockProducts'
@@ -24,8 +25,6 @@ import { useFormValidation } from '../../hooks/useFormValidation'
 import { useToast } from '../../hooks/useToast'
 import styles from './NewBill.module.css'
 
-// The discount bound depends on whether it's a % or a flat ₹ amount, so the schema
-// is built fresh with that context.
 const newBillSchema = (discountType: BillDiscountType) =>
   z.object({
     customerMobile: z.string(),
@@ -59,17 +58,11 @@ export const NewBill = () => {
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [billDiscountValue, setBillDiscountValue] = useState('')
   const [tendered, setTendered] = useState('')
-  const [nowTick, setNowTick] = useState(Date.now())
 
   const billDiscount = billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined
   const totals = computeBillTotals(items, gstApplicable, billDiscount)
   const { errors, validate, clearError, reset: resetErrors } = useFormValidation(newBillSchema(billDiscountType))
   const showToast = useToast()
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNowTick(Date.now()), 1000)
-    return () => window.clearInterval(id)
-  }, [])
 
   const addItem = (product: Product | null) => {
     if (!product) return
@@ -123,7 +116,6 @@ export const NewBill = () => {
     if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
     const tenderedNum = Number(tendered) || 0
     try {
-      // Saves the bill, deducts stock and advances the invoice number.
       const bill = await createBill(buildBillInput())
       navigate(billPrintPath(bill.billNo), {
         state: {
@@ -158,11 +150,6 @@ export const NewBill = () => {
     },
     { allowInInputs: ['F2', 'F3', 'F7', 'F9', 'F10'] },
   )
-
-  const elapsedLabel = () => {
-    const secs = Math.max(0, Math.round((nowTick - startedAt.current) / 1000))
-    return `${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`
-  }
 
   return (
     <>
@@ -318,7 +305,7 @@ export const NewBill = () => {
         <KeyBadge label="F1" />
         <Typography className={styles.shortcutLabel}>all shortcuts</Typography>
         <div className={styles.shortcutsSpacer} />
-        <Typography className={styles.shortcutLabel}>Elapsed on this bill {elapsedLabel()}</Typography>
+        <ElapsedTimer startedAt={startedAt.current} className={styles.shortcutLabel} />
       </div>
 
     </>

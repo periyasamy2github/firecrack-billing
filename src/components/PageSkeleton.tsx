@@ -2,7 +2,6 @@
 import { PageLoader } from './RouteProgress'
 import styles from './PageSkeleton.module.css'
 
-/** Content-area placeholder while a lazy page chunk loads — the sidebar stays put. */
 export const PageSkeleton = () => (
   <>
     <PageLoader />

@@ -34,7 +34,6 @@ export const SuperAdminDashboard = () => {
   const pieColors = [t.primary, t.paid, t.ember]
   const items = topItems(scopedBills, 6)
   const maxTopItem = Math.max(1, ...items.map((i) => i.amount))
-  // Season progress counts the whole shop, whichever counter is on screen.
   const seasonCollected = dashboardKpis(bills).sales
   const seasonPct = Math.round((seasonCollected / shop.seasonTarget) * 100)
 

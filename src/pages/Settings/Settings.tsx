@@ -4,6 +4,7 @@ import { Button, Card, TextField, Typography } from '@mui/material'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { useStoreScope } from '../../hooks/useStoreScope'
+import { useFormValidation } from '../../hooks/useFormValidation'
 import { useToast } from '../../hooks/useToast'
 import styles from './Settings.module.css'
 
@@ -23,6 +24,7 @@ const settingsSchema = z.object({
   addressLine: z.string().trim().min(1, 'Address is required'),
   gstin: z.string().trim().regex(/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/, 'Enter a valid 15-character GSTIN'),
   invoicePrefix: z.string().trim().min(1, 'Prefix is required'),
+  declaration: z.string(),
   nextInvoiceNumber: positiveInteger('Enter a valid invoice number'),
   seasonTarget: positiveInteger('Enter a valid season target'),
 })
@@ -39,33 +41,26 @@ export const Settings = () => {
     declaration: shop.declaration,
     seasonTarget: String(shop.seasonTarget),
   })
-  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({})
+  const { errors, validate, clearError } = useFormValidation(settingsSchema)
   const showToast = useToast()
 
   const setField = (key: keyof typeof form, value: string) => {
     setForm((f) => ({ ...f, [key]: value }))
-    setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev))
+    clearError(key)
   }
 
   const handleSave = async () => {
-    const result = settingsSchema.safeParse(form)
-    if (!result.success) {
-      const next: typeof errors = {}
-      for (const issue of result.error.issues) next[issue.path[0] as keyof typeof form] = issue.message
-      setErrors(next)
-      return
-    }
-    setErrors({})
+    if (!validate(form)) return
     await saveShop({
       ...shop,
-      name: result.data.name.trim(),
-      phone: result.data.phone.trim(),
-      addressLine: result.data.addressLine.trim(),
-      gstin: result.data.gstin.trim(),
-      invoicePrefix: result.data.invoicePrefix.trim(),
-      nextInvoiceNumber: Number(result.data.nextInvoiceNumber),
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      addressLine: form.addressLine.trim(),
+      gstin: form.gstin.trim(),
+      invoicePrefix: form.invoicePrefix.trim(),
+      nextInvoiceNumber: Number(form.nextInvoiceNumber),
       declaration: form.declaration,
-      seasonTarget: Number(result.data.seasonTarget),
+      seasonTarget: Number(form.seasonTarget),
     })
     showToast('Settings saved')
   }

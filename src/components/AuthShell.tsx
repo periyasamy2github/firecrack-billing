@@ -26,7 +26,6 @@ const HIGHLIGHTS = [
   },
 ]
 
-/** Split-screen shell for the signed-out screens: brand on the left, the task on the right. */
 export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: ReactNode }) => {
   const { shop } = useStoreScope()
 
@@ -72,7 +71,6 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
 
       <main className={styles.formPanel}>
         <div className={styles.formInner}>
-          {/* Stands in for the brand panel once it is hidden on narrow screens. */}
           <div className={styles.compactBrand}>
             <div className={styles.logo}>
               <BrandMark className={styles.logoIcon} />

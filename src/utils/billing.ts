@@ -14,7 +14,6 @@ export const computeLineAmounts = (item: BillLineItem, gstApplicable = true): Li
   return { rate, taxable, gstAmount, amount: taxable + gstAmount }
 }
 
-/** The bill-level discount, clamped to sane bounds. It is the only discount on a bill. */
 const resolveBillDiscountAmount = (gross: number, billDiscount?: BillDiscount): number => {
   if (!billDiscount || !Number.isFinite(billDiscount.value) || billDiscount.value <= 0 || gross <= 0) return 0
   if (billDiscount.type === 'percent') return gross * (Math.min(billDiscount.value, 100) / 100)
@@ -62,10 +61,6 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   }
 }
 
-/**
- * The half-rate to print beside CGST/SGST — '9%' when every line is taxed alike,
- * null on a mixed-rate bill, where a single heading would be a lie.
- */
 export const halfGstRateLabel = (items: BillLineItem[]): string | null => {
   const rates = new Set(items.map((item) => item.product.gstRate))
   if (rates.size !== 1) return null

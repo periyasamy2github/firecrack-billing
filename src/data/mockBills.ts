@@ -47,7 +47,6 @@ const buildBills = (specs: BillSpec[], ctx: BranchBillContext): Bill[] =>
 
 const DATE = '10-Nov-2026'
 
-// One invoice series for the whole shop — numbers interleave across counters by time of day.
 const counter1Specs: BillSpec[] = [
   {
     billNo: 'SMF/26-27/1480',

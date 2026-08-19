@@ -24,7 +24,6 @@ const popIn = keyframes`
 interface BillSummaryRailProps {
   totals: BillTotals
   gstApplicable: boolean
-  /** '9%' when every line shares a rate, null on a mixed-rate bill. */
   halfGstRate: string | null
   paymentMethod: PaymentMethod
   onPaymentMethodChange: (method: PaymentMethod) => void
@@ -61,7 +60,6 @@ export const BillSummaryRail = ({
 }: BillSummaryRailProps) => {
   const tenderedNum = Number(tendered) || 0
   const changeDue = tenderedNum - totals.grandTotal
-  // Nothing handed over yet is a neutral state, not a shortfall worth flagging in red.
   const awaitingTender = tenderedNum <= 0
   const changePositive = changeDue >= 0
 

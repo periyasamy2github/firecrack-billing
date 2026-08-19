@@ -9,15 +9,6 @@
   align-items: center;
 }
 
-.footerBar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 10px 16px;
-  border-top: 1px solid var(--line);
-  background-color: var(--action-hover);
-}
-
 .footerSpacer {
   flex: 1;
 }

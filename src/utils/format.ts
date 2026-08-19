@@ -21,11 +21,9 @@ export const formatInt = (value: number): string => integerFormatter.format(valu
 export const formatSignedAmount = (value: number): string =>
   `${value < 0 ? '−' : '+'} ${numberFormatter.format(Math.abs(value))}`
 
-/** 'Tuesday, 18 August 2026' — the date line on the dashboards. */
 export const formatLongDate = (value: Date): string =>
   value.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
-/** '10-Nov-2026' — same shape as the seed bills, so the Reports date filter keeps working. */
 export const formatBillDate = (value: Date): string =>
   value.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')
 
@@ -52,7 +50,6 @@ const threeDigitsToWords = (n: number): string => {
   return parts.join(' ')
 }
 
-/** Indian numbering system (lakh/crore) words for the rupee portion of an invoice total. */
 export const amountToWordsIndian = (value: number): string => {
   const rupees = Math.floor(Math.round(value))
   if (rupees === 0) return 'Rupees Zero Only'

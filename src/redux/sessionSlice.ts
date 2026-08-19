@@ -17,7 +17,6 @@ const emptySession = (): SessionState => ({
   currentBranchId: branches[0]?.id ?? 'all',
 })
 
-/** Keeps you signed in across a refresh — the guard still re-checks the user is active. */
 const loadSession = (): SessionState => {
   try {
     const raw = window.localStorage.getItem(SESSION_KEY)

@@ -3,7 +3,6 @@ import type { z } from 'zod'
 
 type Errors<T> = Partial<Record<keyof T, string>>
 
-/** Validates form values against a Zod schema. Call validate(values) on submit. */
 export const useFormValidation = <T extends Record<string, unknown>>(schema: z.ZodType<T>) => {
   const [errors, setErrors] = useState<Errors<T>>({})
 

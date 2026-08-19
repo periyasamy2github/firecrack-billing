@@ -1,6 +1,6 @@
-﻿import { useMemo, useRef, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, Chip, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
@@ -11,16 +11,16 @@ import { Mono } from '../../components/Mono'
 import { StatusPill } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
-import { TablePaginationBar } from '../../components/TablePaginationBar'
+import { ListFooter } from '../../components/ListFooter'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { ProductDialog } from './ProductDialog'
 import { productCategories, stockStatus } from '../../data/mockProducts'
 import { formatAmount } from '../../utils/format'
 import { useStoreScope } from '../../hooks/useStoreScope'
-import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
-import { usePagination } from '../../hooks/usePagination'
+import { useListPage } from '../../hooks/useListPage'
 import { ROUTES } from '../../utils/routes'
 import { useToast } from '../../hooks/useToast'
-import type { Product, ProductCategory } from '../../types'
+import type { Product } from '../../types'
 import styles from './Products.module.css'
 
 const CATEGORY_KEYS = ['All', ...productCategories] as const
@@ -28,37 +28,23 @@ const CATEGORY_KEYS = ['All', ...productCategories] as const
 export const Products = () => {
   const navigate = useNavigate()
   const { branches, isSuperAdmin, products, importProducts, saveProduct, deleteProduct } = useStoreScope()
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<ProductCategory | 'All'>('All')
   const [addOpen, setAddOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
   const showToast = useToast()
 
-  useKeyShortcuts({
-    '/': () => searchInputRef.current?.focus(),
-    ...Object.fromEntries(CATEGORY_KEYS.map((key, i) => [String(i + 1), () => setCategory(key)])),
-  })
-
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: products.length }
-    productCategories.forEach((c) => { counts[c] = products.filter((p) => p.category === c).length })
-    return counts
-  }, [products])
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return products.filter((p) => {
-      if (category !== 'All' && p.category !== category) return false
-      if (!q) return true
-      return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)
+  const { query, setQuery, searchInputRef, filter: category, setFilter: setCategory, counts: categoryCounts, filtered, page, rowsPerPage, pageRows, changePage, changeRowsPerPage } =
+    useListPage<Product, (typeof CATEGORY_KEYS)[number]>({
+      rows: products,
+      filters: CATEGORY_KEYS,
+      matchesFilter: (product, key) => key === 'All' || product.category === key,
+      matchesSearch: (product, search) => {
+        const q = search.trim().toLowerCase()
+        return !q || product.code.toLowerCase().includes(q) || product.name.toLowerCase().includes(q)
+      },
     })
-  }, [products, search, category])
 
   const lowStockCount = useMemo(() => products.filter((p) => p.stock <= p.lowStockThreshold).length, [products])
-
-  const { page, rowsPerPage, pageRows, changePage, changeRowsPerPage } = usePagination(filtered)
 
   const existingCodes = useMemo(() => new Set(products.map((p) => p.code.toUpperCase())), [products])
 
@@ -95,7 +81,7 @@ export const Products = () => {
       />
       <PageContent>
         <div className={styles.filterRow}>
-          <SearchField placeholder="Search by code or item name… (/)" value={search} onChange={setSearch} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 240 }} />
+          <SearchField placeholder="Search by code or item name… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 240 }} />
           {CATEGORY_KEYS.map((c) => (
             <Chip
               key={c}
@@ -108,7 +94,7 @@ export const Products = () => {
           ))}
         </div>
 
-        <TableCard footer={<TablePaginationBar count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}>
+        <TableCard footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}>
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -175,21 +161,18 @@ export const Products = () => {
         </>
       )}
 
-      <Dialog open={Boolean(deletingProduct)} onClose={() => setDeletingProduct(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Delete product?</DialogTitle>
+      <ConfirmDialog
+        open={Boolean(deletingProduct)}
+        title="Delete product?"
+        confirmLabel="Delete"
+        cancelLabel="Keep product"
+        onConfirm={confirmDelete}
+        onClose={() => setDeletingProduct(null)}
+      >
         {deletingProduct && (
-          <DialogContent>
-            <Typography color="text.secondary">
-              Remove <b>{deletingProduct.name}</b> ({deletingProduct.code}) from the catalogue? Bills already raised keep
-              their copy of the item.
-            </Typography>
-          </DialogContent>
+          <>Remove <b>{deletingProduct.name}</b> ({deletingProduct.code}) from the catalogue? Bills already raised keep their copy of the item.</>
         )}
-        <DialogActions className={styles.dialogActions}>
-          <Button onClick={() => setDeletingProduct(null)}>Keep product</Button>
-          <Button variant="contained" color="error" onClick={confirmDelete}>Delete</Button>
-        </DialogActions>
-      </Dialog>
+      </ConfirmDialog>
     </>
   )
 }

@@ -23,7 +23,6 @@ export interface TopItem {
   amount: number
 }
 
-/** Cancelled bills took no money, so nothing on the dashboard counts them. */
 const paidOnly = (bills: Bill[]): Bill[] => bills.filter((bill) => bill.status === 'Paid')
 
 export const dashboardKpis = (bills: Bill[]): DashboardKpis => {
@@ -52,7 +51,6 @@ const sortKey = (billDate: string): number => {
   return Number(year) * 10000 + (monthIndex + 1) * 100 + Number(day)
 }
 
-/** Takings per day, newest last, in thousands so the axis stays readable. */
 export const salesTrend = (bills: Bill[], days = 10): TrendPoint[] => {
   const byDate = new Map<string, number>()
   for (const bill of paidOnly(bills)) {

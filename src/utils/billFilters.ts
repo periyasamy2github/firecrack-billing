@@ -10,7 +10,6 @@ export const matchesFilter = (bill: Bill, filter: BillFilter): boolean => {
   return bill.paymentMethod === filter
 }
 
-/** Matches bill number or customer mobile, ignoring spaces in the mobile. */
 export const matchesSearch = (bill: Bill, query: string): boolean => {
   const q = query.trim().toLowerCase()
   if (!q) return true

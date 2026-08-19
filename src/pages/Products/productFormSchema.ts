@@ -2,8 +2,6 @@ import { z } from 'zod'
 import { productCategories } from '../../data/mockProducts'
 import type { Product, ProductCategory } from '../../types'
 
-// HSN and the reorder threshold are still fixed defaults; the GST rate is on the form,
-// because it follows the HSN and a shop stocks goods at more than one rate.
 const DEFAULT_HSN = '3604 90 00'
 const DEFAULT_GST_RATE = 18
 const DEFAULT_LOW_STOCK_THRESHOLD = 15
@@ -54,8 +52,7 @@ export const toProductFormValues = (p: Product): ProductFormValues => ({
   stock: String(p.stock),
 })
 
-// `existing` carries forward the hidden fields when editing, so saving a product never
-// resets its real HSN/GST/discount/threshold back to the defaults.
+// `existing` carries the hidden fields forward so editing never resets them.
 export const fromProductFormValues = (v: ProductFormValues, existing?: Product | null): Product => ({
   code: v.code.trim(),
   name: v.name.trim(),

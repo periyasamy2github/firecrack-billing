@@ -9,7 +9,6 @@ interface SearchFieldProps {
   sx?: SxProps<Theme>
 }
 
-/** The standard list-page search box — icon, small size, "/" focuses it. */
 export const SearchField = ({ placeholder, value, onChange, inputRef, sx }: SearchFieldProps) => (
   <TextField
     placeholder={placeholder}

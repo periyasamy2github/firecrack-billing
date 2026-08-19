@@ -1,4 +1,4 @@
-﻿import { useMemo, useRef, useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
@@ -9,15 +9,15 @@ import { Mono } from '../../components/Mono'
 import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
-import { TablePaginationBar } from '../../components/TablePaginationBar'
+import { ListFooter } from '../../components/ListFooter'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { BILL_FILTERS, matchesFilter, matchesSearch, type BillFilter } from '../../utils/billFilters'
 import { billPrintPath } from '../../utils/routes'
 import { downloadCsv } from '../../utils/csv'
+import type { Bill } from '../../types'
 import { useStoreScope } from '../../hooks/useStoreScope'
-import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
-import { usePagination } from '../../hooks/usePagination'
+import { useListPage } from '../../hooks/useListPage'
 import styles from './Reports.module.css'
 
 const MONTH_NUM: Record<string, string> = {
@@ -25,7 +25,7 @@ const MONTH_NUM: Record<string, string> = {
   Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12',
 }
 
-// '10-Nov-2026' ? '2026-11-10', same shape as the date-input values, so plain string compare works.
+// Reformat '10-Nov-2026' to '2026-11-10' so plain string compare works against the date inputs.
 const toIsoDate = (billDate: string): string => {
   const [day, month, year] = billDate.split('-')
   return `${year}-${MONTH_NUM[month] ?? '01'}-${day.padStart(2, '0')}`
@@ -35,39 +35,23 @@ export const Reports = () => {
   const navigate = useNavigate()
   const { currentBranchId, isSuperAdmin, scopedBills, branches } = useStoreScope()
   const viewingAll = currentBranchId === 'all'
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<BillFilter>('All')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [counterFilter, setCounterFilter] = useState('All')
-  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  useKeyShortcuts({
-    '/': () => searchInputRef.current?.focus(),
-    ...Object.fromEntries(BILL_FILTERS.map((key, i) => [String(i + 1), () => setFilter(key)])),
-  })
-
-  const filterCounts = useMemo(() => {
-    const counts: Record<BillFilter, number> = { All: scopedBills.length, Cash: 0, UPI: 0, Card: 0, Cancelled: 0 }
-    scopedBills.forEach((b) => {
-      if (b.status === 'Cancelled') counts.Cancelled += 1
-      else if (b.paymentMethod && b.paymentMethod in counts) counts[b.paymentMethod as BillFilter] += 1
+  const { query, setQuery, searchInputRef, filter, setFilter, counts, filtered, page, rowsPerPage, pageRows, changePage, changeRowsPerPage } =
+    useListPage<Bill, BillFilter>({
+      rows: scopedBills,
+      filters: BILL_FILTERS,
+      matchesFilter,
+      matchesSearch: (bill, search) => {
+        const iso = toIsoDate(bill.date)
+        if (dateFrom && iso < dateFrom) return false
+        if (dateTo && iso > dateTo) return false
+        if (isSuperAdmin && counterFilter !== 'All' && bill.counter !== counterFilter) return false
+        return matchesSearch(bill, search)
+      },
     })
-    return counts
-  }, [scopedBills])
-
-  const filtered = useMemo(() => {
-    return scopedBills.filter((b) => {
-      if (!matchesFilter(b, filter)) return false
-      const iso = toIsoDate(b.date)
-      if (dateFrom && iso < dateFrom) return false
-      if (dateTo && iso > dateTo) return false
-      if (isSuperAdmin && counterFilter !== 'All' && b.counter !== counterFilter) return false
-      return matchesSearch(b, search)
-    })
-  }, [scopedBills, search, filter, dateFrom, dateTo, counterFilter, isSuperAdmin])
-
-  const { page, rowsPerPage, pageRows, changePage, changeRowsPerPage } = usePagination(filtered)
 
   const totalCollected = filtered.filter((b) => b.status === 'Paid').reduce((sum, b) => sum + getBillTotals(b).grandTotal, 0)
 
@@ -85,14 +69,20 @@ export const Reports = () => {
   }
 
   const tableFooter = (
-    <>
-      <div className={styles.footerBar}>
-        <Typography variant="caption">{filtered.length} bills shown</Typography>
-        <div className={styles.footerSpacer} />
-        <Typography variant="caption">Total <Mono sx={{ fontWeight: 700, color: 'text.primary', fontSize: 13 }}>{formatCurrency(totalCollected)}</Mono></Typography>
-      </div>
-      <TablePaginationBar count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />
-    </>
+    <ListFooter
+      count={filtered.length}
+      page={page}
+      rowsPerPage={rowsPerPage}
+      onPageChange={changePage}
+      onRowsPerPageChange={changeRowsPerPage}
+      summary={
+        <>
+          <Typography variant="caption">{filtered.length} bills shown</Typography>
+          <div className={styles.footerSpacer} />
+          <Typography variant="caption">Total <Mono sx={{ fontWeight: 700, color: 'text.primary', fontSize: 13 }}>{formatCurrency(totalCollected)}</Mono></Typography>
+        </>
+      }
+    />
   )
 
   return (
@@ -105,7 +95,7 @@ export const Reports = () => {
       <PageContent>
         <Card className={styles.filterCard}>
           <div className={styles.filterRow}>
-            <SearchField placeholder="Bill number or customer mobile… (/)" value={search} onChange={setSearch} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
+            <SearchField placeholder="Bill number or customer mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
             <TextField
               label="From"
               type="date"
@@ -148,7 +138,7 @@ export const Reports = () => {
               className={styles.paymentField}
             >
               {BILL_FILTERS.map((key) => (
-                <MenuItem key={key} value={key}>{key} ({filterCounts[key]})</MenuItem>
+                <MenuItem key={key} value={key}>{key} ({counts[key]})</MenuItem>
               ))}
             </TextField>
           </div>

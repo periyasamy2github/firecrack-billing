@@ -17,15 +17,12 @@ export type { BranchScope, NewBillInput }
 
 const findBranch = (branches: Branch[], id: string): Branch | undefined => branches.find((branch) => branch.id === id)
 
-/** A thunk rejection carries a string; pages expect an Error they can read. */
 const asError = (reason: unknown, fallback: string): Error =>
   new Error(typeof reason === 'string' ? reason : reason instanceof Error ? reason.message : fallback)
 
 export const useStoreScope = () => {
   const dispatch = useDispatch()
 
-  // By using individual selectors, Redux can optimize re-renders
-  // better than Context could.
   const shop = useSelector((state) => state.shop.shop)
   const users = useSelector((state) => state.users.items)
   const products = useSelector((state) => state.products.items)
@@ -41,7 +38,6 @@ export const useStoreScope = () => {
   const currentBranch = currentBranchId === 'all' ? undefined : findBranch(branches, currentBranchId)
   const activeBranch = currentBranch ?? branches[0]
 
-  // Every list page shows the counter you're scoped to, so the filter lives here once.
   const scopedBills = currentBranchId === 'all' ? bills : bills.filter((bill) => bill.branchId === currentBranchId)
 
   return {

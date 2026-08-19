@@ -16,11 +16,6 @@ const TOAST_ICON: Record<ToastSeverity, SvgIconComponent> = {
   info: InfoRoundedIcon,
 }
 
-/**
- * The one toast for the whole app, in the toastr look: a solid colour block
- * with white text. Snackbar handles timing and placement only — the styling is
- * ours, not MUI's Alert.
- */
 export const GlobalToast = () => {
   const dispatch = useDispatch()
   const { toastId, toastOpen, toastMessage, toastSeverity } = useSelector((state) => state.ui)

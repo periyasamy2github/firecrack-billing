@@ -4,7 +4,6 @@ import NProgress from 'nprogress'
 
 NProgress.configure({ showSpinner: false })
 
-/** Sweeps the top progress bar on every route change. */
 export const RouteProgress = () => {
   const location = useLocation()
   const isFirstRender = useRef(true)
@@ -22,7 +21,6 @@ export const RouteProgress = () => {
   return null
 }
 
-/** Suspense fallback — keeps the bar running while a page chunk downloads. */
 export const PageLoader = () => {
   useEffect(() => {
     NProgress.start()

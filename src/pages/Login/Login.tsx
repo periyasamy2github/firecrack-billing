@@ -65,7 +65,6 @@ export const Login = () => {
           value={account}
           onChange={(_, value) => {
             setAccount(value)
-            // Demo build: fill in the account's password so testers can sign straight in.
             setPassword(value?.password ?? '')
             clearError('email')
           }}

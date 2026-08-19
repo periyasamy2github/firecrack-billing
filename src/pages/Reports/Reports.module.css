@@ -21,14 +21,6 @@
   width: 180px;
 }
 
-.footerBar {
-  display: flex;
-  align-items: center;
-  padding: 8.8px 16px;
-  border-top: 1px solid var(--line);
-  background-color: var(--action-hover);
-}
-
 .footerSpacer {
   flex: 1;
 }

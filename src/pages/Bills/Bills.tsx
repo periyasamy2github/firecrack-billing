@@ -1,6 +1,6 @@
-﻿import { useMemo, useRef, useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, Card, Chip, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
@@ -11,14 +11,14 @@ import { Mono } from '../../components/Mono'
 import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
 import { TableCard, TableEmptyRow } from '../../components/TableCard'
-import { TablePaginationBar } from '../../components/TablePaginationBar'
+import { ListFooter } from '../../components/ListFooter'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { BILL_FILTERS, matchesFilter, matchesSearch, type BillFilter } from '../../utils/billFilters'
 import { ROUTES, billPrintPath } from '../../utils/routes'
 import { useStoreScope } from '../../hooks/useStoreScope'
-import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
-import { usePagination } from '../../hooks/usePagination'
+import { useListPage } from '../../hooks/useListPage'
 import { useToast } from '../../hooks/useToast'
 import type { Bill } from '../../types'
 import styles from './Bills.module.css'
@@ -27,11 +27,16 @@ export const Bills = () => {
   const navigate = useNavigate()
   const { currentBranchId, scopedBills, cancelBill, billReprinted } = useStoreScope()
   const viewingAll = currentBranchId === 'all'
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<BillFilter>('All')
   const [cancellingBill, setCancellingBill] = useState<Bill | null>(null)
   const showToast = useToast()
-  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const { query, setQuery, searchInputRef, filter, setFilter, counts, filtered, page, rowsPerPage, pageRows, changePage, changeRowsPerPage } =
+    useListPage<Bill, BillFilter>({
+      rows: scopedBills,
+      matchesSearch,
+      filters: BILL_FILTERS,
+      matchesFilter,
+    })
 
   const confirmCancel = async () => {
     if (!cancellingBill) return
@@ -40,27 +45,6 @@ export const Bills = () => {
     await cancelBill(billNo)
     showToast(`Bill ${billNo} cancelled`, 'warning')
   }
-
-  useKeyShortcuts({
-    '/': () => searchInputRef.current?.focus(),
-    ...Object.fromEntries(BILL_FILTERS.map((key, i) => [String(i + 1), () => setFilter(key)])),
-  })
-
-  const filterCounts = useMemo(() => {
-    const counts: Record<BillFilter, number> = { All: scopedBills.length, Cash: 0, UPI: 0, Card: 0, Cancelled: 0 }
-    scopedBills.forEach((b) => {
-      if (b.status === 'Cancelled') counts.Cancelled += 1
-      else if (b.paymentMethod && b.paymentMethod in counts) counts[b.paymentMethod as BillFilter] += 1
-    })
-    return counts
-  }, [scopedBills])
-
-  const filtered = useMemo(
-    () => scopedBills.filter((b) => matchesFilter(b, filter) && matchesSearch(b, search)),
-    [scopedBills, search, filter],
-  )
-
-  const { page, rowsPerPage, pageRows, changePage, changeRowsPerPage } = usePagination(filtered)
 
   const paidTotals = filtered.filter((b) => b.status === 'Paid').reduce(
     (acc, b) => {
@@ -74,16 +58,22 @@ export const Bills = () => {
   )
 
   const tableFooter = (
-    <>
-      <div className={styles.footerBar}>
-        <Typography variant="caption">{filtered.length} bills shown · {filterCounts.Cancelled} cancelled</Typography>
-        <div className={styles.footerSpacer} />
-        <Typography variant="caption">Discount <Mono sx={{ fontWeight: 650, color: 'text.primary' }}>{formatCurrency(paidTotals.discount)}</Mono></Typography>
-        <Typography variant="caption">GST <Mono sx={{ fontWeight: 650, color: 'text.primary' }}>{formatCurrency(paidTotals.gst)}</Mono></Typography>
-        <Typography variant="caption">Total <Mono sx={{ fontWeight: 700, color: 'text.primary', fontSize: 13 }}>{formatCurrency(paidTotals.grand)}</Mono></Typography>
-      </div>
-      <TablePaginationBar count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />
-    </>
+    <ListFooter
+      count={filtered.length}
+      page={page}
+      rowsPerPage={rowsPerPage}
+      onPageChange={changePage}
+      onRowsPerPageChange={changeRowsPerPage}
+      summary={
+        <>
+          <Typography variant="caption">{filtered.length} bills shown · {counts.Cancelled} cancelled</Typography>
+          <div className={styles.footerSpacer} />
+          <Typography variant="caption">Discount <Mono sx={{ fontWeight: 650, color: 'text.primary' }}>{formatCurrency(paidTotals.discount)}</Mono></Typography>
+          <Typography variant="caption">GST <Mono sx={{ fontWeight: 650, color: 'text.primary' }}>{formatCurrency(paidTotals.gst)}</Mono></Typography>
+          <Typography variant="caption">Total <Mono sx={{ fontWeight: 700, color: 'text.primary', fontSize: 13 }}>{formatCurrency(paidTotals.grand)}</Mono></Typography>
+        </>
+      }
+    />
   )
 
   return (
@@ -98,11 +88,11 @@ export const Bills = () => {
       <PageContent>
         <Card className={styles.filterCard}>
           <div className={styles.filterRow}>
-            <SearchField placeholder="Bill number or customer mobile… (/)" value={search} onChange={setSearch} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
+            <SearchField placeholder="Bill number or customer mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
             {BILL_FILTERS.map((key) => (
               <Chip
                 key={key}
-                label={`${key} ${filterCounts[key]}`}
+                label={`${key} ${counts[key]}`}
                 size="small"
                 onClick={() => setFilter(key)}
                 color={filter === key ? 'primary' : undefined}
@@ -137,7 +127,6 @@ export const Bills = () => {
                       <TableCell>
                         <div className={styles.billNoCell}>
                           <Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono>
-                          {/* Only the exceptions are worth a badge — most bills are a plain Bill of Supply. */}
                           {bill.gstApplicable && (
                             <Tooltip title={`GST ${formatCurrency(totals.cgst + totals.sgst)}`}>
                               <span><StatusPill tone="paid" dot={false} label="GST" /></span>
@@ -210,20 +199,18 @@ export const Bills = () => {
         </TableCard>
       </PageContent>
 
-      <Dialog open={Boolean(cancellingBill)} onClose={() => setCancellingBill(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Cancel bill?</DialogTitle>
+      <ConfirmDialog
+        open={Boolean(cancellingBill)}
+        title="Cancel bill?"
+        confirmLabel="Cancel bill"
+        cancelLabel="Keep bill"
+        onConfirm={confirmCancel}
+        onClose={() => setCancellingBill(null)}
+      >
         {cancellingBill && (
-          <DialogContent>
-            <Typography color="text.secondary">
-              Cancel bill <b>{cancellingBill.billNo}</b> for {formatCurrency(getBillTotals(cancellingBill).grandTotal)}? This can't be undone.
-            </Typography>
-          </DialogContent>
+          <>Cancel bill <b>{cancellingBill.billNo}</b> for {formatCurrency(getBillTotals(cancellingBill).grandTotal)}? This can't be undone.</>
         )}
-        <DialogActions>
-          <Button onClick={() => setCancellingBill(null)}>Keep bill</Button>
-          <Button variant="contained" color="error" onClick={confirmCancel}>Cancel bill</Button>
-        </DialogActions>
-      </Dialog>
+      </ConfirmDialog>
     </>
   )
 }

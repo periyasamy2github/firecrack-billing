@@ -58,7 +58,6 @@ const importRowSchema = z.object({
   .refine((v) => Number.isFinite(v.gstRate) && v.gstRate >= 0, { message: 'GST rate must be 0 or more', path: ['gstRate'] })
   .refine((v) => Number.isFinite(v.stock) && v.stock >= 0, { message: 'Stock must be 0 or more', path: ['stock'] })
 
-/** A code already in the catalogue is an update, not a mistake. */
 type Outcome = 'new' | 'update' | 'error'
 
 interface ImportRow {
@@ -144,7 +143,6 @@ const downloadTemplate = () => {
 
 const STEPS = ['Choose file', 'Review rows', 'Import'] as const
 
-
 export const ProductImport = () => {
   const navigate = useNavigate()
   const { products, importProducts } = useStoreScope()
@@ -173,7 +171,6 @@ export const ProductImport = () => {
     [rows],
   )
 
-  // Review is a validation step: it reports what is wrong, nothing else.
   const errorRows = useMemo(() => rows.filter((r) => r.outcome === 'error'), [rows])
   const readyCount = counts.created + counts.updated
 
@@ -213,15 +210,12 @@ export const ProductImport = () => {
     }
   }
 
-  /** Imports in batches so the bar tracks rows actually written, not a timer. */
   const startImport = () => {
     const queue = rows.filter((r) => r.product).map((r) => r.product as Product)
     if (queue.length === 0) return
 
     setStage('importing')
     setProcessed(0)
-    // At most 20 ticks, paced so even a handful of rows shows the bar for ~1s
-    // instead of flashing — a progress bar nobody can read is worse than none.
     const ticks = Math.min(20, queue.length)
     const batchSize = Math.max(1, Math.ceil(queue.length / ticks))
     const interval = Math.round(900 / ticks)

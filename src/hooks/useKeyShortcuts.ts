@@ -9,15 +9,9 @@ const isEditableElement = (el: Element | null): boolean => {
 }
 
 interface UseKeyShortcutsOptions {
-  /** Keys that should fire even while a text field has focus — safe for function keys, never for bare letters. */
   allowInInputs?: string[]
 }
 
-/**
- * Binds `bindings` (e.g. { F2: focusSearch, n: goToNewBill }) to window keydown.
- * Bare letters and digits are ignored while focus is inside a text field so shortcuts
- * never fight with typing; function keys can opt into firing anyway via allowInInputs.
- */
 export const useKeyShortcuts = (bindings: KeyBindings, options?: UseKeyShortcutsOptions) => {
   const bindingsRef = useRef(bindings)
   bindingsRef.current = bindings
@@ -27,7 +21,6 @@ export const useKeyShortcuts = (bindings: KeyBindings, options?: UseKeyShortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return
-      // Letters match case-insensitively so one binding covers Shift too.
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key
       const action = bindingsRef.current[key]
       if (!action) return

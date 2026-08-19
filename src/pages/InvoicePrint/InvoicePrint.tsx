@@ -41,7 +41,6 @@ export const InvoicePrint = () => {
   const navState = location.state as PrintNavState | undefined
   const { bills } = useStoreScope()
 
-  // Fresh bills arrive through router state; reprints are looked up in the store.
   const billNo = decodeURIComponent(params.billNo ?? '')
   const bill = navState?.bill ?? bills.find((item) => item.billNo === billNo)
 

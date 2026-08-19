@@ -33,7 +33,6 @@ export const ShortcutsDialog = ({ open, onClose, groups }: ShortcutsDialogProps)
     </DialogTitle>
 
     <div className={styles.body}>
-      {/* Columns rather than one tall list, so every shortcut is on screen at once. */}
       <div className={styles.columns}>
         {groups.map((group) => (
           <div key={group.title} className={styles.group}>

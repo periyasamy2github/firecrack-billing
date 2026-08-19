@@ -6,10 +6,6 @@ import type { Bill, Shop } from '../types'
 
 export type NewBillInput = Omit<Bill, 'billNo' | 'status' | 'reprintCount'>
 
-/**
- * Only the parts of the store these thunks read. Declared here rather than
- * imported from store.ts, which would make the two files depend on each other.
- */
 interface BillThunkState {
   shop: { shop: Shop }
   bills: { items: Bill[]; nextNumber: number }
@@ -33,8 +29,6 @@ const billsSlice = createSlice({
   name: 'bills',
   initialState: {
     items: structuredClone(seedBills) as Bill[],
-    // The running invoice number lives with the bills, so no other slice has to
-    // react when one is raised.
     nextNumber: seedShop.nextInvoiceNumber,
   },
   reducers: {},

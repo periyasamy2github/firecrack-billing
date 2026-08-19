@@ -1,4 +1,3 @@
-/** SparkBill mark — a spark inside a receipt. Takes its colour from the container. */
 export const BrandMark = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
     <path

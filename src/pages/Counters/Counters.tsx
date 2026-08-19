@@ -1,6 +1,5 @@
 ﻿import { useState } from 'react'
-import { z } from 'zod'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Button, IconButton, Switch, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { PageHeader } from '../../components/PageHeader'
@@ -8,45 +7,34 @@ import { PageContent } from '../../components/PageContent'
 import { StatusPill } from '../../components/StatusPill'
 import { TableCard } from '../../components/TableCard'
 import { useStoreScope } from '../../hooks/useStoreScope'
-import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../hooks/useToast'
 import type { Branch } from '../../types'
+import { CounterDialog } from './CounterDialog'
 import styles from './Counters.module.css'
-
-const counterSchema = z.object({
-  name: z.string().trim().min(1, 'Counter name is required'),
-})
 
 export const Counters = () => {
   const { branches: counters, saveBranch } = useStoreScope()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Branch | null>(null)
-  const [name, setName] = useState('')
-  const { errors, validate, clearError, reset: resetErrors } = useFormValidation(counterSchema)
+  const showToast = useToast()
 
   const openAdd = () => {
     setEditing(null)
-    setName('')
-    resetErrors()
     setOpen(true)
   }
 
-  const openEdit = (c: Branch) => {
-    setEditing(c)
-    setName(c.name)
-    resetErrors()
+  const openEdit = (counter: Branch) => {
+    setEditing(counter)
     setOpen(true)
   }
 
   const closeDialog = () => setOpen(false)
 
-  const save = async () => {
-    if (!validate({ name })) return
+  const save = async (counter: Branch) => {
+    const wasEditing = Boolean(editing)
     closeDialog()
-    if (editing) {
-      await saveBranch({ ...editing, name: name.trim() })
-    } else {
-      await saveBranch({ id: `c${Date.now()}`, name: name.trim(), active: true })
-    }
+    await saveBranch(counter)
+    showToast(`${counter.name} ${wasEditing ? 'updated' : 'added'}`)
   }
 
   const toggleActive = (counter: Branch) => {
@@ -103,27 +91,14 @@ export const Counters = () => {
         </TableCard>
       </PageContent>
 
-      <Dialog open={open} onClose={closeDialog} fullWidth maxWidth="xs">
-        <DialogTitle>{editing ? 'Edit counter' : 'Add counter'}</DialogTitle>
-        <DialogContent className={styles.dialogContentTop}>
-          <TextField
-            label="Counter name"
-            value={name}
-            onChange={(e) => { setName(e.target.value); clearError('name') }}
-            fullWidth
-            autoFocus
-            required
-            className={styles.nameField}
-            placeholder="e.g. Counter 4 — Gift desk"
-            error={Boolean(errors.name)}
-            helperText={errors.name || ' '}
-          />
-        </DialogContent>
-        <DialogActions className={styles.dialogActions}>
-          <Button onClick={closeDialog}>Cancel</Button>
-          <Button variant="contained" onClick={save}>{editing ? 'Save changes' : 'Add counter'}</Button>
-        </DialogActions>
-      </Dialog>
+      {open && (
+        <CounterDialog
+          open={open}
+          counter={editing}
+          onClose={closeDialog}
+          onSubmit={save}
+        />
+      )}
     </>
   )
 }

@@ -23,7 +23,6 @@ const SPARKS = [
   { cx: 92, cy: 26, r: 1.6 },
 ]
 
-/** Decorative fireworks for the sign-in panel — drawn, so it stays crisp and weighs nothing. */
 export const FireworksArt = () => (
   <svg className={styles.art} viewBox="0 0 380 250" aria-hidden="true" focusable="false">
     {BURSTS.map(({ cx, cy, r, rays, color, width }) => (

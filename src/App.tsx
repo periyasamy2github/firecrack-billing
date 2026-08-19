@@ -5,7 +5,6 @@ import { RouteProgress, PageLoader } from './components/RouteProgress'
 import { RequireAuth, RequireSuperAdmin } from './components/RouteGuards'
 import { GlobalToast } from './components/GlobalToast'
 
-// Each page loads as its own chunk — the top bar shows while it downloads.
 const Login = lazy(() => import('./pages/Login/Login'))
 const SelectCounter = lazy(() => import('./pages/SelectCounter/SelectCounter'))
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))

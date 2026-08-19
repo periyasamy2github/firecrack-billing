@@ -9,7 +9,6 @@ export type ProductCategory =
 
 export type UserRole = 'Counter Staff' | 'Super Admin'
 
-/** The single shop this deployment serves — one GSTIN, one licence, printed on every invoice. */
 export interface Shop {
   name: string
   town: string
@@ -23,7 +22,6 @@ export interface Shop {
   seasonTarget: number
 }
 
-/** A billing counter within the shop. Super Admin oversees all of them. */
 export interface Branch {
   id: string
   name: string
@@ -36,11 +34,9 @@ export interface User {
   initials: string
   staffId: string
   mobile: string
-  /** The sign-in credential. */
   email: string
   password: string
   role: UserRole
-  /** Counters this user can bill from. Empty for Super Admin — they aren't tied to one. */
   counters: string[]
   active: boolean
   joinedOn: string
@@ -93,12 +89,10 @@ export interface Bill {
   reprintCount: number
   /** Off produces a plain Bill of Supply — no CGST/SGST, no tax columns. */
   gstApplicable: boolean
-  /** The one discount on a bill — the shop's flat festival offer, percent or rupees. */
   billDiscount?: BillDiscount
 }
 
 export interface BillTotals {
-  /** Sum of MRP × qty — only used to tell the customer what they saved. */
   mrpValue: number
   gross: number
   billDiscountAmount: number
