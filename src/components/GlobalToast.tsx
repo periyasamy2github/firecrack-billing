@@ -7,7 +7,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { useDispatch, useSelector } from '../redux/store'
 import { hideToast, type ToastSeverity } from '../redux/uiSlice'
-import styles from './GlobalToast.module.css'
+import styles from '../css/components/GlobalToast.module.css'
 
 const TOAST_ICON: Record<ToastSeverity, SvgIconComponent> = {
   success: CheckCircleRoundedIcon,
@@ -26,7 +26,7 @@ export const GlobalToast = () => {
     <Snackbar
       key={toastId}
       open={toastOpen}
-      autoHideDuration={3000}
+      autoHideDuration={3500}
       onClose={close}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >

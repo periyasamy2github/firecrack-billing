@@ -1,122 +1,113 @@
-﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { z } from 'zod'
-import { Autocomplete, Avatar, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
-import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
 import { AuthShell } from '../../components/AuthShell'
-import { useStoreScope } from '../../hooks/useStoreScope'
-import { useFormValidation } from '../../hooks/useFormValidation'
+import { useDispatch } from '../../redux/store'
+import { loadSession } from '../../redux/sessionSlice'
+import { api, setToken } from '../../services/api'
+import { useSession } from '../../hooks/useSession'
 import { useToast } from '../../hooks/useToast'
+import { errorMessage } from '../../utils/errorMessage'
 import type { User } from '../../types'
 import { ROUTES } from '../../utils/routes'
-import styles from './Login.module.css'
+import styles from '../../css/pages/Login.module.css'
+import nProgress from 'nprogress'
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Pick your email from the list'),
+  email: z.string().min(1, 'Enter your email').email('Enter a valid email'),
+  password: z.string().min(1, 'Enter your password'),
 })
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 export const Login = () => {
   const navigate = useNavigate()
-  const { setCurrentUser, setCurrentBranchId, setActiveCounter, users, branches } = useStoreScope()
-  const [account, setAccount] = useState<User | null>(null)
-  const [password, setPassword] = useState('')
+  const dispatch = useDispatch()
+
+  const landingPage = ROUTES.dashboard
+  const { setCounterScope } = useSession()
   const [showPassword, setShowPassword] = useState(false)
-  const { errors, validate, clearError } = useFormValidation(loginSchema)
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
+
   const showToast = useToast()
-  const findBranchByName = (name: string) => branches.find((branch) => branch.name === name)
 
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validate({ email: account?.email ?? '' }) || !account) return
-    // Password isn't checked yet — there's no backend to authenticate against.
-
-    setCurrentUser(account)
-    if (account.role === 'Super Admin') {
-      setCurrentBranchId('all')
-      setActiveCounter(null)
-      navigate(ROUTES.dashboard)
+  const routeAfterLogin = (user: User) => {
+    if (user.role !== 'Super Admin' && !user.counterId) {
+      setToken(null)
+      showToast('No counter is assigned to you. Ask a Super Admin.', 'error')
       return
     }
-    const usableCounters = account.counters.filter((c) => findBranchByName(c)?.active)
-    if (usableCounters.length > 1) {
-      navigate(ROUTES.selectCounter)
-    } else {
-      const counter = usableCounters[0] ?? null
-      setActiveCounter(counter)
-      setCurrentBranchId(counter ? findBranchByName(counter)?.id ?? 'all' : 'all')
-      navigate(ROUTES.dashboard)
+
+    setCounterScope(user.role === 'Super Admin' ? 'all' : user.counterId as string)
+    navigate(landingPage, { replace: true })
+  }
+
+  const handleSignIn = async ({ email, password }: LoginFormValues) => {
+    nProgress.start()
+    nProgress.inc(0.1)
+    try {
+      const { token } = await api.login(email, password)
+      setToken(token)
+      const data = await dispatch(loadSession()).unwrap()
+      routeAfterLogin(data.user)
+    } catch (err) {
+      setToken(null)
+      showToast(errorMessage(err, 'Could not sign in'), 'error')
+    } finally {
+      nProgress.done();
     }
   }
 
   return (
     <AuthShell>
-      <form onSubmit={handleSignIn} className={styles.form}>
+      <form onSubmit={handleSubmit(handleSignIn)} className={styles.form}>
         <div className={styles.heading}>
           <Typography component="h2" className={styles.title}>Sign in</Typography>
           <Typography className={styles.subtitle}>Use your work email to open your counter.</Typography>
         </div>
 
-        <Autocomplete
-          options={users.filter((user) => user.active)}
-          value={account}
-          onChange={(_, value) => {
-            setAccount(value)
-            setPassword(value?.password ?? '')
-            clearError('email')
+        <TextField
+          label="Email address"
+          type="email"
+          {...register('email')}
+          placeholder="you@example.com"
+          size="medium"
+          fullWidth
+          autoFocus
+          required
+          autoComplete="username"
+          error={Boolean(errors.email)}
+          helperText={errors.email?.message || ' '}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <MailOutlineRoundedIcon sx={{ fontSize: 19, color: 'text.secondary' }} />
+              </InputAdornment>
+            ),
           }}
-          getOptionLabel={(user) => user.email}
-          isOptionEqualToValue={(a, b) => a.id === b.id}
-          filterOptions={(options, { inputValue }) => {
-            const q = inputValue.trim().toLowerCase()
-            return options.filter((user) => user.email.toLowerCase().includes(q))
-          }}
-          renderOption={({ key, ...props }, user) => (
-            <li {...props} key={key} className={`${props.className ?? ''} ${styles.option}`}>
-              <Avatar className={styles.optionAvatar}>{user.initials}</Avatar>
-              <span className={styles.optionText}>
-                <Typography className={styles.optionName}>{user.email}</Typography>
-                <Typography className={styles.optionMeta}>{user.role}</Typography>
-              </span>
-              {user.role === 'Super Admin' && <ShieldOutlinedIcon className={styles.optionShield} />}
-            </li>
-          )}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Email address"
-              placeholder="you@sparkbill.app"
-              size="medium"
-              autoFocus
-              required
-              error={Boolean(errors.email)}
-              helperText={errors.email || ' '}
-              InputProps={{
-                ...params.InputProps,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutlineRoundedIcon sx={{ fontSize: 19, color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          )}
         />
 
         <TextField
           label="Password"
           type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          {...register('password')}
           placeholder="••••••••"
           size="medium"
           fullWidth
           required
           autoComplete="current-password"
-          helperText=" "
+          error={Boolean(errors.password)}
+          helperText={errors.password?.message || ' '}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -137,10 +128,11 @@ export const Login = () => {
           type="submit"
           variant="contained"
           size="large"
+          disabled={isSubmitting}
           endIcon={<ArrowForwardRoundedIcon />}
           className={styles.signInButton}
         >
-          Sign in
+          {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
 
         <div className={styles.footerRow}>
@@ -153,7 +145,7 @@ export const Login = () => {
           >
             Forgot password?
           </Button>
-          <Typography className={styles.footerVersion}>v1.0 · Season {new Date().getFullYear()}</Typography>
+          <Typography className={styles.footerVersion}>Season {new Date().getFullYear()}</Typography>
         </div>
       </form>
     </AuthShell>

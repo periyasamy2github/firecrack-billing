@@ -1,36 +1,35 @@
-import { useState } from 'react'
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Button } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined'
-import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
-import { Mono } from '../../components/Mono'
-import { StatusPill } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
-import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { ListFooter } from '../../components/ListFooter'
-import { useStoreScope } from '../../hooks/useStoreScope'
+import { useSession } from '../../hooks/useSession'
+import { useDispatch, useSelector } from '../../redux/store'
+import { loadUsers, saveUser } from '../../redux/usersSlice'
 import { useListPage } from '../../hooks/useListPage'
 import { useToast } from '../../hooks/useToast'
+import { errorMessage } from '../../utils/errorMessage'
 import type { User } from '../../types'
+
 import { UserDialog } from './UserDialog'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
-import styles from './Users.module.css'
-
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <div className={styles.detailRow}>
-    <Typography className={styles.detailLabel}>{label}</Typography>
-    <Typography className={styles.detailValue}>{value}</Typography>
-  </div>
-)
+import { UsersTable } from './UsersTable'
+import { UserDetailsDialog } from './UserDetailsDialog'
 
 export const Users = () => {
-  const { users, saveUser, branches } = useStoreScope()
-  const counterNames = branches.map((branch) => branch.name)
+  const { counters } = useSession()
+  const dispatch = useDispatch()
+  const users = useSelector((state) => state.users.items)
   const showToast = useToast()
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    void dispatch(loadUsers()).finally(() => setLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
@@ -61,18 +60,29 @@ export const Users = () => {
     setEditingUser(null)
   }
 
+  // Await before closing so the dialog stays open if saving fails.
   const submitUser = async (user: User) => {
     const wasEditing = Boolean(editingUser)
+    try {
+      await dispatch(saveUser(user)).unwrap()
+    } catch (err) {
+      showToast(errorMessage(err, 'Could not save this user'), 'error')
+      throw err
+    }
     closeForm()
-    await saveUser(user)
     showToast(`${user.name} ${wasEditing ? 'updated' : 'added'}`)
   }
 
   const submitPassword = async (password: string) => {
     if (!resettingUser) return
     const { name } = resettingUser
+    try {
+      await dispatch(saveUser({ ...resettingUser, password })).unwrap()
+    } catch (err) {
+      showToast(errorMessage(err, 'Could not reset this password'), 'error')
+      throw err
+    }
     setResettingUser(null)
-    await saveUser({ ...resettingUser, password })
     showToast(`Password reset for ${name}`)
   }
 
@@ -90,68 +100,15 @@ export const Users = () => {
       <PageContent>
         <SearchField placeholder="Search by name or staff ID… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ maxWidth: 340 }} />
 
-        <TableCard footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Staff ID</TableCell>
-                <TableCell>Mobile</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Counters</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right" />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pageRows.map((user) => (
-                <TableRow key={user.id} hover>
-                  <TableCell><Typography className={styles.userName}>{user.name}</Typography></TableCell>
-                  <TableCell><Mono sx={{ fontWeight: 600 }}>{user.staffId}</Mono></TableCell>
-                  <TableCell><Mono sx={{ fontSize: 12 }}>{user.mobile}</Mono></TableCell>
-                  <TableCell>
-                    <div className={styles.roleRow}>
-                      {user.role === 'Super Admin' && <ShieldOutlinedIcon sx={{ fontSize: 14, color: 'secondary.dark' }} />}
-                      <Typography className={styles.roleLabel}>{user.role}</Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {user.role === 'Super Admin' ? (
-                      <Typography className={styles.allCountersLabel}>All counters</Typography>
-                    ) : (
-                      <div className={styles.countersWrap}>
-                        {user.counters.map((counter) => (
-                          <Chip key={counter} size="small" label={counter.split(' — ')[0]} variant="outlined" />
-                        ))}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell><StatusPill tone={user.active ? 'paid' : 'mut'} label={user.active ? 'Active' : 'Inactive'} /></TableCell>
-                  <TableCell align="right">
-                    <div className={styles.actionsRow}>
-                      <Tooltip title="View details">
-                        <IconButton size="small" onClick={() => setViewingUser(user)}>
-                          <VisibilityOutlinedIcon className={styles.actionIcon} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit user">
-                        <IconButton size="small" onClick={() => openEdit(user)}>
-                          <EditOutlinedIcon className={styles.actionIcon} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Reset password">
-                        <IconButton size="small" onClick={() => setResettingUser(user)}>
-                          <LockResetOutlinedIcon className={styles.actionIcon} />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filtered.length === 0 && <TableEmptyRow colSpan={7} message="No users match this search." />}
-            </TableBody>
-          </Table>
-        </TableCard>
+        <UsersTable
+          rows={pageRows}
+          loading={loading}
+          filteredCount={filtered.length}
+          onView={setViewingUser}
+          onEdit={openEdit}
+          onResetPassword={setResettingUser}
+          footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}
+        />
       </PageContent>
 
       {formOpen && (
@@ -159,7 +116,7 @@ export const Users = () => {
           open={formOpen}
           user={editingUser}
           users={users}
-          counterNames={counterNames}
+          counters={counters}
           onClose={closeForm}
           onSubmit={submitUser}
         />
@@ -172,24 +129,7 @@ export const Users = () => {
         onSubmit={submitPassword}
       />
 
-      <Dialog open={Boolean(viewingUser)} onClose={() => setViewingUser(null)} fullWidth maxWidth="xs">
-        <DialogTitle>User details</DialogTitle>
-        {viewingUser && (
-          <DialogContent className={styles.dialogContentTop}>
-            <DetailRow label="Name" value={viewingUser.name} />
-            <DetailRow label="Staff ID" value={viewingUser.staffId} />
-            <DetailRow label="Mobile" value={viewingUser.mobile} />
-            <DetailRow label="Email" value={viewingUser.email} />
-            <DetailRow label="Role" value={viewingUser.role} />
-            <DetailRow label="Counters" value={viewingUser.role === 'Super Admin' ? 'All counters' : viewingUser.counters.join(', ') || '—'} />
-            <DetailRow label="Joined on" value={viewingUser.joinedOn} />
-            <DetailRow label="Status" value={viewingUser.active ? 'Active' : 'Inactive'} />
-          </DialogContent>
-        )}
-        <DialogActions className={styles.dialogActions}>
-          <Button onClick={() => setViewingUser(null)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <UserDetailsDialog user={viewingUser} onClose={() => setViewingUser(null)} />
     </>
   )
 }

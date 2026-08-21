@@ -4,7 +4,7 @@ import type { BillLineItem } from '../../types'
 import { computeLineAmounts } from '../../utils/billing'
 import { formatAmount } from '../../utils/format'
 import { Mono } from '../../components/Mono'
-import styles from './BillItemsTable.module.css'
+import styles from '../../css/pages/BillItemsTable.module.css'
 
 interface BillItemsTableProps {
   items: BillLineItem[]

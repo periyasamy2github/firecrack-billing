@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
 import { RouteProgress, PageLoader } from './components/RouteProgress'
@@ -6,7 +6,6 @@ import { RequireAuth, RequireSuperAdmin } from './components/RouteGuards'
 import { GlobalToast } from './components/GlobalToast'
 
 const Login = lazy(() => import('./pages/Login/Login'))
-const SelectCounter = lazy(() => import('./pages/SelectCounter/SelectCounter'))
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))
 const NewBill = lazy(() => import('./pages/NewBill/NewBill'))
 const Bills = lazy(() => import('./pages/Bills/Bills'))
@@ -17,8 +16,7 @@ const ProductImport = lazy(() => import('./pages/ProductImport/ProductImport'))
 const Users = lazy(() => import('./pages/Users/Users'))
 const Counters = lazy(() => import('./pages/Counters/Counters'))
 const Settings = lazy(() => import('./pages/Settings/Settings'))
-const AccessDenied = lazy(async () => ({ default: (await import('./pages/SystemPage')).AccessDenied }))
-const NotFound = lazy(async () => ({ default: (await import('./pages/SystemPage')).NotFound }))
+const SystemPage = lazy(() => import('./pages/System/SystemPage'))
 
 function App() {
   return (
@@ -28,15 +26,14 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route element={<RequireAuth />}>
-            <Route path="/select-counter" element={<SelectCounter />} />
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/bills/new" element={<NewBill />} />
               <Route path="/bills" element={<Bills />} />
-              <Route path="/bills/:billNo/print" element={<InvoicePrint />} />
+              <Route path="/bills/:billId/print" element={<InvoicePrint />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/products" element={<Products />} />
-              <Route path="/unauthorized" element={<AccessDenied />} />
+              <Route path="/unauthorized" element={<SystemPage type="403" />} />
               <Route element={<RequireSuperAdmin />}>
                 <Route path="/products/import" element={<ProductImport />} />
                 <Route path="/users" element={<Users />} />
@@ -45,7 +42,8 @@ function App() {
               </Route>
             </Route>
           </Route>
-          <Route path="*" element={<NotFound />} />
+          <Route path="/500" element={<SystemPage type="500" />} />
+          <Route path="*" element={<SystemPage type="404" />} />
         </Routes>
       </Suspense>
       <GlobalToast />

@@ -1,6 +1,6 @@
 import type { ShortcutGroup } from '../components/ShortcutsDialog'
 
-export const globalShortcuts: ShortcutGroup = {
+const globalShortcuts: ShortcutGroup = {
   title: 'Everywhere',
   items: [
     { key: 'F1', label: 'Show keyboard shortcuts' },
@@ -26,7 +26,7 @@ export const newBillShortcuts: ShortcutGroup = {
   ],
 }
 
-export const billsShortcuts: ShortcutGroup = {
+const billsShortcuts: ShortcutGroup = {
   title: 'Bills',
   items: [
     { key: '/', label: 'Search bills', hint: 'By bill number or customer mobile' },
@@ -34,7 +34,7 @@ export const billsShortcuts: ShortcutGroup = {
   ],
 }
 
-export const productsShortcuts: ShortcutGroup = {
+const productsShortcuts: ShortcutGroup = {
   title: 'Products',
   items: [
     { key: '/', label: 'Search products', hint: 'By code or item name' },
@@ -42,7 +42,7 @@ export const productsShortcuts: ShortcutGroup = {
   ],
 }
 
-export const reportsShortcuts: ShortcutGroup = {
+const reportsShortcuts: ShortcutGroup = {
   title: 'Reports',
   items: [
     { key: '/', label: 'Search bills', hint: 'By bill number or customer mobile' },
@@ -50,7 +50,7 @@ export const reportsShortcuts: ShortcutGroup = {
   ],
 }
 
-export const usersShortcuts: ShortcutGroup = {
+const usersShortcuts: ShortcutGroup = {
   title: 'Users',
   items: [{ key: '/', label: 'Search users', hint: 'By name or staff ID' }],
 }

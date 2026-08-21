@@ -1,4 +1,4 @@
-import styles from './FireworksArt.module.css'
+import styles from '../css/components/FireworksArt.module.css'
 
 interface Burst {
   cx: number

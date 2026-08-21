@@ -1,18 +1,32 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { shop as seedShop } from '../data/shop'
-import { mockApi } from '../services/mockApi'
+import { api } from '../services/api'
 import type { Shop } from '../types'
+import { loadSession } from './sessionSlice'
+import { createBill } from './billsSlice'
 
-export const saveShop = createAsyncThunk('shop/save', (shop: Shop) => mockApi.saveShop(shop))
+const emptyShop: Shop = {
+  name: '', town: '', address: '', phone: '', gstin: '', stateCode: '',
+  invoicePrefix: '', nextInvoiceNumber: 0, declaration: '', seasonTarget: 0,
+}
+
+export const saveShop = createAsyncThunk('shop/save', (shop: Shop) => api.saveShop(shop))
 
 const shopSlice = createSlice({
   name: 'shop',
-  initialState: { shop: structuredClone(seedShop) as Shop },
+  initialState: { shop: emptyShop },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(saveShop.fulfilled, (state, action) => {
-      state.shop = action.payload
-    })
+    builder
+      .addCase(loadSession.fulfilled, (state, action) => {
+        state.shop = action.payload.shop
+      })
+      .addCase(saveShop.fulfilled, (state, action) => {
+        state.shop = action.payload
+      })
+      // Advance locally so New Bill shows the next number.
+      .addCase(createBill.fulfilled, (state) => {
+        state.shop.nextInvoiceNumber += 1
+      })
   },
 })
 

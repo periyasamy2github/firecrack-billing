@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { productCategories } from '../../data/mockProducts'
-import type { Product, ProductCategory } from '../../types'
+import { productCategories } from '../../data/products'
+import type { Product } from '../../types'
 
 const DEFAULT_HSN = '3604 90 00'
 const DEFAULT_GST_RATE = 18
@@ -9,7 +9,7 @@ const DEFAULT_LOW_STOCK_THRESHOLD = 15
 const positiveNumber = (message: string) => z.string().refine((v) => /^\d+(\.\d+)?$/.test(v.trim()) && Number(v) > 0, message)
 const nonNegativeNumber = (message: string) => z.string().refine((v) => /^\d+(\.\d+)?$/.test(v.trim()) && Number(v) >= 0, message)
 
-export const productFormSchema = (takenCodes: Set<string>, excludeCode: string | null) =>
+const productFormSchema = (takenCodes: Set<string>, excludeCode: string | null) =>
   z.object({
     code: z.string().trim().min(1, 'Barcode is required'),
     name: z.string().trim().min(1, 'Name is required'),
@@ -20,11 +20,34 @@ export const productFormSchema = (takenCodes: Set<string>, excludeCode: string |
     gstRate: nonNegativeNumber('GST % must be 0 or more'),
     stock: nonNegativeNumber('Stock must be 0 or more'),
   })
-    .refine((v) => (productCategories as string[]).includes(v.category), { message: 'Pick a category', path: ['category'] })
+    .refine((v) => productCategories.includes(v.category), { message: 'Pick a category', path: ['category'] })
     .refine((v) => {
       const key = v.code.trim().toUpperCase()
       return key === (excludeCode ?? '') || !takenCodes.has(key)
     }, { message: 'That barcode is already in use', path: ['code'] })
+
+// Codes must also be unique within one batch.
+export const productBatchSchema = (takenCodes: Set<string>, excludeCode: string | null) =>
+  z.object({
+    products: z.array(productFormSchema(takenCodes, excludeCode)),
+  }).superRefine((batch, ctx) => {
+    const timesUsed = new Map<string, number>()
+    for (const row of batch.products) {
+      const key = row.code.trim().toUpperCase()
+      if (key) timesUsed.set(key, (timesUsed.get(key) ?? 0) + 1)
+    }
+
+    batch.products.forEach((row, index) => {
+      const key = row.code.trim().toUpperCase()
+      if (key && (timesUsed.get(key) ?? 0) > 1) {
+        ctx.addIssue({ code: 'custom', message: 'Duplicate code in this batch', path: ['products', index, 'code'] })
+      }
+    })
+  })
+
+export interface ProductBatchValues {
+  products: ProductFormValues[]
+}
 
 export interface ProductFormValues {
   code: string
@@ -52,11 +75,12 @@ export const toProductFormValues = (p: Product): ProductFormValues => ({
   stock: String(p.stock),
 })
 
-// `existing` carries the hidden fields forward so editing never resets them.
-export const fromProductFormValues = (v: ProductFormValues, existing?: Product | null): Product => ({
+// `existing` carries hidden fields forward so editing never resets them.
+export const fromProductFormValues = (v: ProductFormValues, existing: Product | null, counterId: string): Product => ({
   code: v.code.trim(),
+  counterId: existing?.counterId ?? counterId,
   name: v.name.trim(),
-  category: v.category as ProductCategory,
+  category: v.category,
   unit: v.unit.trim(),
   mrp: Number(v.mrp),
   rate: Number(v.rate),

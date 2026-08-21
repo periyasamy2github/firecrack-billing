@@ -1,6 +1,5 @@
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useKeyShortcuts } from './useKeyShortcuts'
-import { usePagination } from './usePagination'
 
 interface ListPageOptions<T, F extends string> {
   rows: T[]
@@ -9,6 +8,7 @@ interface ListPageOptions<T, F extends string> {
   matchesFilter?: (row: T, filter: F) => boolean
 }
 
+// Search, filter and paging for a list already held in full. Bills page on the server.
 export const useListPage = <T, F extends string = string>({
   rows,
   matchesSearch,
@@ -17,6 +17,8 @@ export const useListPage = <T, F extends string = string>({
 }: ListPageOptions<T, F>) => {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<F>((filters?.[0] ?? '') as F)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useKeyShortcuts({
@@ -33,6 +35,15 @@ export const useListPage = <T, F extends string = string>({
     (row) => (!matchesFilter || !filters?.length || matchesFilter(row, filter)) && matchesSearch(row, query),
   )
 
+  useEffect(() => {
+    setPage(0)
+  }, [filtered.length])
+
+  const pageRows = useMemo(
+    () => filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [filtered, page, rowsPerPage],
+  )
+
   return {
     query,
     setQuery,
@@ -41,6 +52,13 @@ export const useListPage = <T, F extends string = string>({
     setFilter,
     counts,
     filtered,
-    ...usePagination(filtered),
+    page,
+    rowsPerPage,
+    pageRows,
+    changePage: (_: unknown, newPage: number) => setPage(newPage),
+    changeRowsPerPage: (e: { target: { value: unknown } }) => {
+      setRowsPerPage(Number(e.target.value))
+      setPage(0)
+    },
   }
 }

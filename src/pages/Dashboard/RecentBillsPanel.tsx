@@ -7,7 +7,7 @@ import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
 import type { Bill } from '../../types'
-import styles from './RecentBillsPanel.module.css'
+import styles from '../../css/pages/RecentBillsPanel.module.css'
 
 interface RecentBillsPanelProps {
   bills: Bill[]

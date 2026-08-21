@@ -1,54 +1,21 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { bills as seedBills } from '../data/mockBills'
-import { shop as seedShop } from '../data/shop'
-import { mockApi } from '../services/mockApi'
-import type { Bill, Shop } from '../types'
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import { computeBillTotals } from '../utils/billing'
+import { api } from '../services/api'
+import type { Bill, NewBillPayload } from '../types'
 
-export type NewBillInput = Omit<Bill, 'billNo' | 'status' | 'reprintCount'>
+export type NewBillInput = Omit<Bill, 'id' | 'billNo' | 'status' | 'reprintCount'>
 
-interface BillThunkState {
-  shop: { shop: Shop }
-  bills: { items: Bill[]; nextNumber: number }
-}
-
-export const createBill = createAsyncThunk<Bill, NewBillInput, { state: BillThunkState }>(
-  'bills/create',
-  (input, { getState }) => {
-    const { shop } = getState().shop
-    const { nextNumber } = getState().bills
-    const bill: Bill = { ...input, billNo: `${shop.invoicePrefix}${nextNumber}`, status: 'Paid', reprintCount: 0 }
-    return mockApi.createBill(bill)
-  },
-)
-
-export const cancelBill = createAsyncThunk('bills/cancel', (billNo: string) => mockApi.cancelBill(billNo))
-
-export const reprintBill = createAsyncThunk('bills/reprint', (billNo: string) => mockApi.reprintBill(billNo))
-
-const billsSlice = createSlice({
-  name: 'bills',
-  initialState: {
-    items: structuredClone(seedBills) as Bill[],
-    nextNumber: seedShop.nextInvoiceNumber,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(createBill.fulfilled, (state, action) => {
-        state.items.unshift(action.payload)
-        state.nextNumber += 1
-      })
-      .addCase(cancelBill.fulfilled, (state, action) => {
-        const bill = state.items.find((item) => item.billNo === action.payload)
-        if (!bill) return
-        bill.status = 'Cancelled'
-        bill.paymentMethod = null
-      })
-      .addCase(reprintBill.fulfilled, (state, action) => {
-        const bill = state.items.find((item) => item.billNo === action.payload)
-        if (bill) bill.reprintCount += 1
-      })
-  },
+// Cart of full products -> the API's codes + flat-₹ discount.
+const toPayload = (input: NewBillInput): NewBillPayload => ({
+  counterId: input.counterId,
+  customerName: input.customerName,
+  customerMobile: input.customerMobile,
+  paymentMethod: input.paymentMethod,
+  gstApplicable: input.gstApplicable,
+  discount: computeBillTotals(input.items, input.gstApplicable, input.billDiscount).billDiscountAmount,
+  items: input.items.map((i) => ({ code: i.product.code, qty: i.qty })),
 })
 
-export default billsSlice.reducer
+export const createBill = createAsyncThunk('bills/create', (input: NewBillInput) => api.createBill(toPayload(input)))
+export const cancelBill = createAsyncThunk('bills/cancel', (billNo: string) => api.cancelBill(billNo))
+export const reprintBill = createAsyncThunk('bills/reprint', (billNo: string) => api.reprintBill(billNo))

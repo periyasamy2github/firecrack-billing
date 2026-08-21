@@ -1,4 +1,4 @@
-﻿import styles from './StatusPill.module.css'
+﻿import styles from '../css/components/StatusPill.module.css'
 import type { Bill } from '../types'
 
 export type PillTone = 'paid' | 'due' | 'hold' | 'mut'

@@ -1,0 +1,179 @@
+.card {
+  position: sticky;
+  top: 12px;
+  overflow: hidden;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px 6px;
+}
+
+.headerLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.supplyBadge {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ember-ink);
+}
+
+.sumList {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2px;
+  padding: 0 14px 8px;
+}
+
+.sumRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sumRowLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.billDiscountRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.billDiscountLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+  flex: 1;
+}
+
+.discountTypeGroup {
+  height: 26px;
+}
+
+.discountTypeButton {
+  padding: 0 7.2px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.discountValueField {
+  width: 64px;
+}
+
+.discountValueInput {
+  text-align: right;
+  font-size: 12.5px;
+  padding: 4px 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--line);
+  margin: 4px 0;
+}
+
+.totalBanner {
+  position: relative;
+  padding: 16px 14px;
+  overflow: hidden;
+  background-image: var(--gradient-brand);
+}
+
+.totalBannerGlow {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.22), transparent 55%);
+}
+
+.totalBannerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+
+.totalBannerLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2px;
+}
+
+.paymentSection {
+  padding: 12px 14px 0;
+}
+
+.paymentLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 8px;
+}
+
+.paymentGroup {
+  gap: 6px;
+}
+
+.paymentButton {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4px;
+  border: 1px solid var(--line);
+  border-radius: 8px !important;
+  padding: 8px 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  text-transform: none;
+  color: var(--muted);
+  transition: transform 150ms ease;
+}
+
+.paymentIcon {
+  font-size: 16px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8.8px;
+  padding: 14px;
+}
+
+.printButton {
+  padding-top: 11.2px;
+  padding-bottom: 11.2px;
+  font-size: 14px;
+}
+
+.shortcutHint {
+  margin-left: 8px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.shortcutHintSubtle {
+  margin-left: 8px;
+  font-size: 11px;
+  opacity: 0.6;
+}

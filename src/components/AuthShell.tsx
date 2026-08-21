@@ -5,8 +5,8 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import type { ReactNode } from 'react'
 import { BrandMark } from './BrandMark'
 import { FireworksArt } from './FireworksArt'
-import { useStoreScope } from '../hooks/useStoreScope'
-import styles from './AuthShell.module.css'
+import { useSession } from '../hooks/useSession'
+import styles from '../css/components/AuthShell.module.css'
 
 const HIGHLIGHTS = [
   {
@@ -27,7 +27,7 @@ const HIGHLIGHTS = [
 ]
 
 export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: ReactNode }) => {
-  const { shop } = useStoreScope()
+  const { shop } = useSession()
 
   return (
     <div className={styles.page}>

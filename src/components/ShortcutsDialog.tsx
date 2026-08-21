@@ -2,7 +2,7 @@
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined'
 import { KeyBadge } from './KeyBadge'
-import styles from './ShortcutsDialog.module.css'
+import styles from '../css/components/ShortcutsDialog.module.css'
 
 export interface ShortcutItem {
   key: string

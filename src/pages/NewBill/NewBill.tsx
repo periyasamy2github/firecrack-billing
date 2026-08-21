@@ -1,48 +1,34 @@
-﻿import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { z } from 'zod'
-import { Autocomplete, Box, Button, Switch, TextField, Typography } from '@mui/material'
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button, Switch, TextField, Typography } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { Panel } from '../../components/Panel'
-import { Mono } from '../../components/Mono'
-import { KeyBadge } from '../../components/KeyBadge'
 import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
-import { ElapsedTimer } from './ElapsedTimer'
-import type { BillDiscountType, BillLineItem, PaymentMethod } from '../../types'
-import type { Product } from '../../types'
-import { stockStatus } from '../../data/mockProducts'
-import { formatAmount, formatBillDate, formatBillTime } from '../../utils/format'
-import { newBillShortcuts } from '../../data/shortcuts'
+import { ProductSearchField } from './ProductSearchField'
+import { ShortcutsBar } from './ShortcutsBar'
+import { newBillSchema, type NewBillFormValues } from './newBillSchema'
+import type { BillDiscountType, BillLineItem, PaymentMethod, Product } from '../../types'
+import { formatBillDate, formatBillTime } from '../../utils/format'
 import { computeBillTotals, halfGstRateLabel } from '../../utils/billing'
 import { billPrintPath } from '../../utils/routes'
-import { useStoreScope, type NewBillInput } from '../../hooks/useStoreScope'
+import { useSession } from '../../hooks/useSession'
+import { useDispatch, useSelector } from '../../redux/store'
+import { createBill, type NewBillInput } from '../../redux/billsSlice'
+import { loadProducts } from '../../redux/productsSlice'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
-import { useFormValidation } from '../../hooks/useFormValidation'
 import { useToast } from '../../hooks/useToast'
-import styles from './NewBill.module.css'
-
-const newBillSchema = (discountType: BillDiscountType) =>
-  z.object({
-    customerMobile: z.string(),
-    billDiscountValue: z.string(),
-  })
-    .refine((v) => !v.customerMobile.trim() || /^\d{10}$/.test(v.customerMobile.replace(/\s/g, '')), {
-      message: 'Enter a valid 10-digit mobile number', path: ['customerMobile'],
-    })
-    .refine((v) => !v.billDiscountValue || Number(v.billDiscountValue) > 0, {
-      message: 'Discount must be greater than 0', path: ['billDiscountValue'],
-    })
-    .refine((v) => discountType !== 'percent' || !v.billDiscountValue || Number(v.billDiscountValue) <= 100, {
-      message: 'Percent discount cannot exceed 100', path: ['billDiscountValue'],
-    })
+import styles from '../../css/pages/NewBill.module.css'
 
 export const NewBill = () => {
   const navigate = useNavigate()
-  const { products, createBill, nextBillNo, activeBranch, currentBranchId, isSuperAdmin, currentUser, activeCounter } = useStoreScope()
+  const { nextBillNo, billingCounter, counterScope, isSuperAdmin, currentUser } = useSession()
+  const dispatch = useDispatch()
+  const products = useSelector((state) => state.products.items)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const customerNameInputRef = useRef<HTMLInputElement>(null)
   const billDiscountInputRef = useRef<HTMLInputElement>(null)
@@ -50,29 +36,38 @@ export const NewBill = () => {
   const startedAt = useRef(Date.now())
 
   const [items, setItems] = useState<BillLineItem[]>([])
-  const [query, setQuery] = useState('')
   const [customerName, setCustomerName] = useState('')
-  const [customerMobile, setCustomerMobile] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
   const [gstApplicable, setGstApplicable] = useState(false)
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
-  const [billDiscountValue, setBillDiscountValue] = useState('')
-  const [tendered, setTendered] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  // The whole catalogue loads once so search and scanning read from memory.
+  const billingCounterId = counterScope === 'all' ? billingCounter.id : counterScope
+  const [loadingProducts, setLoadingProducts] = useState(true)
+  useEffect(() => {
+    setLoadingProducts(true)
+    void dispatch(loadProducts(billingCounterId)).finally(() => setLoadingProducts(false))
+  }, [billingCounterId])
+
+  const { register, watch, setValue, trigger, reset: resetForm, formState: { errors } } = useForm<NewBillFormValues>({
+    resolver: zodResolver(newBillSchema(billDiscountType)),
+    defaultValues: { customerMobile: '', billDiscountValue: '' },
+  })
+
+  const customerMobile = watch('customerMobile')
+  const billDiscountValue = watch('billDiscountValue')
 
   const billDiscount = billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined
   const totals = computeBillTotals(items, gstApplicable, billDiscount)
-  const { errors, validate, clearError, reset: resetErrors } = useFormValidation(newBillSchema(billDiscountType))
   const showToast = useToast()
 
-  const addItem = (product: Product | null) => {
-    if (!product) return
+  const addItem = (product: Product) =>
     setItems((prev) => {
       const existing = prev.find((i) => i.product.code === product.code)
       if (existing) return prev.map((i) => (i.lineId === existing.lineId ? { ...i, qty: i.qty + 1 } : i))
       return [...prev, { lineId: `L${nextLineId.current++}`, product, qty: 1 }]
     })
-    setQuery('')
-  }
 
   // Never let a line exceed what's on the shelf — createBill rejects the whole bill otherwise.
   const updateQty = (lineId: string, qty: number) =>
@@ -82,25 +77,22 @@ export const NewBill = () => {
   const clearBill = () => {
     setItems([])
     setCustomerName('')
-    setCustomerMobile('')
-    setTendered('')
     setPaymentMethod('Cash')
     setGstApplicable(false)
     setBillDiscountType('percent')
-    setBillDiscountValue('')
-    resetErrors()
+    resetForm({ customerMobile: '', billDiscountValue: '' })
     startedAt.current = Date.now()
   }
 
   const buildBillInput = (): NewBillInput => {
     const now = new Date()
     return {
-      branchId: currentBranchId === 'all' ? activeBranch.id : currentBranchId,
+      counterId: billingCounterId,
       date: formatBillDate(now),
       time: formatBillTime(now),
       customerName: customerName || 'Walk-in',
       customerMobile,
-      counter: activeCounter ?? activeBranch.name,
+      counter: currentUser?.counter ?? billingCounter.name,
       billedBy: currentUser?.name ?? 'Unknown',
       items,
       paymentMethod,
@@ -110,33 +102,32 @@ export const NewBill = () => {
   }
 
   const failed = (err: unknown) =>
-    showToast(err instanceof Error ? err.message : 'Could not save this bill', 'error')
+    showToast((err as { message?: string })?.message ?? 'Could not save this bill', 'error')
 
   const saveAndPrint = async () => {
-    if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
-    const tenderedNum = Number(tendered) || 0
+    if (saving || items.length === 0 || !(await trigger())) return
+    setSaving(true)
     try {
-      const bill = await createBill(buildBillInput())
-      navigate(billPrintPath(bill.billNo), {
-        state: {
-          bill,
-          tendered: paymentMethod === 'Cash' && tenderedNum > 0 ? tenderedNum : undefined,
-          changeDue: paymentMethod === 'Cash' && tenderedNum > 0 ? tenderedNum - totals.grandTotal : undefined,
-        },
-      })
+      const { bill } = await dispatch(createBill(buildBillInput())).unwrap()
+      navigate(billPrintPath(bill.id), { state: { bill } })
     } catch (err) {
       failed(err)
+    } finally {
+      setSaving(false)
     }
   }
 
   const saveOnly = async () => {
-    if (items.length === 0 || !validate({ customerMobile, billDiscountValue })) return
+    if (saving || items.length === 0 || !(await trigger())) return
+    setSaving(true)
     try {
-      const bill = await createBill(buildBillInput())
+      const { bill } = await dispatch(createBill(buildBillInput())).unwrap()
       showToast(`Bill ${bill.billNo} saved without printing`)
       clearBill()
     } catch (err) {
       failed(err)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -155,12 +146,12 @@ export const NewBill = () => {
     <>
       <PageHeader
         title="New Bill"
-        crumb={`${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${activeCounter ?? activeBranch.name}`}
+        crumb={`${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${currentUser?.counter ?? billingCounter.name} · ${loadingProducts ? 'loading products…' : `${products.length} items ready`}`}
         actions={
           <>
-            {isSuperAdmin && currentBranchId === 'all' && (
+            {isSuperAdmin && counterScope === 'all' && (
               <span className={styles.counterWarning}>
-                No counter selected — billing under {activeBranch.name}
+                No counter selected — billing under {billingCounter.name}
               </span>
             )}
             <Button size="small" color="error" startIcon={<CloseRoundedIcon />} onClick={clearBill} disabled={items.length === 0}>
@@ -174,15 +165,14 @@ export const NewBill = () => {
           <div className={styles.leftCol}>
             <div className={styles.topFieldsGrid}>
               <TextField
-                label="Customer mobile — optional"
-                value={customerMobile}
-                onChange={(e) => { setCustomerMobile(e.target.value); clearError('customerMobile') }}
+                label="Customer Mobile"
+                {...register('customerMobile', { required: "Mobile is required" })}
                 placeholder="98431 20055"
                 error={Boolean(errors.customerMobile)}
-                helperText={errors.customerMobile || ' '}
+                helperText={errors.customerMobile?.message || ' '}
               />
               <TextField label="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Walk-in" inputRef={customerNameInputRef} />
-              <TextField label="Counter" value={activeCounter ?? activeBranch.name} disabled />
+              <TextField label="Counter" value={currentUser?.counter ?? billingCounter.name} disabled />
               <div className={gstApplicable ? styles.gstBox : `${styles.gstBox} ${styles.gstBoxOff}`}>
                 <div>
                   <Typography className={styles.gstBoxTitle}>{gstApplicable ? 'Tax Invoice' : 'Bill of Supply'}</Typography>
@@ -192,76 +182,13 @@ export const NewBill = () => {
               </div>
             </div>
 
-            <div
-              onKeyDownCapture={(e) => {
-                if (e.key !== 'Enter') return
-                const exact = products.find((p) => p.code.toLowerCase() === query.trim().toLowerCase())
-                if (exact) {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  addItem(exact)
-                }
-              }}
-            >
-              <Autocomplete
-                options={products}
-                value={null}
-                ListboxProps={{ style: { maxHeight: 320 } }}
-                inputValue={query}
-                onInputChange={(_, value) => setQuery(value)}
-                onChange={(_, value) => addItem(value)}
-                getOptionLabel={(p) => `${p.code} — ${p.name}`}
-                renderOption={(props, p) => {
-                  const status = stockStatus(p)
-                  return (
-                    <Box component="li" {...props} key={p.code} className={styles.optionRow}>
-                      <div className={styles.optionLeft}>
-                        <Typography className={styles.optionName}>{p.name}</Typography>
-                        <div className={styles.optionMetaRow}>
-                          <Mono sx={{ fontSize: 10.5, color: 'text.secondary' }}>{p.code}</Mono>
-                          <Typography className={styles.optionUnit}>· {p.unit}</Typography>
-                          {status.tone !== 'paid' && (
-                            <Typography className={status.tone === 'due' ? `${styles.optionStock} ${styles.optionStockDue}` : `${styles.optionStock} ${styles.optionStockWarn}`}>
-                              · {p.stock} left
-                            </Typography>
-                          )}
-                        </div>
-                      </div>
-                      <div className={styles.optionRight}>
-                        <Mono sx={{ fontSize: 14, fontWeight: 700 }}>₹{formatAmount(p.rate)}</Mono>
-                        <Mono sx={{ display: 'block', fontSize: 10, color: 'text.secondary', textDecoration: 'line-through' }}>₹{formatAmount(p.mrp)}</Mono>
-                      </div>
-                    </Box>
-                  )
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    inputRef={searchInputRef}
-                    label="Item search"
-                    placeholder="Scan barcode, or type item code / name…"
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: <SearchRoundedIcon className={styles.searchIcon} />,
-                      endAdornment: (
-                        <span className={styles.searchEndAdornment}>
-                          <KeyBadge label="F2" />
-                        </span>
-                      ),
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        bgcolor: 'background.paper',
-                        borderRadius: '8px',
-                        py: 0.6,
-                        boxShadow: '0 0 0 3px var(--primary-soft)',
-                        '& fieldset': { borderColor: 'primary.main', borderWidth: '1.5px' },
-                      },
-                    }}
-                  />
-                )}
-              />
-            </div>
+            <ProductSearchField
+              products={products}
+              loading={loadingProducts}
+              inputRef={searchInputRef}
+              onAdd={addItem}
+              onScanBlocked={() => showToast('Still loading this counter’s products — scan again in a moment.', 'info')}
+            />
 
             <Panel title="Items" subtitle={`${totals.itemCount} items · ${totals.qtyCount} qty`} action={<Typography variant="caption">Enter adds a line</Typography>} flush>
               {items.length === 0 ? (
@@ -283,31 +210,18 @@ export const NewBill = () => {
             billDiscountType={billDiscountType}
             onBillDiscountTypeChange={setBillDiscountType}
             billDiscountValue={billDiscountValue}
-            onBillDiscountValueChange={(v) => { setBillDiscountValue(v); clearError('billDiscountValue') }}
+            onBillDiscountValueChange={(v) => setValue('billDiscountValue', v, { shouldValidate: Boolean(errors.billDiscountValue) })}
             billDiscountError={Boolean(errors.billDiscountValue)}
             billDiscountInputRef={billDiscountInputRef}
-            tendered={tendered}
-            onTenderedChange={setTendered}
             onSaveAndPrint={saveAndPrint}
             onSaveOnly={saveOnly}
-            disabled={items.length === 0}
+            disabled={items.length === 0 || saving}
+            saving={saving}
           />
         </div>
       </PageContent>
 
-      <div className={styles.shortcutsBar}>
-        {newBillShortcuts.items.map(({ key, label }) => (
-          <div key={key} className={styles.shortcutItem}>
-            <KeyBadge label={key} />
-            <Typography className={styles.shortcutLabel}>{label}</Typography>
-          </div>
-        ))}
-        <KeyBadge label="F1" />
-        <Typography className={styles.shortcutLabel}>all shortcuts</Typography>
-        <div className={styles.shortcutsSpacer} />
-        <ElapsedTimer startedAt={startedAt.current} className={styles.shortcutLabel} />
-      </div>
-
+      <ShortcutsBar startedAt={startedAt.current} />
     </>
   )
 }

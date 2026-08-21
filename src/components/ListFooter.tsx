@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { TablePaginationBar } from './TablePaginationBar'
-import styles from './ListFooter.module.css'
+import styles from '../css/components/ListFooter.module.css'
 
 interface ListFooterProps {
   count: number

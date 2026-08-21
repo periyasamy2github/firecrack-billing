@@ -2,7 +2,10 @@
 import { useLocation } from 'react-router-dom'
 import NProgress from 'nprogress'
 
-NProgress.configure({ showSpinner: false })
+NProgress.configure({
+  minimum: 0.15,
+  showSpinner: false
+})
 
 export const RouteProgress = () => {
   const location = useLocation()

@@ -1,6 +1,6 @@
 ﻿import { Typography } from '@mui/material'
 import type { ReactNode } from 'react'
-import styles from './PageHeader.module.css'
+import styles from '../css/components/PageHeader.module.css'
 
 interface PageHeaderProps {
   title: string

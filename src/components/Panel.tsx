@@ -1,6 +1,6 @@
 ﻿import { Card, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
-import styles from './Panel.module.css'
+import styles from '../css/components/Panel.module.css'
 
 interface PanelProps {
   title?: string

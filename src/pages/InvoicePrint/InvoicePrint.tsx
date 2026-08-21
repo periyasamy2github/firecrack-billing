@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Switch, Typography } from '@mui/material'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
@@ -12,16 +12,14 @@ import { ThermalReceipt } from './ThermalReceipt'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
-import { useStoreScope } from '../../hooks/useStoreScope'
+import { api } from '../../services/api'
 import type { Bill } from '../../types'
-import styles from './InvoicePrint.module.css'
+import styles from '../../css/pages/InvoicePrint.module.css'
 
 type PrintFormat = 'thermal' | 'a4'
 
 interface PrintNavState {
   bill: Bill
-  tendered?: number
-  changeDue?: number
 }
 
 const PREVIEW_CAPTION_CLASS: Record<PrintFormat, string> = {
@@ -36,24 +34,32 @@ const FORMAT_OPTIONS = [
 
 export const InvoicePrint = () => {
   const navigate = useNavigate()
-  const params = useParams<{ billNo: string }>()
+  const params = useParams<{ billId: string }>()
   const location = useLocation()
   const navState = location.state as PrintNavState | undefined
-  const { bills } = useStoreScope()
 
-  const billNo = decodeURIComponent(params.billNo ?? '')
-  const bill = navState?.bill ?? bills.find((item) => item.billNo === billNo)
+  const billId = params.billId ?? ''
+  const [bill, setBill] = useState<Bill | null>(navState?.bill ?? null)
+  const [notFound, setNotFound] = useState(false)
+
+  // Printing from a fresh page load (no nav state) — fetch the one bill by its encrypted id.
+  useEffect(() => {
+    if (navState?.bill) return
+    api.loadBill(billId).then(setBill).catch(() => setNotFound(true))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billId])
 
   const [format, setFormat] = useState<PrintFormat>('thermal')
-  const [showQr, setShowQr] = useState(true)
   const [showMrpSaved, setShowMrpSaved] = useState(true)
 
   if (!bill) {
+    if (!notFound) return null
+
     return (
       <>
         <PageHeader title="Print bill" actions={<Button onClick={() => navigate(ROUTES.bills)}>Back to bills</Button>} />
         <PageContent>
-          <Typography color="text.secondary">Bill "{billNo}" was not found.</Typography>
+          <Typography color="text.secondary">This bill was not found.</Typography>
         </PageContent>
       </>
     )
@@ -106,13 +112,6 @@ export const InvoicePrint = () => {
                 <div className={styles.optionsStack}>
                   <div className={styles.toggleRow}>
                     <div className={styles.toggleRowText}>
-                      <Typography className={styles.toggleRowLabel}>Include UPI QR</Typography>
-                      <Typography variant="caption">On thermal only</Typography>
-                    </div>
-                    <Switch size="small" checked={showQr} onChange={(e) => setShowQr(e.target.checked)} />
-                  </div>
-                  <div className={styles.toggleRow}>
-                    <div className={styles.toggleRowText}>
                       <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
                       <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
                     </div>
@@ -133,7 +132,7 @@ export const InvoicePrint = () => {
             </Typography>
 
             {activeFormat === 'thermal' ? (
-              <ThermalReceipt bill={bill} tendered={navState?.tendered} changeDue={navState?.changeDue} showQr={showQr} showMrpSaved={showMrpSaved} />
+              <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
             ) : (
               <div className={styles.a4Wrap}>
                 <A4Invoice bill={bill} />

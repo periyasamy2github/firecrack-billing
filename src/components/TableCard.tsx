@@ -1,6 +1,6 @@
-﻿import { Card, TableCell, TableRow } from '@mui/material'
+﻿import { Card, CircularProgress, TableCell, TableRow } from '@mui/material'
 import type { ReactNode } from 'react'
-import styles from './TableCard.module.css'
+import styles from '../css/components/TableCard.module.css'
 
 export const TableCard = ({ children, footer }: { children: ReactNode; footer?: ReactNode }) => (
   <Card className={styles.card}>
@@ -13,6 +13,14 @@ export const TableEmptyRow = ({ colSpan, message }: { colSpan: number; message: 
   <TableRow>
     <TableCell colSpan={colSpan} align="center" className={styles.emptyCell}>
       {message}
+    </TableCell>
+  </TableRow>
+)
+
+export const TableLoadingRow = ({ colSpan }: { colSpan: number }) => (
+  <TableRow>
+    <TableCell colSpan={colSpan} align="center" className={styles.emptyCell}>
+      <CircularProgress size={20} />
     </TableCell>
   </TableRow>
 )

@@ -1,26 +1,27 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { useDispatch as useReduxDispatch, useSelector as useReduxSelector, type TypedUseSelectorHook } from 'react-redux'
-import billsReducer from './billsSlice'
 import countersReducer from './countersSlice'
 import productsReducer from './productsSlice'
-import sessionReducer, { saveSession } from './sessionSlice'
+import sessionReducer, { saveCounterScope, signOut } from './sessionSlice'
 import shopReducer from './shopSlice'
 import uiReducer from './uiSlice'
 import usersReducer from './usersSlice'
 
-export const store = configureStore({
-  reducer: {
-    shop: shopReducer,
-    counters: countersReducer,
-    users: usersReducer,
-    products: productsReducer,
-    bills: billsReducer,
-    session: sessionReducer,
-    ui: uiReducer,
-  },
+const appReducer = combineReducers({
+  session: sessionReducer,
+  shop: shopReducer,
+  counters: countersReducer,
+  users: usersReducer,
+  products: productsReducer,
+  ui: uiReducer,
 })
 
-store.subscribe(() => saveSession(store.getState().session))
+// Signing out wipes every slice, so nothing from the last user lingers in memory for the next one.
+const rootReducer: typeof appReducer = (state, action) => appReducer(signOut.match(action) ? undefined : state, action)
+
+export const store = configureStore({ reducer: rootReducer })
+
+store.subscribe(() => saveCounterScope(store.getState().session))
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

@@ -1,45 +1,63 @@
 ﻿import { useState } from 'react'
-import { Button, IconButton, Switch, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, CircularProgress, IconButton, Switch, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { StatusPill } from '../../components/StatusPill'
 import { TableCard } from '../../components/TableCard'
-import { useStoreScope } from '../../hooks/useStoreScope'
+import { useSession } from '../../hooks/useSession'
+import { useDispatch } from '../../redux/store'
+import { saveCounter } from '../../redux/countersSlice'
+import { usePendingAction } from '../../hooks/usePendingAction'
 import { useToast } from '../../hooks/useToast'
-import type { Branch } from '../../types'
+import { errorMessage } from '../../utils/errorMessage'
+import type { Counter } from '../../types'
 import { CounterDialog } from './CounterDialog'
-import styles from './Counters.module.css'
+import styles from '../../css/pages/Counters.module.css'
 
 export const Counters = () => {
-  const { branches: counters, saveBranch } = useStoreScope()
+  const { counters } = useSession()
+  const dispatch = useDispatch()
+  const persistCounter = (counter: Counter) => dispatch(saveCounter(counter)).unwrap()
   const [open, setOpen] = useState(false)
-  const [editing, setEditing] = useState<Branch | null>(null)
+  const [editing, setEditing] = useState<Counter | null>(null)
   const showToast = useToast()
+  const { isPending, run } = usePendingAction()
 
   const openAdd = () => {
     setEditing(null)
     setOpen(true)
   }
 
-  const openEdit = (counter: Branch) => {
+  const openEdit = (counter: Counter) => {
     setEditing(counter)
     setOpen(true)
   }
 
   const closeDialog = () => setOpen(false)
 
-  const save = async (counter: Branch) => {
+  // Await before closing so the dialog stays open if saving fails.
+  const save = async (counter: Counter) => {
     const wasEditing = Boolean(editing)
+    try {
+      await persistCounter(counter)
+    } catch (err) {
+      showToast(errorMessage(err, 'Could not save this counter'), 'error')
+      throw err
+    }
     closeDialog()
-    await saveBranch(counter)
     showToast(`${counter.name} ${wasEditing ? 'updated' : 'added'}`)
   }
 
-  const toggleActive = (counter: Branch) => {
-    void saveBranch({ ...counter, active: !counter.active })
-  }
+  const toggleActive = (counter: Counter) =>
+    run(counter.id, async () => {
+      try {
+        await persistCounter({ ...counter, active: !counter.active })
+      } catch (err) {
+        showToast(errorMessage(err, 'Could not update this counter'), 'error')
+      }
+    })
 
   return (
     <>
@@ -75,14 +93,18 @@ export const Counters = () => {
                     <TableCell><Typography className={styles.counterName}>{c.name}</Typography></TableCell>
                     <TableCell><StatusPill tone={c.active ? 'paid' : 'mut'} label={c.active ? 'Active' : 'Inactive'} /></TableCell>
                     <TableCell align="right">
-                      <Switch size="small" checked={c.active} onChange={() => toggleActive(c)} />
+                      <Switch size="small" checked={c.active} onChange={() => toggleActive(c)} disabled={isPending(c.id)} />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Edit counter">
-                        <IconButton size="small" onClick={() => openEdit(c)}>
-                          <EditOutlinedIcon className={styles.actionIcon} />
-                        </IconButton>
-                      </Tooltip>
+                      {isPending(c.id) ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <Tooltip title="Edit counter">
+                          <IconButton size="small" onClick={() => openEdit(c)}>
+                            <EditOutlinedIcon className={styles.actionIcon} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

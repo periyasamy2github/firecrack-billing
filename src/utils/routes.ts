@@ -1,6 +1,5 @@
 export const ROUTES = {
   login: '/login',
-  selectCounter: '/select-counter',
   dashboard: '/',
   newBill: '/bills/new',
   bills: '/bills',
@@ -13,4 +12,4 @@ export const ROUTES = {
   unauthorized: '/unauthorized',
 }
 
-export const billPrintPath = (billNo: string): string => `/bills/${encodeURIComponent(billNo)}/print`
+export const billPrintPath = (billId: string): string => `/bills/${encodeURIComponent(billId)}/print`

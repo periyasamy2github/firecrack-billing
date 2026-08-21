@@ -9,9 +9,11 @@ export interface LineAmounts {
 
 export const computeLineAmounts = (item: BillLineItem, gstApplicable = true): LineAmounts => {
   const rate = item.product.rate
-  const taxable = rate * item.qty
-  const gstAmount = gstApplicable ? taxable * (item.product.gstRate / 100) : 0
-  return { rate, taxable, gstAmount, amount: taxable + gstAmount }
+  // rate is the GST-inclusive selling price — back out the tax rather than adding it on top.
+  const lineTotal = rate * item.qty
+  const taxable = gstApplicable ? lineTotal / (1 + item.product.gstRate / 100) : lineTotal
+  const gstAmount = lineTotal - taxable
+  return { rate, taxable, gstAmount, amount: lineTotal }
 }
 
 const resolveBillDiscountAmount = (gross: number, billDiscount?: BillDiscount): number => {
@@ -29,22 +31,24 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   }
 
   const billDiscountAmount = resolveBillDiscountAmount(gross, billDiscount)
-  const taxable = gross - billDiscountAmount
+  // `gross` and the discount are GST-inclusive; `payable` is what the customer actually hands over.
+  const payable = gross - billDiscountAmount
   // Same factor on every line so mixed GST rates still net out correctly.
-  const shrink = gross > 0 ? taxable / gross : 1
+  const shrink = gross > 0 ? payable / gross : 1
 
   let gstTotal = 0
   if (gstApplicable) {
     for (const item of items) {
-      gstTotal += item.product.rate * item.qty * shrink * (item.product.gstRate / 100)
+      const lineInclusive = item.product.rate * item.qty * shrink
+      gstTotal += lineInclusive - lineInclusive / (1 + item.product.gstRate / 100)
     }
   }
 
+  const taxable = payable - gstTotal
   const cgst = gstTotal / 2
   const sgst = gstTotal / 2
-  const rawTotal = taxable + gstTotal
-  const grandTotal = Math.round(rawTotal)
-  const roundOff = grandTotal - rawTotal
+  const grandTotal = Math.round(payable)
+  const roundOff = grandTotal - payable
   const qtyCount = items.reduce((sum, i) => sum + i.qty, 0)
 
   return {

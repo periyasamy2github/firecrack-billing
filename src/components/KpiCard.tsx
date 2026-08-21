@@ -1,6 +1,6 @@
 import { Card, Typography } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
-import styles from './KpiCard.module.css'
+import styles from '../css/components/KpiCard.module.css'
 
 export type KpiTone = 'primary' | 'info' | 'ember' | 'paid' | 'due'
 

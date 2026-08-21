@@ -1,6 +1,6 @@
 ﻿import { Box, type SxProps, type Theme } from '@mui/material'
 import type { ReactNode } from 'react'
-import styles from './Mono.module.css'
+import styles from '../css/components/Mono.module.css'
 
 interface MonoProps {
   children: ReactNode

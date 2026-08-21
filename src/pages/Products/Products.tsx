@@ -1,37 +1,51 @@
-﻿import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Chip, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { Button, Chip, Tooltip } from '@mui/material'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import { useConfirm } from 'material-ui-confirm'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
-import { Mono } from '../../components/Mono'
-import { StatusPill } from '../../components/StatusPill'
 import { SearchField } from '../../components/SearchField'
-import { TableCard, TableEmptyRow } from '../../components/TableCard'
 import { ListFooter } from '../../components/ListFooter'
-import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { ProductDialog } from './ProductDialog'
-import { productCategories, stockStatus } from '../../data/mockProducts'
-import { formatAmount } from '../../utils/format'
-import { useStoreScope } from '../../hooks/useStoreScope'
+import { ProductsTable } from './ProductsTable'
+import { productCategories } from '../../data/products'
+import { useSession } from '../../hooks/useSession'
+import { useDispatch, useSelector } from '../../redux/store'
+import { deleteProduct, loadProducts, saveProduct } from '../../redux/productsSlice'
 import { useListPage } from '../../hooks/useListPage'
+import { usePendingAction } from '../../hooks/usePendingAction'
 import { ROUTES } from '../../utils/routes'
 import { useToast } from '../../hooks/useToast'
+import { errorMessage } from '../../utils/errorMessage'
 import type { Product } from '../../types'
-import styles from './Products.module.css'
+import styles from '../../css/pages/Products.module.css'
 
 const CATEGORY_KEYS = ['All', ...productCategories] as const
 
 export const Products = () => {
   const navigate = useNavigate()
-  const { branches, isSuperAdmin, products, importProducts, saveProduct, deleteProduct } = useStoreScope()
+  const { counters, isSuperAdmin, counterScope } = useSession()
+  const dispatch = useDispatch()
+  const products = useSelector((state) => state.products.items)
   const [addOpen, setAddOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
+  const confirm = useConfirm()
   const showToast = useToast()
+  const { isPending, run } = usePendingAction()
+  const [loading, setLoading] = useState(true)
+
+  // Adding or importing needs one counter in scope.
+  const viewingAllCounters = counterScope === 'all'
+  const currentCounterName = counters.find((counter) => counter.id === counterScope)?.name ?? ''
+  const pickCounterHint = viewingAllCounters ? 'Pick a counter first — products belong to one counter' : ''
+
+  useEffect(() => {
+    setLoading(true)
+    void dispatch(loadProducts(counterScope)).finally(() => setLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counterScope])
 
   const { query, setQuery, searchInputRef, filter: category, setFilter: setCategory, counts: categoryCounts, filtered, page, rowsPerPage, pageRows, changePage, changeRowsPerPage } =
     useListPage<Product, (typeof CATEGORY_KEYS)[number]>({
@@ -48,22 +62,44 @@ export const Products = () => {
 
   const existingCodes = useMemo(() => new Set(products.map((p) => p.code.toUpperCase())), [products])
 
-  const confirmDelete = async () => {
-    if (!deletingProduct) return
-    const { code, name } = deletingProduct
-    setDeletingProduct(null)
-    await deleteProduct(code)
-    showToast(`${name} deleted`, 'warning')
+  const handleDelete = async ({ code, counterId, name }: Product) => {
+    const { confirmed } = await confirm({
+      title: 'Delete product?',
+      description: <>Remove <b>{name}</b> ({code}) from the catalogue? Bills already raised keep their copy of the item.</>,
+      confirmationText: 'Delete',
+      cancellationText: 'Keep product',
+    })
+    if (!confirmed) return
+
+    // Follows the product's own counter, so it works in the all-counters view.
+    await run(`${counterId}:${code}`, async () => {
+      try {
+        await dispatch(deleteProduct({ code, counterId })).unwrap()
+        showToast(`${name} deleted`, 'warning')
+      } catch (err) {
+        showToast(errorMessage(err, 'Could not delete this product'), 'error')
+      }
+    })
   }
 
+  // Throws on failure so the dialog keeps the typed-in values.
   const handleProductSubmit = async (rows: Product[]) => {
-    if (editingProduct) {
-      setEditingProduct(null)
-      await saveProduct(rows[0])
-      showToast(`${rows[0].name} updated`)
-    } else {
-      await importProducts(rows)
+    try {
+      if (editingProduct) {
+        await dispatch(saveProduct({ product: rows[0], counterId: editingProduct.counterId })).unwrap()
+        setEditingProduct(null)
+        showToast(`${rows[0].name} updated`)
+        return
+      }
+
+      // Manual add saves row by row; bulk upload is the Import page.
+      for (const row of rows) {
+        await dispatch(saveProduct({ product: row, counterId: counterScope })).unwrap()
+      }
       showToast(`${rows.length} product${rows.length === 1 ? '' : 's'} added`)
+    } catch (err) {
+      showToast(errorMessage(err, 'Could not save this product'), 'error')
+      throw err
     }
   }
 
@@ -71,13 +107,29 @@ export const Products = () => {
     <>
       <PageHeader
         title="Products"
-        crumb={isSuperAdmin ? `${products.length} items · shared catalog across ${branches.length} counters` : `${products.length} items · ${lowStockCount} running low`}
-        actions={
-          <>
-            {isSuperAdmin && <Button size="small" startIcon={<FileUploadOutlinedIcon />} onClick={() => navigate(ROUTES.productImport)}>Import from Excel</Button>}
-            {isSuperAdmin && <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setAddOpen(true)}>Add item</Button>}
-          </>
+        crumb={
+          viewingAllCounters
+            ? `${products.length} items · all ${counters.length} counters`
+            : `${products.length} items · ${currentCounterName} · ${lowStockCount} running low`
         }
+        actions={isSuperAdmin && (
+          <>
+            <Tooltip title={pickCounterHint}>
+              <span>
+                <Button size="small" startIcon={<FileUploadOutlinedIcon />} disabled={viewingAllCounters} onClick={() => navigate(ROUTES.productImport)}>
+                  Import from Excel
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title={pickCounterHint}>
+              <span>
+                <Button variant="contained" startIcon={<AddRoundedIcon />} disabled={viewingAllCounters} onClick={() => setAddOpen(true)}>
+                  Add item
+                </Button>
+              </span>
+            </Tooltip>
+          </>
+        )}
       />
       <PageContent>
         <div className={styles.filterRow}>
@@ -94,85 +146,31 @@ export const Products = () => {
           ))}
         </div>
 
-        <TableCard footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Barcode</TableCell>
-                  <TableCell>Item name</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Unit</TableCell>
-                  <TableCell align="right">MRP</TableCell>
-                  <TableCell align="right">Rate</TableCell>
-                  <TableCell align="right">Stock</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right" />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pageRows.map((p) => {
-                  const status = stockStatus(p)
-                  return (
-                    <TableRow key={p.code} hover>
-                      <TableCell><Mono sx={{ fontWeight: 600 }}>{p.code}</Mono></TableCell>
-                      <TableCell><Typography className={styles.itemName}>{p.name}</Typography></TableCell>
-                      <TableCell>{p.category}</TableCell>
-                      <TableCell className={styles.unitCell}>{p.unit}</TableCell>
-                      <TableCell align="right"><Mono sx={{ color: 'text.secondary' }}>{formatAmount(p.mrp)}</Mono></TableCell>
-                      <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(p.rate)}</Mono></TableCell>
-                      <TableCell align="right">
-                        <Mono sx={{ fontWeight: 650, color: status.tone === 'due' ? 'var(--due)' : status.tone === 'hold' ? 'var(--ember-ink)' : 'var(--ink)' }}>
-                          {p.stock}
-                        </Mono>
-                      </TableCell>
-                      <TableCell><StatusPill tone={status.tone} label={status.label} /></TableCell>
-                      <TableCell align="right">
-                        {isSuperAdmin && (
-                          <>
-                            <Tooltip title="Edit">
-                              <IconButton size="small" onClick={() => setEditingProduct(p)}><EditOutlinedIcon className={styles.actionIcon} /></IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                              <IconButton size="small" onClick={() => setDeletingProduct(p)}><DeleteOutlineRoundedIcon className={styles.actionIcon} /></IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-                {filtered.length === 0 && <TableEmptyRow colSpan={9} message="No products match this search." />}
-              </TableBody>
-            </Table>
-        </TableCard>
+        <ProductsTable
+          rows={pageRows}
+          loading={loading}
+          filteredCount={filtered.length}
+          viewingAllCounters={viewingAllCounters}
+          canManage={isSuperAdmin}
+          isPending={isPending}
+          onEdit={setEditingProduct}
+          onDelete={handleDelete}
+          footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}
+        />
       </PageContent>
 
       {isSuperAdmin && (
-        <>
-          <ProductDialog
-            key={editingProduct ? `edit-${editingProduct.code}` : 'add'}
-            mode={editingProduct ? 'edit' : 'add'}
-            open={addOpen || Boolean(editingProduct)}
-            onClose={() => { setAddOpen(false); setEditingProduct(null) }}
-            product={editingProduct}
-            existingCodes={existingCodes}
-            onSubmit={handleProductSubmit}
-          />
-        </>
+        <ProductDialog
+          key={editingProduct ? `edit-${editingProduct.code}` : 'add'}
+          mode={editingProduct ? 'edit' : 'add'}
+          open={addOpen || Boolean(editingProduct)}
+          onClose={() => { setAddOpen(false); setEditingProduct(null) }}
+          product={editingProduct}
+          existingCodes={existingCodes}
+          counterId={editingProduct?.counterId ?? counterScope}
+          onSubmit={handleProductSubmit}
+        />
       )}
-
-      <ConfirmDialog
-        open={Boolean(deletingProduct)}
-        title="Delete product?"
-        confirmLabel="Delete"
-        cancelLabel="Keep product"
-        onConfirm={confirmDelete}
-        onClose={() => setDeletingProduct(null)}
-      >
-        {deletingProduct && (
-          <>Remove <b>{deletingProduct.name}</b> ({deletingProduct.code}) from the catalogue? Bills already raised keep their copy of the item.</>
-        )}
-      </ConfirmDialog>
     </>
   )
 }

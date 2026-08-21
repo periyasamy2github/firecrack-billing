@@ -1,6 +1,6 @@
 ﻿import { Skeleton, Stack } from '@mui/material'
 import { PageLoader } from './RouteProgress'
-import styles from './PageSkeleton.module.css'
+import styles from '../css/components/PageSkeleton.module.css'
 
 export const PageSkeleton = () => (
   <>
