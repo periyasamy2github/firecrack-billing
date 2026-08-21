@@ -31,3 +31,6 @@ dist-ssr
 
 # Generated test spreadsheets
 test-data/
+
+# Laravel API lives on the backend branch
+backend/
