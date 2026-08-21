@@ -1,8 +1,8 @@
 # SparkBill API
 
-Laravel 12 + MySQL backend for the SparkBill SPA in the parent folder. JSON only — no Blade pages, no Vite. Auth is Sanctum bearer tokens.
+Laravel 12 + MySQL API for SparkBill, the fireworks-shop counter-billing app. The React SPA that calls it lives on the `main` branch of the same repository; this branch holds only the API. JSON only — no Blade pages, no Vite. Auth is Sanctum bearer tokens.
 
-See the root [README](../README.md) for the full local-setup and deploy walkthrough.
+The SPA's README on `main` has the full local-setup and deploy walkthrough for both halves.
 
 ## Quick start
 
@@ -40,4 +40,4 @@ Counter staff are locked to their own counter server-side; a Super Admin passes 
 - `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://<api-domain>`
 - `CORS_ALLOWED_ORIGINS=https://<spa-domain>` (comma-separated, no wildcard)
 - `php artisan migrate --force && php artisan db:seed --force` once, **then** `php artisan config:cache && php artisan route:cache`
-- Cron: `* * * * * php /path/to/backend/artisan schedule:run` (prunes expired tokens and password resets daily)
+- Cron: `* * * * * php /path/to/api/artisan schedule:run` (prunes expired tokens and password resets daily)
