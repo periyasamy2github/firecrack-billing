@@ -1,0 +1,43 @@
+# SparkBill API
+
+Laravel 12 + MySQL backend for the SparkBill SPA in the parent folder. JSON only — no Blade pages, no Vite. Auth is Sanctum bearer tokens.
+
+See the root [README](../README.md) for the full local-setup and deploy walkthrough.
+
+## Quick start
+
+```bash
+composer install
+cp .env.example .env          # set DB_*, CORS_ALLOWED_ORIGINS, SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD
+php artisan key:generate
+php artisan migrate
+php artisan db:seed           # shop row + the Super Admin from SEED_ADMIN_*
+php artisan serve             # http://localhost:8000
+```
+
+`composer setup` runs the same steps in one go. For a dev database with sample counters, staff logins and products:
+
+```bash
+php artisan db:seed --class=DemoSeeder
+```
+
+## Routes (`routes/api.php`)
+
+| Method | Path | Who |
+|---|---|---|
+| POST | `/api/login` | anyone (throttled) |
+| GET / POST | `/api/me`, `/api/logout` | signed in |
+| GET | `/api/dashboard`, `/api/bills`, `/api/bills/find?id=`, `/api/products` | signed in, counter-scoped |
+| POST | `/api/bills`, `/api/bills/cancel`, `/api/bills/reprint` | signed in, own counter |
+| PUT | `/api/shop`, `/api/counters/{id}`, `/api/users/{id}`, `/api/users/{id}/password` | Super Admin |
+| POST | `/api/counters`, `/api/users`, `/api/products`, `/api/products/import` | Super Admin |
+| DELETE | `/api/products/{code}` | Super Admin |
+
+Counter staff are locked to their own counter server-side; a Super Admin passes `?scope=<counterId>` or `all`.
+
+## Production checklist
+
+- `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://<api-domain>`
+- `CORS_ALLOWED_ORIGINS=https://<spa-domain>` (comma-separated, no wildcard)
+- `php artisan migrate --force && php artisan db:seed --force` once, **then** `php artisan config:cache && php artisan route:cache`
+- Cron: `* * * * * php /path/to/backend/artisan schedule:run` (prunes expired tokens and password resets daily)
