@@ -1,0 +1,1 @@
+import{V as e}from"./Typography-BNeGW-3c.js";var t={pill:`_pill_13msu_1`,dot:`_dot_13msu_13`,paid:`_paid_13msu_20`,due:`_due_13msu_25`,hold:`_hold_13msu_30`,mut:`_mut_13msu_35`},n=e(),r={Paid:`paid`,Cancelled:`due`},i=({label:e,tone:r,dot:i=!0})=>(0,n.jsxs)(`span`,{className:`${t.pill} ${t[r]}`,children:[i&&(0,n.jsx)(`span`,{className:t.dot}),e]});export{i as n,r as t};

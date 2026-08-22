@@ -1,1 +1,0 @@
-var e=(e,t)=>e?.message||t;export{e as t};

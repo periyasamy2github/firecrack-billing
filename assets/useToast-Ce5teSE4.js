@@ -1,1 +1,0 @@
-import{E as e,r as t}from"./useSession-DeqD9mFP.js";var n=()=>{let n=t();return(t,r=`success`)=>n(e({message:t,severity:r}))};export{n as t};

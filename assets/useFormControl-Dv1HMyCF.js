@@ -1,1 +1,0 @@
-import{i as e}from"./rolldown-runtime-Dd_uD5pT.js";import{ft as t}from"./Button-Bd_pQYS8.js";var n=e(t());function r({controlled:e,default:t,name:r,state:i=`value`}){let{current:a}=n.useRef(e!==void 0),[o,s]=n.useState(t);return[a?e:o,n.useCallback(e=>{a||s(e)},[])]}var i=r,a=n.createContext(void 0);function o(){return n.useContext(a)}export{r as i,a as n,i as r,o as t};

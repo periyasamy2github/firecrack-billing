@@ -1,0 +1,1 @@
+var e=[`All`,`Cash`,`UPI`,`Card`,`Cancelled`],t=(e,t)=>t===`All`?!0:t===`Cancelled`?e.status===`Cancelled`:e.paymentMethod===t,n=(e,t)=>{let n=t.trim().toLowerCase();return!n||e.billNo.toLowerCase().includes(n)||e.customerMobile.replace(/\s/g,``).includes(n.replace(/\s/g,``))};export{t as n,n as r,e as t};
