@@ -1,0 +1,1 @@
+import{i as e}from"./rolldown-runtime-Dd_uD5pT.js";import{ft as t}from"./Button-Bd_pQYS8.js";var n=e(t(),1),r=()=>{let[e,t]=(0,n.useState)([]),r=(0,n.useRef)(new Set);return{isPending:t=>e.includes(t),run:async(e,n)=>{if(!r.current.has(e)){r.current.add(e),t(t=>[...t,e]);try{await n()}finally{r.current.delete(e),t(t=>t.filter(t=>t!==e))}}}}};export{r as t};

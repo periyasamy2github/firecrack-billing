@@ -1,0 +1,1 @@
+import{ot as e}from"./Button-Bd_pQYS8.js";import{t}from"./Box-Bi4b4YuQ.js";var n={mono:`_mono_haudo_1`},r=e(),i=({children:e,sx:i})=>(0,r.jsx)(t,{component:`span`,className:n.mono,sx:i,children:e});export{i as t};

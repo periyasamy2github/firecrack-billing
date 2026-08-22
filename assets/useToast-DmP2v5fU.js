@@ -1,1 +1,0 @@
-import{o as e,r as t}from"./useStoreScope-6KEOEndd.js";var n=()=>{let n=t();return(t,r=`success`)=>n(e({message:t,severity:r}))};export{n as t};

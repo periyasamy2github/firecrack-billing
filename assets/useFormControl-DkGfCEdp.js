@@ -1,1 +1,0 @@
-import{r as e}from"./rolldown-runtime-hePW80VL.js";import{J as t}from"./Typography-BNeGW-3c.js";var n=e(t());function r({controlled:e,default:t,name:r,state:i=`value`}){let{current:a}=n.useRef(e!==void 0),[o,s]=n.useState(t);return[a?e:o,n.useCallback(e=>{a||s(e)},[])]}var i=r,a=n.createContext(void 0);function o(){return n.useContext(a)}export{r as i,a as n,i as r,o as t};
