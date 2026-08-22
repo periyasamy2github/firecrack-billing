@@ -9,7 +9,7 @@ import { ListFooter } from '../../components/ListFooter'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { billPrintPath } from '../../utils/routes'
-import { downloadCsv } from '../../utils/csv'
+import { downloadXlsx } from '../../utils/xlsx'
 import { api } from '../../services/api'
 import { useSession } from '../../hooks/useSession'
 import { useBillsPage } from '../../hooks/useBillsPage'
@@ -72,7 +72,7 @@ export const Reports = () => {
       return showCounterColumn ? [row[0], bill.counter, ...row.slice(1)] : row
     })
 
-    downloadCsv(`bills-${new Date().toISOString().slice(0, 10)}.csv`, [headers, ...rows])
+    await downloadXlsx(`bills-${new Date().toISOString().slice(0, 10)}.xlsx`, 'Bills', headers, rows)
   }
 
   const tableFooter = (

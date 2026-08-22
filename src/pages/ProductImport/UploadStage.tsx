@@ -14,7 +14,7 @@ export const UploadStage = ({ onFileSelected }: UploadStageProps) => {
       <label className={styles.dropZone}>
         <input
           type="file"
-          accept=".xlsx,.xls,.csv"
+          accept=".xlsx,.xls"
           hidden
           onChange={(e) => {
             const file = e.target.files?.[0]
@@ -24,7 +24,7 @@ export const UploadStage = ({ onFileSelected }: UploadStageProps) => {
         />
         <FileUploadOutlinedIcon className={styles.dropZoneIcon} />
         <Typography className={styles.dropZoneTitle}>Choose an Excel file</Typography>
-        <Typography variant="caption">.xlsx, .xls or .csv — nothing is saved until you start the import</Typography>
+        <Typography variant="caption">.xlsx or .xls — nothing is saved until you start the import</Typography>
       </label>
 
       <div className={styles.helpPanel}>

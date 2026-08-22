@@ -77,13 +77,13 @@ One shop, many **counters**. Every product and bill belongs to exactly one count
 | `components/` | Shared primitives — `PageHeader`, `TableCard`, `StatusPill`, `ListFooter`, `SearchField`, `RouteGuards`, … |
 | `css/{components,layouts,pages}/` | All CSS modules, named after the file they style. |
 | `types/index.ts` | Domain types (`Bill`, `Product`, `Counter`, `User`, `Shop`) and the API shapes (`BillsPage`, `DashboardStats`, …). |
-| `utils/` | `billing.ts` (totals and GST maths — same formulas as the server), `format.ts`, `routes.ts`, `billFilters.ts`, `csv.ts`. |
+| `utils/` | `billing.ts` (totals and GST maths — same formulas as the server), `format.ts`, `routes.ts`, `billFilters.ts`, `xlsx.ts` (styled Excel downloads, SheetJS loaded on demand). |
 
 **Boot and auth.** `RequireAuth` checks the token, dispatches `loadSession` (`GET /me` → user, shop, counters; each slice takes its part) and shows a loader until the session is `ready`. `Login` posts credentials, stores the token, runs the same `loadSession`, and sets `counterScope` (staff: their counter, admin: `all`). Sign-out revokes the token (`POST /logout`), clears it, and wipes the store.
 
 **Counter scope.** `counterScope` (`all` or a counter id) is the only UI state persisted (localStorage `sparkbill:counter-scope`). Data pages send it as `?scope=`; the server ignores it for staff.
 
-**Screens.** *New Bill* preloads the counter's products once and searches them in memory (30-row cap, Enter on an exact barcode adds instantly); F9 saves & prints, F10 saves only. *Bills* / *Reports* are server-paginated with search, filters, date range, cancel (restores stock), reprint and CSV export. *Print* renders a thermal 80 mm receipt or an A4 tax invoice (GST bills only) at `/bills/:encryptedId/print`. *Products → Import* validates rows client-side (Zod) and lets the server decide create-vs-update. *Users*, *Counters*, *Settings* are Super Admin only (route guard + server role middleware). Forms are react-hook-form + Zod; confirmations use `material-ui-confirm`.
+**Screens.** *New Bill* preloads the counter's products once and searches them in memory (30-row cap, Enter on an exact barcode adds instantly); F9 saves & prints, F10 saves only. *Bills* / *Reports* are server-paginated with search, filters, date range, cancel (restores stock), reprint and Excel (.xlsx) export. *Print* renders a thermal 80 mm receipt or an A4 tax invoice (GST bills only) at `/bills/:encryptedId/print`. *Products → Import* validates rows client-side (Zod) and lets the server decide create-vs-update. *Users*, *Counters*, *Settings* are Super Admin only (route guard + server role middleware). Forms are react-hook-form + Zod; confirmations use `material-ui-confirm`.
 
 ### Backend — `backend/`
 

@@ -13,6 +13,7 @@ import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
 import { formatInt } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
+import { downloadXlsx } from '../../utils/xlsx'
 import type { ImportResult, Product } from '../../types'
 import styles from '../../css/pages/ProductImport.module.css'
 
@@ -24,13 +25,6 @@ import { DoneStage } from './DoneStage'
 
 // Headers are matched case-insensitively on import, so these stay readable.
 export const TEMPLATE_COLUMNS = ['Barcode', 'Name', 'Category', 'HSN', 'Unit', 'MRP', 'Rate', 'GST Rate', 'Stock', 'Low Stock Threshold']
-
-const HEADER_STYLE = {
-  font: { bold: true, sz: 11, color: { rgb: '1F3B2C' } },
-  fill: { fgColor: { rgb: 'E2EFDA' } },
-  alignment: { vertical: 'center' as const },
-  border: { bottom: { style: 'thin' as const, color: { rgb: 'A9C4A0' } } },
-}
 
 const HEADER_ALIASES: Record<string, string> = {
   barcode: 'code', code: 'code', 'product code': 'code', sku: 'code',
@@ -123,18 +117,7 @@ const buildRow = (raw: Record<string, unknown>, index: number, seenCodes: Set<st
   }
 }
 
-const downloadTemplate = () => {
-  const book = XLSX.utils.book_new()
-  const sheet = XLSX.utils.aoa_to_sheet([TEMPLATE_COLUMNS])
-
-  TEMPLATE_COLUMNS.forEach((_, index) => {
-    sheet[XLSX.utils.encode_cell({ r: 0, c: index })].s = HEADER_STYLE
-  })
-  sheet['!cols'] = TEMPLATE_COLUMNS.map((column) => ({ wch: Math.max(column.length + 4, 12) }))
-
-  XLSX.utils.book_append_sheet(book, sheet, 'Products')
-  XLSX.writeFile(book, 'Import-Template.xlsx')
-}
+const downloadTemplate = () => downloadXlsx('Import-Template.xlsx', 'Products', TEMPLATE_COLUMNS, [])
 
 const STEPS = ['Choose file', 'Review rows', 'Import'] as const
 
