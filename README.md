@@ -31,22 +31,6 @@ The `VITE_SHOP_*` values are what the sign-in screen shows before anyone is logg
 
 Sign in with the `SEED_ADMIN_*` credentials, then create counters, staff and products from the Master menu (or import products from Excel — the dialog offers a template).
 
-## Demo data (dev only)
-
-```bash
-cd backend && php artisan db:seed --class=DemoSeeder
-```
-
-Creates counters Erode / Chennai / Kovai, six sample products per counter, and these logins (password `123456`):
-
-| Email | Role | Counter |
-|---|---|---|
-| `admin@gmail.com` | Super Admin | all |
-| `user@gmail.com` | Counter Staff | Erode |
-| `user1@gmail.com` | Counter Staff | Chennai |
-| `user2@gmail.com` | Counter Staff | Kovai |
-| `inactive@gmail.com` | Counter Staff (deactivated) | Erode |
-
 ## Scripts
 
 | Command | What it does |
@@ -97,7 +81,7 @@ One shop, many **counters**. Every product and bill belongs to exactly one count
 | `Services/BillService.php` | Creating a bill in one transaction (lock the invoice counter, deduct stock with row locks, compute GST totals, insert bill + items), cancelling (restore stock), reprint, and the touched-products echo. |
 | `Models/*` | `Bill` (`visibleTo($user)` scope), `BillItem`, `Product` (soft deletes, unique per counter + barcode), `BillCounter`, `User` (hashed password), `Setting` (singleton row). |
 | `Http/Middleware/` | `EnsureActive` (deactivated mid-session → token revoked, 401) and `RoleMiddleware`. |
-| `database/` | Nine create-migrations. `DatabaseSeeder` = shop row + Super Admin from `SEED_ADMIN_*`; `DemoSeeder` = sample counters, logins and products for development. |
+| `database/` | Nine create-migrations. `DatabaseSeeder` = shop row + Super Admin from `SEED_ADMIN_*`; counters, staff and products are created from the app. |
 | `config/` | CORS from `CORS_ALLOWED_ORIGINS`; Sanctum tokens expire after 8 h; `routes/console.php` schedules token and password-reset pruning. |
 
 Authorization is enforced in the controllers: `Bill::visibleTo($user)` for lists and `authorizeCounter()` for anything that names a counter — staff requests are forced to their own counter whatever they send. The server owns the billing invariants: invoice numbers are assigned under a row lock, stock can never go negative (409), closed counters cannot bill (422), only paid bills can be cancelled, and totals are recomputed from product rates at bill time and frozen into `bill_items`.
