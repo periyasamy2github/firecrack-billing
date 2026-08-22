@@ -30,14 +30,14 @@ class AuthController extends Controller
         }
 
         if (! $user->active) {
-            return response()->json(['message' => 'This account is disabled. Ask a Super Admin.'], 403);
+            return response()->json(['message' => 'This account is disabled. Ask an Administrator.'], 403);
         }
 
         $user->load('counter');
 
         // A closed counter stops trading, so its staff cannot sign in either.
         if (! $user->isSuperAdmin() && $user->counter && ! $user->counter->active) {
-            return response()->json(['message' => 'Your counter is closed. Ask a Super Admin.'], 403);
+            return response()->json(['message' => 'Your counter is closed. Ask an Administrator.'], 403);
         }
 
         $token = $user->createToken('spa')->plainTextToken;
