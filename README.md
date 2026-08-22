@@ -40,7 +40,7 @@ Sign in with the `SEED_ADMIN_*` credentials, then create counters, staff and pro
 
 ## Deploying
 
-- **SPA**: served from the domain root. Build with `VITE_API_URL=https://<api-domain>/api npm run build` and upload `dist/` to the web root (add an SPA rewrite so deep links like `/bills` fall back to `index.html`).
+- **SPA**: served from the domain root. Set `VITE_API_URL` and the `VITE_SHOP_*` values in `.env` for the client, run `npm run build`, and upload `dist/` to the web root. `public/.htaccess` ships inside `dist/` and rewrites deep links like `/bills/new` to `index.html` on Apache hosts (Hostinger); on nginx use `try_files $uri /index.html;`.
 - **API**: follow the production checklist in [backend/README.md](backend/README.md) (`APP_DEBUG=false`, CORS origin, seed before `config:cache`, cron for `schedule:run`).
 
 ## Architecture

@@ -1,0 +1,6 @@
+# Copied into dist/ by the build. Sends every non-file URL to index.html so the React router handles it
+# (deep links and refreshes on /bills/new, /reports, ... work on Apache hosts like Hostinger).
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
