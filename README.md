@@ -24,7 +24,7 @@ php artisan serve        # http://localhost:8000
 ```bash
 npm install
 cp .env.example .env     # VITE_API_URL=http://localhost:8000/api, plus VITE_SHOP_NAME / VITE_SHOP_TOWN / VITE_SHOP_GSTIN
-npm run dev              # http://localhost:5173/firecrack-billing/
+npm run dev              # http://localhost:5173/
 ```
 
 The `VITE_SHOP_*` values are what the sign-in screen shows before anyone is logged in (nothing is fetched from the API until then); they are baked in at build time, so rebuild after changing them. Everything shown after sign-in comes from the Settings page.
@@ -57,14 +57,13 @@ Creates counters Erode / Chennai / Kovai, six sample products per counter, and t
 
 ## Deploying
 
-- **GitHub Pages demo**: https://periyasamy2github.github.io/firecrack-billing/ serves the `demo` branch — the pre-API, browser-only build with mock data. `main` is not deployed there because it needs the Laravel API.
-- **SPA**: `vite.config.ts` sets `base: '/firecrack-billing/'` for GitHub Pages — change it if the app is served from a domain root. Build with `VITE_API_URL=https://<api-domain>/api npm run build` and upload `dist/`.
+- **SPA**: served from the domain root. Build with `VITE_API_URL=https://<api-domain>/api npm run build` and upload `dist/` to the web root (add an SPA rewrite so deep links like `/bills` fall back to `index.html`).
 - **API**: follow the production checklist in [backend/README.md](backend/README.md) (`APP_DEBUG=false`, CORS origin, seed before `config:cache`, cron for `schedule:run`).
 
 ## Architecture
 
 ```
-Browser (React SPA, /firecrack-billing/) ──axios, Bearer token──▶ Laravel 12 API (/api/*) ──Eloquent──▶ MySQL
+Browser (React SPA) ──axios, Bearer token──▶ Laravel 12 API (/api/*) ──Eloquent──▶ MySQL
 ```
 
 One shop, many **counters**. Every product and bill belongs to exactly one counter. **Counter Staff** are locked to their counter server-side; a **Super Admin** sees everything and picks a counter (or *All counters*) from the sidebar. Prices are GST-inclusive: the rate is the final price, tax is extracted from it and split CGST/SGST.
