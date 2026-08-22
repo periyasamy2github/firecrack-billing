@@ -15,11 +15,7 @@ php artisan db:seed           # shop row + the Super Admin from SEED_ADMIN_*
 php artisan serve             # http://localhost:8000
 ```
 
-`composer setup` runs the same steps in one go. For a dev database with sample counters, staff logins and products:
-
-```bash
-php artisan db:seed --class=DemoSeeder
-```
+`composer setup` runs the same steps in one go. Counters, staff and products are then created from the app (Master menu), not seeded.
 
 ## Routes (`routes/api.php`)
 
