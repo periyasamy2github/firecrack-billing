@@ -8,6 +8,7 @@ import { ListFooter } from '../../components/ListFooter'
 import { useSession } from '../../hooks/useSession'
 import { useDispatch, useSelector } from '../../redux/store'
 import { loadUsers, saveUser } from '../../redux/usersSlice'
+import { api } from '../../services/api'
 import { useListPage } from '../../hooks/useListPage'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
@@ -77,7 +78,7 @@ export const Users = () => {
     if (!resettingUser) return
     const { name } = resettingUser
     try {
-      await dispatch(saveUser({ ...resettingUser, password })).unwrap()
+      await api.resetPassword(resettingUser.id, password)
     } catch (err) {
       showToast(errorMessage(err, 'Could not reset this password'), 'error')
       throw err

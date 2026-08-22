@@ -29,7 +29,7 @@ export const ResetPasswordDialog = ({ user, onClose, onSubmit }: ResetPasswordDi
           autoFocus
           required
           error={Boolean(errors.newPassword)}
-          helperText={errors.newPassword?.message || 'At least 4 characters'}
+          helperText={errors.newPassword?.message || 'At least 6 characters'}
         />
         <TextField
           label="Confirm new password"

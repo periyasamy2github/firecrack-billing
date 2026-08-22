@@ -5,8 +5,14 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import type { ReactNode } from 'react'
 import { BrandMark } from './BrandMark'
 import { FireworksArt } from './FireworksArt'
-import { useSession } from '../hooks/useSession'
 import styles from '../css/components/AuthShell.module.css'
+
+// Nothing is fetched before sign-in, so the shop identity comes from VITE_SHOP_* in .env at build time.
+const SHOP = {
+  name: import.meta.env.VITE_SHOP_NAME || 'SparkBill',
+  town: import.meta.env.VITE_SHOP_TOWN || '',
+  gstin: import.meta.env.VITE_SHOP_GSTIN || '',
+}
 
 const HIGHLIGHTS = [
   {
@@ -26,62 +32,56 @@ const HIGHLIGHTS = [
   },
 ]
 
-export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: ReactNode }) => {
-  const { shop } = useSession()
+export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: ReactNode }) => (
+  <div className={styles.page}>
+    <aside className={styles.brandPanel}>
+      <FireworksArt />
 
-  return (
-    <div className={styles.page}>
-      <aside className={styles.brandPanel}>
-        <FireworksArt />
+      <div className={styles.brandRow}>
+        <div className={styles.logo}>
+          <BrandMark className={styles.logoIcon} />
+        </div>
+        <Typography className={styles.brandName}>SparkBill</Typography>
+      </div>
 
-        <div className={styles.brandRow}>
+      <div className={styles.pitch}>
+        <Typography component="h1" className={styles.headline}>
+          Billing built for the counter rush.
+        </Typography>
+        <Typography className={styles.subhead}>
+          {[SHOP.name, SHOP.town].filter(Boolean).join(' · ')}
+        </Typography>
+      </div>
+
+      <ul className={styles.highlights}>
+        {HIGHLIGHTS.map(({ icon: Icon, title, body }) => (
+          <li key={title} className={styles.highlight}>
+            <span className={styles.highlightIcon}>
+              <Icon sx={{ fontSize: 17 }} />
+            </span>
+            <span className={styles.highlightText}>
+              <Typography className={styles.highlightTitle}>{title}</Typography>
+              <Typography className={styles.highlightBody}>{body}</Typography>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {SHOP.gstin && <Typography className={styles.legal}>GSTIN {SHOP.gstin}</Typography>}
+    </aside>
+
+    <main className={styles.formPanel}>
+      <div className={styles.formInner}>
+        <div className={styles.compactBrand}>
           <div className={styles.logo}>
             <BrandMark className={styles.logoIcon} />
           </div>
-          <Typography className={styles.brandName}>SparkBill</Typography>
+          <Typography className={styles.compactBrandName}>SparkBill</Typography>
         </div>
 
-        <div className={styles.pitch}>
-          <Typography component="h1" className={styles.headline}>
-            Billing built for the counter rush.
-          </Typography>
-          <Typography className={styles.subhead}>
-            {shop.name} · {shop.town}
-          </Typography>
-        </div>
-
-        <ul className={styles.highlights}>
-          {HIGHLIGHTS.map(({ icon: Icon, title, body }) => (
-            <li key={title} className={styles.highlight}>
-              <span className={styles.highlightIcon}>
-                <Icon sx={{ fontSize: 17 }} />
-              </span>
-              <span className={styles.highlightText}>
-                <Typography className={styles.highlightTitle}>{title}</Typography>
-                <Typography className={styles.highlightBody}>{body}</Typography>
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        <Typography className={styles.legal}>
-          GSTIN {shop.gstin} · State {shop.stateCode}
-        </Typography>
-      </aside>
-
-      <main className={styles.formPanel}>
-        <div className={styles.formInner}>
-          <div className={styles.compactBrand}>
-            <div className={styles.logo}>
-              <BrandMark className={styles.logoIcon} />
-            </div>
-            <Typography className={styles.compactBrandName}>SparkBill</Typography>
-          </div>
-
-          {children}
-          {footer}
-        </div>
-      </main>
-    </div>
-  )
-}
+        {children}
+        {footer}
+      </div>
+    </main>
+  </div>
+)

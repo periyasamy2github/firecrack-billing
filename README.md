@@ -23,9 +23,11 @@ php artisan serve        # http://localhost:8000
 
 ```bash
 npm install
-cp .env.example .env     # VITE_API_URL=http://localhost:8000/api
+cp .env.example .env     # VITE_API_URL=http://localhost:8000/api, plus VITE_SHOP_NAME / VITE_SHOP_TOWN / VITE_SHOP_GSTIN
 npm run dev              # http://localhost:5173/firecrack-billing/
 ```
+
+The `VITE_SHOP_*` values are what the sign-in screen shows before anyone is logged in (nothing is fetched from the API until then); they are baked in at build time, so rebuild after changing them. Everything shown after sign-in comes from the Settings page.
 
 Sign in with the `SEED_ADMIN_*` credentials, then create counters, staff and products from the Master menu (or import products from Excel — the dialog offers a template).
 

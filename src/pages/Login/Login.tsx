@@ -44,7 +44,7 @@ export const Login = () => {
   const routeAfterLogin = (user: User) => {
     if (user.role !== 'Super Admin' && !user.counterId) {
       setToken(null)
-      showToast('No counter is assigned to you. Ask a Super Admin.', 'error')
+      showToast('No counter is assigned to you. Ask Administrator.', 'error')
       return
     }
 
@@ -140,7 +140,7 @@ export const Login = () => {
             type="button"
             variant="text"
             size="small"
-            onClick={() => showToast('Ask a Super Admin to reset your password.', 'info')}
+            onClick={() => showToast('Ask a Administrator to reset your password.', 'info')}
             className={styles.footerLink}
           >
             Forgot password?

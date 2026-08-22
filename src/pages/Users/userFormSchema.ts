@@ -84,7 +84,6 @@ export const fromUserFormValues = (values: UserFormValues, existing: User | null
   return {
     ...shared,
     id: `U${Date.now()}`,
-    counterId: null,
     password: values.password,
     active: true,
     joinedOn: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),

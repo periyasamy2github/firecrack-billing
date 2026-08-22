@@ -71,7 +71,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
                 fullWidth
                 required
                 error={Boolean(errors.password)}
-                helperText={errors.password?.message || 'At least 4 characters'}
+                helperText={errors.password?.message || 'At least 6 characters'}
               />
               <TextField
                 label="Confirm password"
