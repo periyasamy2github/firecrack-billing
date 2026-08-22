@@ -35,5 +35,5 @@ Counter staff are locked to their own counter server-side; a Super Admin passes 
 
 - `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://<api-domain>`
 - `CORS_ALLOWED_ORIGINS=https://<spa-domain>` (comma-separated, no wildcard)
-- `php artisan migrate --force && php artisan db:seed --force` once, **then** `php artisan config:cache && php artisan route:cache`
+- `php artisan migrate --force && php artisan db:seed --force` once, **then** `php artisan config:cache && php artisan route:cache` — or, with no shell, open `https://<api-domain>/optimize` after each deploy (runs `optimize:clear` + `optimize`)
 - Cron: `* * * * * php /path/to/api/artisan schedule:run` (prunes expired tokens and password resets daily)
