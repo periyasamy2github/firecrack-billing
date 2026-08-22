@@ -55,6 +55,7 @@ Creates counters Erode / Chennai / Kovai, six sample products per counter, and t
 
 ## Deploying
 
+- **GitHub Pages demo**: https://periyasamy2github.github.io/firecrack-billing/ serves the `demo` branch — the pre-API, browser-only build with mock data. `main` is not deployed there because it needs the Laravel API.
 - **SPA**: `vite.config.ts` sets `base: '/firecrack-billing/'` for GitHub Pages — change it if the app is served from a domain root. Build with `VITE_API_URL=https://<api-domain>/api npm run build` and upload `dist/`.
 - **API**: follow the production checklist in [backend/README.md](backend/README.md) (`APP_DEBUG=false`, CORS origin, seed before `config:cache`, cron for `schedule:run`).
 
