@@ -37,7 +37,6 @@ Sign in with the `SEED_ADMIN_*` credentials, then create counters, staff and pro
 |---|---|
 | `npm run dev` / `npm run build` / `npm run preview` | Vite dev server / `tsc -b` + production build to `dist/` / serve the build |
 | `npm run lint` | oxlint |
-| `node scripts/make-import-test-sheet.mjs`, `node scripts/make-bulk-test-sheet.mjs` | Sample spreadsheets for testing Products → Import (written to `test-data/`, git-ignored) |
 
 ## Deploying
 
