@@ -6,6 +6,7 @@ import { Button, Switch, TextField, Typography } from '@mui/material'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
+import { PageMessage } from '../../components/PageMessage'
 import { Panel } from '../../components/Panel'
 import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
@@ -42,10 +43,11 @@ export const NewBill = () => {
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [saving, setSaving] = useState(false)
 
-  // The whole catalogue loads once so search and scanning read from memory.
-  const billingCounterId = counterScope === 'all' ? billingCounter.id : counterScope
+  // The whole catalogue loads once so search and scanning read from memory. Empty id = no counter exists yet.
+  const billingCounterId = (counterScope === 'all' ? billingCounter?.id : counterScope) ?? ''
   const [loadingProducts, setLoadingProducts] = useState(true)
   useEffect(() => {
+    if (!billingCounterId) return
     setLoadingProducts(true)
     void dispatch(loadProducts(billingCounterId)).finally(() => setLoadingProducts(false))
   }, [billingCounterId])
@@ -92,7 +94,7 @@ export const NewBill = () => {
       time: formatBillTime(now),
       customerName: customerName || 'Walk-in',
       customerMobile,
-      counter: currentUser?.counter ?? billingCounter.name,
+      counter: currentUser?.counter ?? billingCounter?.name ?? '',
       billedBy: currentUser?.name ?? 'Unknown',
       items,
       paymentMethod,
@@ -141,6 +143,11 @@ export const NewBill = () => {
     },
     { allowInInputs: ['F2', 'F3', 'F7', 'F9', 'F10'] },
   )
+
+  // A fresh install has no counters yet — nothing to bill on until one is created.
+  if (!billingCounter) {
+    return <PageMessage title="New Bill" message="No counter is set up yet. Create one under Master → Counters, then come back to bill." />
+  }
 
   return (
     <>
