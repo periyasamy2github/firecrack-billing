@@ -26,8 +26,6 @@ dist-ssr
 # Local tooling
 .playwright-mcp/
 
-# Environment
-.env
 
 # Generated test spreadsheets
 test-data/
