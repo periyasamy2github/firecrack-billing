@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 
@@ -39,7 +39,7 @@ class UserController extends Controller
     }
 
     /** Admin password reset — forces re-login by revoking existing tokens. */
-    public function password(Request $request, User $user): JsonResponse
+    public function password(Request $request, User $user): Response
     {
         $request->validate(['password' => ['required', 'string', 'min:6']]);
         $user->forceFill(['password' => $request->input('password')])->save();
