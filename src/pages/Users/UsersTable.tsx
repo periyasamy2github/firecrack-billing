@@ -26,6 +26,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
       <TableHead>
         <TableRow>
           <TableCell>Name</TableCell>
+          <TableCell>Login email</TableCell>
           <TableCell>Staff ID</TableCell>
           <TableCell>Mobile</TableCell>
           <TableCell>Role</TableCell>
@@ -38,6 +39,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
         {!loading && rows.map((user) => (
           <TableRow key={user.id} hover>
             <TableCell><Typography className={styles.userName}>{user.name}</Typography></TableCell>
+            <TableCell><Mono sx={{ fontSize: 12 }}>{user.email}</Mono></TableCell>
             <TableCell><Mono sx={{ fontWeight: 600 }}>{user.staffId}</Mono></TableCell>
             <TableCell><Mono sx={{ fontSize: 12 }}>{user.mobile}</Mono></TableCell>
             <TableCell>
@@ -48,7 +50,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
             </TableCell>
             <TableCell>
               {user.role === 'Super Admin' ? (
-                <Typography className={styles.allCountersLabel}>All counters</Typography>
+                <Typography className={styles.allCountersLabel}>All branches</Typography>
               ) : (
                 <div className={styles.countersWrap}>
                   {user.counter && <Chip size="small" label={user.counter.split(' — ')[0]} variant="outlined" />}
@@ -77,8 +79,8 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
             </TableCell>
           </TableRow>
         ))}
-        {loading && <TableLoadingRow colSpan={7} />}
-        {!loading && filteredCount === 0 && <TableEmptyRow colSpan={7} message="No users match this search." />}
+        {loading && <TableLoadingRow colSpan={8} />}
+        {!loading && filteredCount === 0 && <TableEmptyRow colSpan={8} message="No users match this search." />}
       </TableBody>
     </Table>
   </TableCard>
