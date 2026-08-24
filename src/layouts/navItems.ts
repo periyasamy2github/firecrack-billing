@@ -26,6 +26,6 @@ export const PRIMARY_NAV: NavItem[] = [
 export const MASTER_NAV: NavItem[] = [
   { label: 'Products', to: '/products', icon: Inventory2OutlinedIcon },
   { label: 'Users', to: '/users', icon: BadgeOutlinedIcon, superAdminOnly: true },
-  { label: 'Counters', to: '/counters', icon: PointOfSaleOutlinedIcon, superAdminOnly: true },
+  { label: 'Branches', to: '/counters', icon: PointOfSaleOutlinedIcon, superAdminOnly: true },
   { label: 'Settings', to: '/settings', icon: SettingsOutlinedIcon, superAdminOnly: true },
 ]

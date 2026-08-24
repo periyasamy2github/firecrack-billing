@@ -21,7 +21,7 @@ export const AppLayout = () => {
   const { isSuperAdmin, shop, counters, counterScope, setCounterScope, selectedCounter, currentUser, signOut } = useSession()
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
 
-  const brandSubtitle = isSuperAdmin ? (counterScope === 'all' ? 'All counters' : selectedCounter?.name) : (currentUser?.counter ?? shop.name)
+  const brandSubtitle = isSuperAdmin ? (counterScope === 'all' ? 'All branches' : selectedCounter?.name) : (currentUser?.counter ?? shop.name)
 
   const navKeys: Record<string, string> = {
     n: ROUTES.newBill,
@@ -65,7 +65,7 @@ export const AppLayout = () => {
             }}
             MenuProps={{ PaperProps: { sx: { bgcolor: 'background.paper', color: 'text.primary' } } }}
           >
-            <MenuItem value="all" sx={{ fontWeight: 700 }}>All counters</MenuItem>
+            <MenuItem value="all" sx={{ fontWeight: 700 }}>All branches</MenuItem>
             {counters.filter((b) => b.active).map((b) => (
               <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>
             ))}
@@ -92,7 +92,7 @@ export const AppLayout = () => {
         <LoggedProfile
           user={currentUser}
           isSuperAdmin={isSuperAdmin}
-          counterLabel={currentUser?.counter ?? 'All counters'}
+          counterLabel={currentUser?.counter ?? 'All branches'}
           onSignOut={() => { signOut(); }}
         />
       </aside>

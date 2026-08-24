@@ -49,7 +49,7 @@ Sign in with the `SEED_ADMIN_*` credentials, then create counters, staff and pro
 Browser (React SPA) ──axios, Bearer token──▶ Laravel 12 API (/api/*) ──Eloquent──▶ MySQL
 ```
 
-One shop, many **counters**. Every product and bill belongs to exactly one counter. **Counter Staff** are locked to their counter server-side; a **Super Admin** sees everything and picks a counter (or *All counters*) from the sidebar. Prices are GST-inclusive: the rate is the final price, tax is extracted from it and split CGST/SGST.
+One shop, many **counters** (shown as **branches** in the UI). Every product and bill belongs to exactly one counter. **Counter Staff** are locked to their counter server-side; a **Super Admin** sees everything and picks a counter (or *All counters*) from the sidebar. Prices are GST-inclusive: the rate is the final price, tax is extracted from it and split CGST/SGST.
 
 ### Frontend — `src/`
 

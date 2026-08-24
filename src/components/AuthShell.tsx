@@ -28,7 +28,7 @@ const HIGHLIGHTS = [
   },
   {
     icon: InsightsOutlinedIcon,
-    title: 'Every counter in one place',
+    title: 'Every branch in one place',
     body: 'Sales, stock and season reports across the whole shop.',
   },
 ]

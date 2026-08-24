@@ -29,7 +29,7 @@ export const Reports = () => {
   const canPickCounter = isSuperAdmin && counterScope === 'all'
   const scope = canPickCounter ? range.counterId : counterScope
   const showCounterColumn = scope === 'all'
-  const scopeName = showCounterColumn ? 'all counters' : (counters.find((b) => b.id === scope)?.name ?? '')
+  const scopeName = showCounterColumn ? 'all branches' : (counters.find((b) => b.id === scope)?.name ?? '')
 
   const { query, setQuery, filter, setFilter, page, rowsPerPage, changePage, changeRowsPerPage, result } =
     useBillsPage({ scope, from: range.dateFrom || undefined, to: range.dateTo || undefined })
@@ -64,7 +64,7 @@ export const Reports = () => {
     const all = await api.loadBills({ scope, search: query, filter, from: range.dateFrom || undefined, to: range.dateTo || undefined, all: true })
 
     const headers = showCounterColumn
-      ? ['Bill no.', 'Counter', 'Date', 'Customer', 'Mobile', 'Total', 'Payment', 'Status']
+      ? ['Bill no.', 'Branch', 'Date', 'Customer', 'Mobile', 'Total', 'Payment', 'Status']
       : ['Bill no.', 'Date', 'Customer', 'Mobile', 'Total', 'Payment', 'Status']
 
     const rows = all.data.map((bill) => {

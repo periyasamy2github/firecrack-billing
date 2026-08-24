@@ -27,7 +27,7 @@ export const ReportsTable = ({ bills, loading, error, showCounterColumn, onView,
         <TableHead>
           <TableRow>
             <TableCell>Bill no.</TableCell>
-            {showCounterColumn && <TableCell>Counter</TableCell>}
+            {showCounterColumn && <TableCell>Branch</TableCell>}
             <TableCell>Date</TableCell>
             <TableCell>Customer</TableCell>
             <TableCell align="right">Total</TableCell>

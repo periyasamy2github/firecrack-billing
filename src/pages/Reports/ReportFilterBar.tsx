@@ -46,14 +46,14 @@ export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, se
       />
       {counters && (
         <TextField
-          label="Counter"
+          label="Branch"
           select
           value={filters.counterId}
           onChange={(e) => onChange({ counterId: e.target.value })}
           size="small"
           className={styles.counterField}
         >
-          <MenuItem value="all">All counters</MenuItem>
+          <MenuItem value="all">All branches</MenuItem>
           {counters.map((counter) => (
             <MenuItem key={counter.id} value={counter.id}>{counter.name}</MenuItem>
           ))}

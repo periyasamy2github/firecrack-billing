@@ -146,7 +146,7 @@ export const NewBill = () => {
 
   // A fresh install has no counters yet — nothing to bill on until one is created.
   if (!billingCounter) {
-    return <PageMessage title="New Bill" message="No counter is set up yet. Create one under Master → Counters, then come back to bill." />
+    return <PageMessage title="New Bill" message="No branch is set up yet. Create one under Master → Branches, then come back to bill." />
   }
 
   return (
@@ -158,7 +158,7 @@ export const NewBill = () => {
           <>
             {isSuperAdmin && counterScope === 'all' && (
               <span className={styles.counterWarning}>
-                No counter selected — billing under {billingCounter.name}
+                No branch selected — billing under {billingCounter.name}
               </span>
             )}
             <Button size="small" color="error" startIcon={<CloseRoundedIcon />} onClick={clearBill} disabled={items.length === 0}>
@@ -179,7 +179,7 @@ export const NewBill = () => {
                 helperText={errors.customerMobile?.message || ' '}
               />
               <TextField label="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Walk-in" inputRef={customerNameInputRef} />
-              <TextField label="Counter" value={currentUser?.counter ?? billingCounter.name} disabled />
+              <TextField label="Branch" value={currentUser?.counter ?? billingCounter.name} disabled />
               <div className={gstApplicable ? styles.gstBox : `${styles.gstBox} ${styles.gstBoxOff}`}>
                 <div>
                   <Typography className={styles.gstBoxTitle}>{gstApplicable ? 'Tax Invoice' : 'Bill of Supply'}</Typography>
@@ -194,7 +194,7 @@ export const NewBill = () => {
               loading={loadingProducts}
               inputRef={searchInputRef}
               onAdd={addItem}
-              onScanBlocked={() => showToast('Still loading this counter’s products — scan again in a moment.', 'info')}
+              onScanBlocked={() => showToast('Still loading this branch’s products — scan again in a moment.', 'info')}
             />
 
             <Panel title="Items" subtitle={`${totals.itemCount} items · ${totals.qtyCount} qty`} action={<Typography variant="caption">Enter adds a line</Typography>} flush>

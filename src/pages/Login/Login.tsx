@@ -44,7 +44,7 @@ export const Login = () => {
   const routeAfterLogin = (user: User) => {
     if (user.role !== 'Super Admin' && !user.counterId) {
       setToken(null)
-      showToast('No counter is assigned to you. Ask Administrator.', 'error')
+      showToast('No branch is assigned to you. Ask Administrator.', 'error')
       return
     }
 
@@ -73,7 +73,7 @@ export const Login = () => {
       <form onSubmit={handleSubmit(handleSignIn)} className={styles.form}>
         <div className={styles.heading}>
           <Typography component="h2" className={styles.title}>Sign in</Typography>
-          <Typography className={styles.subtitle}>Use your work email to open your counter.</Typography>
+          <Typography className={styles.subtitle}>Use your work email to open your branch.</Typography>
         </div>
 
         <TextField

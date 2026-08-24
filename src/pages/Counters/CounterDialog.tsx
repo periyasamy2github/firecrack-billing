@@ -6,7 +6,7 @@ import type { Counter } from '../../types'
 import styles from '../../css/pages/Counters.module.css'
 
 const counterSchema = z.object({
-  name: z.string().trim().min(1, 'Counter name is required'),
+  name: z.string().trim().min(1, 'Branch name is required'),
 })
 
 type CounterFormValues = z.infer<typeof counterSchema>
@@ -31,16 +31,16 @@ export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialo
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{counter ? 'Edit counter' : 'Add counter'}</DialogTitle>
+      <DialogTitle>{counter ? 'Edit branch' : 'Add branch'}</DialogTitle>
       <DialogContent className={styles.dialogContentTop}>
         <TextField
-          label="Counter name"
+          label="Branch name"
           {...register('name')}
           fullWidth
           autoFocus
           required
           className={styles.nameField}
-          placeholder="e.g. Counter 4 — Gift desk"
+          placeholder="e.g. Branch 4 — Gift desk"
           error={Boolean(errors.name)}
           helperText={errors.name?.message || ' '}
         />
@@ -53,7 +53,7 @@ export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialo
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={14} /> : undefined}
         >
-          {counter ? 'Save changes' : 'Add counter'}
+          {counter ? 'Save changes' : 'Add branch'}
         </Button>
       </DialogActions>
     </Dialog>

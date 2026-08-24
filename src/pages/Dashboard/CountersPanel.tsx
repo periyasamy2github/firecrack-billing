@@ -16,8 +16,8 @@ interface CountersPanelProps {
 
 export const CountersPanel = ({ perCounter, seasonSales, counterScope, viewingAll, onSelect }: CountersPanelProps) => (
   <Panel
-    title="Counters"
-    subtitle={viewingAll ? `${perCounter.length} counters · tap one to drill in` : 'tap a counter to switch · showing one counter'}
+    title="Branches"
+    subtitle={viewingAll ? `${perCounter.length} branches · tap one to drill in` : 'tap a branch to switch · showing one branch'}
     action={
       <div className={styles.superAdminBadge}>
         <ShieldOutlinedIcon className={styles.superAdminBadgeIcon} />

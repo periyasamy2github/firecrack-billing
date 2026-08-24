@@ -95,7 +95,7 @@ export const Bills = () => {
     <>
       <PageHeader
         title="Bills"
-        crumb={viewingAll ? `${result.total} bills · all counters` : `${result.total} bills`}
+        crumb={viewingAll ? `${result.total} bills · all branches` : `${result.total} bills`}
         actions={
           <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => navigate(ROUTES.newBill)}>New Bill</Button>
         }

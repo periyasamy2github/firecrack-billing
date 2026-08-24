@@ -98,7 +98,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
               className={styles.roleGroup}
             >
               <ToggleButton value="Counter Staff" className={styles.roleButton}>
-                <StorefrontOutlinedIcon className={styles.roleIcon} /> Counter Staff
+                <StorefrontOutlinedIcon className={styles.roleIcon} /> Branch Staff
               </ToggleButton>
               <ToggleButton value="Super Admin" className={styles.roleButton}>
                 <ShieldOutlinedIcon className={styles.roleIcon} /> Super Admin
@@ -115,7 +115,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
               render={({ field }) => (
                 <TextField
                   select
-                  label="Counter"
+                  label="Branch"
                   {...field}
                   fullWidth
                   error={Boolean(errors.counterId)}
@@ -130,7 +130,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
             />
           ) : (
             <Typography className={styles.superAdminNote}>
-              Super Admin accounts aren't tied to one counter — they see every counter after signing in.
+              Super Admin accounts aren't tied to one branch — they see every branch after signing in.
             </Typography>
           )}
 

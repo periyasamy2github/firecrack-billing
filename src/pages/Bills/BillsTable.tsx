@@ -32,7 +32,7 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
         <TableHead>
           <TableRow>
             <TableCell>Bill no.</TableCell>
-            {viewingAll && <TableCell>Counter</TableCell>}
+            {viewingAll && <TableCell>Branch</TableCell>}
             <TableCell>Customer</TableCell>
             <TableCell align="right">Items</TableCell>
             <TableCell align="right">Qty</TableCell>

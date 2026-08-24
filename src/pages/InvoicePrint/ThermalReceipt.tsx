@@ -43,7 +43,7 @@ export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
       <Dash />
       <Row label="Bill" value={bill.billNo.split('/').pop() ?? bill.billNo} />
       <Row label="Date" value={`${bill.date} ${bill.time}`} />
-      <Row label="Counter" value={bill.counter.replace('Counter ', '').split(' ')[0] + ' · ' + bill.billedBy.split(' ')[0]} />
+      <Row label="Branch" value={bill.counter.replace('Branch ', '').replace('Counter ', '').split(' ')[0] + ' · ' + bill.billedBy.split(' ')[0]} />
       <Dash />
       <Row label="Item" value="Qty × Rate      Amt" bold={false} />
       <Dash />

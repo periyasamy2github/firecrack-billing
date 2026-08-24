@@ -39,7 +39,7 @@ export const Products = () => {
   // Adding or importing needs one counter in scope.
   const viewingAllCounters = counterScope === 'all'
   const currentCounterName = counters.find((counter) => counter.id === counterScope)?.name ?? ''
-  const pickCounterHint = viewingAllCounters ? 'Pick a counter first — products belong to one counter' : ''
+  const pickCounterHint = viewingAllCounters ? 'Pick a branch first — products belong to one branch' : ''
 
   useEffect(() => {
     setLoading(true)
@@ -109,7 +109,7 @@ export const Products = () => {
         title="Products"
         crumb={
           viewingAllCounters
-            ? `${products.length} items · all ${counters.length} counters`
+            ? `${products.length} items · all ${counters.length} branches`
             : `${products.length} items · ${currentCounterName} · ${lowStockCount} running low`
         }
         actions={isSuperAdmin && (

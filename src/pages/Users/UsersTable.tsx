@@ -29,7 +29,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
           <TableCell>Staff ID</TableCell>
           <TableCell>Mobile</TableCell>
           <TableCell>Role</TableCell>
-          <TableCell>Counters</TableCell>
+          <TableCell>Branches</TableCell>
           <TableCell>Status</TableCell>
           <TableCell align="right" />
         </TableRow>
@@ -43,7 +43,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
             <TableCell>
               <div className={styles.roleRow}>
                 {user.role === 'Super Admin' && <ShieldOutlinedIcon sx={{ fontSize: 14, color: 'secondary.dark' }} />}
-                <Typography className={styles.roleLabel}>{user.role}</Typography>
+                <Typography className={styles.roleLabel}>{user.role === 'Counter Staff' ? 'Branch Staff' : user.role}</Typography>
               </div>
             </TableCell>
             <TableCell>

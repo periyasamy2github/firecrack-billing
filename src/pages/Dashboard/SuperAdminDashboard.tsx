@@ -46,7 +46,7 @@ export const SuperAdminDashboard = () => {
     <>
       <PageHeader
         title="Dashboard"
-        crumb={viewingAll ? `${formatLongDate(new Date())} · all ${counters.length} counters` : `${formatLongDate(new Date())} · ${counters.find((b) => b.id === counterScope)?.name}`}
+        crumb={viewingAll ? `${formatLongDate(new Date())} · all ${counters.length} branches` : `${formatLongDate(new Date())} · ${counters.find((b) => b.id === counterScope)?.name}`}
         actions={
           <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => navigate(ROUTES.newBill)}>
             New Bill

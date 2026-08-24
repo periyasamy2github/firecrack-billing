@@ -21,7 +21,7 @@ export const InvoicePartyGrid = ({ bill, stateCode }: InvoicePartyGridProps) => 
       {[
         ['Invoice no.', bill.billNo],
         ['Date', `${bill.date} · ${bill.time}`],
-        ['Counter', `${bill.counter} · ${bill.billedBy}`],
+        ['Branch', `${bill.counter} · ${bill.billedBy}`],
         ['Payment', bill.paymentMethod ?? '—'],
       ].map(([label, value]) => (
         <div key={label} className={styles.metaRow}>

@@ -31,7 +31,7 @@ export const ProductsTable = ({ rows, loading, filteredCount, viewingAllCounters
         <TableHead>
           <TableRow>
             <TableCell>Barcode</TableCell>
-            {viewingAllCounters && <TableCell>Counter</TableCell>}
+            {viewingAllCounters && <TableCell>Branch</TableCell>}
             <TableCell>Item name</TableCell>
             <TableCell>Category</TableCell>
             <TableCell>Unit</TableCell>

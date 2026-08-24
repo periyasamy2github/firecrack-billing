@@ -43,7 +43,7 @@ export const Counters = () => {
     try {
       await persistCounter(counter)
     } catch (err) {
-      showToast(errorMessage(err, 'Could not save this counter'), 'error')
+      showToast(errorMessage(err, 'Could not save this branch'), 'error')
       throw err
     }
     closeDialog()
@@ -55,18 +55,18 @@ export const Counters = () => {
       try {
         await persistCounter({ ...counter, active: !counter.active })
       } catch (err) {
-        showToast(errorMessage(err, 'Could not update this counter'), 'error')
+        showToast(errorMessage(err, 'Could not update this branch'), 'error')
       }
     })
 
   return (
     <>
       <PageHeader
-        title="Counters"
-        crumb={`${counters.length} counters · ${counters.filter((c) => c.active).length} active`}
+        title="Branches"
+        crumb={`${counters.length} branches · ${counters.filter((c) => c.active).length} active`}
         actions={
           <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={openAdd}>
-            Add counter
+            Add branch
           </Button>
         }
       />
@@ -74,14 +74,14 @@ export const Counters = () => {
         <TableCard
           footer={
             <div className={styles.footer}>
-              <Typography variant="caption">Inactive counters can't be picked at login or billed from.</Typography>
+              <Typography variant="caption">Inactive branches can't be picked at login or billed from.</Typography>
             </div>
           }
         >
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Counter</TableCell>
+                  <TableCell>Branch</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell align="right">Active</TableCell>
                   <TableCell align="right" />
@@ -99,7 +99,7 @@ export const Counters = () => {
                       {isPending(c.id) ? (
                         <CircularProgress size={16} />
                       ) : (
-                        <Tooltip title="Edit counter">
+                        <Tooltip title="Edit branch">
                           <IconButton size="small" onClick={() => openEdit(c)}>
                             <EditOutlinedIcon className={styles.actionIcon} />
                           </IconButton>
