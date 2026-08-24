@@ -46,12 +46,12 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
-    /** saveProduct — add a product (with opening stock) or edit its details; editing never changes stock. */
+    /** saveProduct — add a product or edit it; the stock field saves along with the rest. */
     public function store(Request $request): ProductResource
     {
         $data = $request->validate($this->rules(stockRequired: false));
         $counterId = $this->resolveCounterId($request->user(), $request->integer('counterId') ?: null);
-        $product = $this->upsert($counterId, $data, overwriteStock: false);
+        $product = $this->upsert($counterId, $data);
 
         return new ProductResource($product);
     }
@@ -90,7 +90,7 @@ class ProductController extends Controller
 
             $data = $validator->validated();
             $existed = Product::withTrashed()->where('counter_id', $counterId)->where('barcode', $data['code'])->exists();
-            $saved[] = $this->upsert($counterId, $data, overwriteStock: true);
+            $saved[] = $this->upsert($counterId, $data);
             $existed ? $updated++ : $created++;
         }
 
@@ -117,7 +117,7 @@ class ProductController extends Controller
         return $requested;
     }
 
-    private function upsert(int $counterId, array $data, bool $overwriteStock): Product
+    private function upsert(int $counterId, array $data): Product
     {
         $product = Product::withTrashed()->firstOrNew([
             'counter_id' => $counterId,
@@ -128,9 +128,11 @@ class ProductController extends Controller
             $product->restore();
         }
 
-        // Editing an existing product leaves stock alone; adding or importing sets it.
-        if ($overwriteStock || ! $product->exists) {
-            $product->stock = $data['stock'] ?? 0;
+        // Stock saves whenever the form sends it; a brand-new product without one starts at 0.
+        if (isset($data['stock'])) {
+            $product->stock = $data['stock'];
+        } elseif (! $product->exists) {
+            $product->stock = 0;
         }
 
         $product->fill([
