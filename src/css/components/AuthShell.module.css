@@ -55,20 +55,24 @@
 }
 
 .logo {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  border-radius: 10px;
-  background-image: var(--gradient-brand);
-  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.6);
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
   display: grid;
   place-items: center;
 }
 
 .logoIcon {
-  width: 30px;
-  height: 30px;
-  color: #fff;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.shopBadge {
+  display: block;
+  width: min(230px, 55%);
+  margin: 28px auto 0;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
 }
 
 .brandRow .brandName {

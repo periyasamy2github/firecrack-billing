@@ -44,17 +44,14 @@
   width: 32px;
   height: 32px;
   flex: 0 0 32px;
-  border-radius: 9px;
-  background-image: var(--gradient-brand);
-  box-shadow: var(--glow-primary);
   display: grid;
   place-items: center;
 }
 
 .logoIcon {
-  width: 18px;
-  height: 18px;
-  color: #fff;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .brandText {

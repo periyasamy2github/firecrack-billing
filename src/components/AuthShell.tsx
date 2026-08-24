@@ -5,6 +5,7 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import type { ReactNode } from 'react'
 import { BrandMark } from './BrandMark'
 import { FireworksArt } from './FireworksArt'
+import shopBadge from '../assets/logo-2.png'
 import styles from '../css/components/AuthShell.module.css'
 
 // Nothing is fetched before sign-in, so the shop identity comes from VITE_SHOP_* in .env at build time.
@@ -43,6 +44,8 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
         </div>
         <Typography className={styles.brandName}>SparkBill</Typography>
       </div>
+
+      <img src={shopBadge} alt="" className={styles.shopBadge} />
 
       <div className={styles.pitch}>
         <Typography component="h1" className={styles.headline}>
