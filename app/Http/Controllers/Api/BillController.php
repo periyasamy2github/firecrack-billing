@@ -117,7 +117,7 @@ class BillController extends Controller
             'items.*.code' => ['required', 'string'],
             'items.*.qty' => ['required', 'integer', 'gt:0'],
         ], [
-            'counterId.exists' => 'This counter is closed, so it cannot take new bills.',
+            'counterId.exists' => 'This branch is closed, so it cannot take new bills.',
         ]);
 
         $this->authorizeCounter($request->user(), (int) $data['counterId']);
@@ -181,7 +181,7 @@ class BillController extends Controller
     private function authorizeCounter(User $user, int $counterId): void
     {
         if (! $user->isSuperAdmin() && $user->counter_id !== $counterId) {
-            abort(response()->json(['message' => 'You are not assigned to this counter'], 403));
+            abort(response()->json(['message' => 'You are not assigned to this branch'], 403));
         }
     }
 

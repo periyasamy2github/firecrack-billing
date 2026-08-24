@@ -111,7 +111,7 @@ class ProductController extends Controller
         }
 
         if (! $requested) {
-            abort(response()->json(['message' => 'Choose a counter for these products.'], 422));
+            abort(response()->json(['message' => 'Choose a branch for these products.'], 422));
         }
 
         return $requested;

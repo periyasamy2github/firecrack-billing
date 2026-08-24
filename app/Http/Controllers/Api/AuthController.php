@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         // A closed counter stops trading, so its staff cannot sign in either.
         if (! $user->isSuperAdmin() && $user->counter && ! $user->counter->active) {
-            return response()->json(['message' => 'Your counter is closed. Ask an Administrator.'], 403);
+            return response()->json(['message' => 'Your branch is closed. Ask an Administrator.'], 403);
         }
 
         $token = $user->createToken('spa')->plainTextToken;
