@@ -58,10 +58,10 @@ export const ProductDialog = ({ mode, open, onClose, product, existingCodes, cou
                     </Tooltip>
                   )}
                 </div>
-                <ProductFormFields index={index} showStock />
+                <ProductFormFields index={index} />
               </div>
             ) : (
-              <ProductFormFields key={row.id} index={index} showStock={false} />
+              <ProductFormFields key={row.id} index={index} />
             )
           ))}
           {isAdd && (

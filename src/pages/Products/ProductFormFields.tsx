@@ -6,11 +6,9 @@ import styles from '../../css/pages/ProductFormFields.module.css'
 
 interface ProductFormFieldsProps {
   index: number
-  // Opening stock, set only when adding.
-  showStock?: boolean
 }
 
-export const ProductFormFields = ({ index, showStock = true }: ProductFormFieldsProps) => {
+export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
   const { register, control, formState: { errors } } = useFormContext<ProductBatchValues>()
   const rowErrors = errors.products?.[index]
 
@@ -47,7 +45,7 @@ export const ProductFormFields = ({ index, showStock = true }: ProductFormFields
       <TextField label="MRP (₹)" {...field('mrp')} />
       <TextField label="Rate (₹)" {...field('rate')} />
       <TextField label="GST %" {...field('gstRate')} />
-      {showStock && <TextField label="Stock" {...field('stock')} />}
+      <TextField label="Stock" {...field('stock')} />
     </div>
   )
 }

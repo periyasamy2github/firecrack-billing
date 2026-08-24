@@ -98,7 +98,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
               className={styles.roleGroup}
             >
               <ToggleButton value="Counter Staff" className={styles.roleButton}>
-                <StorefrontOutlinedIcon className={styles.roleIcon} /> Branch Staff
+                <StorefrontOutlinedIcon className={styles.roleIcon} /> Counter Staff
               </ToggleButton>
               <ToggleButton value="Super Admin" className={styles.roleButton}>
                 <ShieldOutlinedIcon className={styles.roleIcon} /> Super Admin

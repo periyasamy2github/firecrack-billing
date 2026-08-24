@@ -23,7 +23,7 @@ export const UserDetailsDialog = ({ user, onClose }: UserDetailsDialogProps) => 
         <DetailRow label="Staff ID" value={user.staffId} />
         <DetailRow label="Mobile" value={user.mobile} />
         <DetailRow label="Email" value={user.email} />
-        <DetailRow label="Role" value={user.role === 'Counter Staff' ? 'Branch Staff' : user.role} />
+        <DetailRow label="Role" value={user.role} />
         <DetailRow label="Branch" value={user.role === 'Super Admin' ? 'All branches' : (user.counter || '—')} />
         <DetailRow label="Joined on" value={user.joinedOn} />
         <DetailRow label="Status" value={user.active ? 'Active' : 'Inactive'} />
