@@ -10,8 +10,8 @@ import { SearchField } from '../../components/SearchField'
 import { ListFooter } from '../../components/ListFooter'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
-import { BILL_FILTERS } from '../../utils/billFilters'
-import { ROUTES, billPrintPath } from '../../utils/routes'
+import { billFilters } from '../../utils/billFilters'
+import { ROUTES, billEditPath, billPrintPath } from '../../utils/routes'
 import { useSession } from '../../hooks/useSession'
 import { useDispatch } from '../../redux/store'
 import { cancelBill, reprintBill } from '../../redux/billsSlice'
@@ -26,7 +26,8 @@ import styles from '../../css/pages/Bills.module.css'
 
 export const Bills = () => {
   const navigate = useNavigate()
-  const { counterScope } = useSession()
+  const { counterScope, paymentTypes } = useSession()
+  const filters = billFilters(paymentTypes.map((type) => type.name))
   const dispatch = useDispatch()
   const confirm = useConfirm()
   const viewingAll = counterScope === 'all'
@@ -39,7 +40,7 @@ export const Bills = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   useKeyShortcuts({
     '/': () => searchInputRef.current?.focus(),
-    ...Object.fromEntries(BILL_FILTERS.map((key, index) => [String(index + 1), () => setFilter(key)])),
+    ...Object.fromEntries(filters.map((key, index) => [String(index + 1), () => setFilter(key)])),
   })
 
   const cancelWithConfirm = async (bill: Bill) => {
@@ -104,7 +105,7 @@ export const Bills = () => {
         <Card className={styles.filterCard}>
           <div className={styles.filterRow}>
             <SearchField placeholder="Bill number or customer mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
-            {BILL_FILTERS.map((key) => (
+            {filters.map((key) => (
               <Chip
                 key={key}
                 label={`${key} ${result.counts[key] ?? 0}`}
@@ -124,6 +125,7 @@ export const Bills = () => {
           viewingAll={viewingAll}
           isPending={isPending}
           onView={(bill) => navigate(billPrintPath(bill.id))}
+          onEdit={(bill) => navigate(billEditPath(bill.id))}
           onReprint={reprintAndOpen}
           onCancel={cancelWithConfirm}
           footer={tableFooter}

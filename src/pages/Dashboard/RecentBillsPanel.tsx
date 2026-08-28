@@ -5,7 +5,7 @@ import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { Mono } from '../../components/Mono'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
-import { ROUTES } from '../../utils/routes'
+import { ROUTES, billPrintPath } from '../../utils/routes'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/RecentBillsPanel.module.css'
 
@@ -21,7 +21,7 @@ export const RecentBillsPanel = ({ bills, showCounter }: RecentBillsPanelProps) 
       <Table size="small">
         <TableBody>
           {bills.map((b) => (
-            <TableRow key={b.billNo} hover>
+            <TableRow key={b.billNo} hover className={styles.billRow} onClick={() => navigate(billPrintPath(b.id))}>
               <TableCell>
                 <Mono sx={{ fontSize: 11.5, fontWeight: 600 }}>{b.billNo}</Mono>
                 {showCounter && <Typography variant="caption" className={styles.counterCaption}>{b.counter}</Typography>}

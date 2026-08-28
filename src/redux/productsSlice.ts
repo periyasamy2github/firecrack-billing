@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { api } from '../services/api'
 import type { BillMutation, Product } from '../types'
-import { cancelBill, createBill } from './billsSlice'
+import { cancelBill, createBill, updateBill } from './billsSlice'
 
 // Each page loads its own catalogue; the boot call does not.
 export const loadProducts = createAsyncThunk('products/load', (scope: string) => api.loadProducts(scope))
@@ -61,6 +61,7 @@ const productsSlice = createSlice({
       })
       // Bills echo back the new stock.
       .addCase(createBill.fulfilled, (state, action) => applyStock(state.items, action.payload.products))
+      .addCase(updateBill.fulfilled, (state, action) => applyStock(state.items, action.payload.products))
       .addCase(cancelBill.fulfilled, (state, action) => applyStock(state.items, action.payload.products))
   },
 })

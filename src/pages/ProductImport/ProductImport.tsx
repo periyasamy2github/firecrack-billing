@@ -24,14 +24,13 @@ import { ImportingStage } from './ImportingStage'
 import { DoneStage } from './DoneStage'
 
 // Headers are matched case-insensitively on import, so these stay readable.
-export const TEMPLATE_COLUMNS = ['Barcode', 'Name', 'Category', 'HSN', 'Unit', 'MRP', 'Rate', 'GST Rate', 'Stock', 'Low Stock Threshold']
+export const TEMPLATE_COLUMNS = ['Barcode', 'Name', 'Category', 'HSN', 'MRP', 'Rate', 'GST Rate', 'Stock', 'Low Stock Threshold']
 
 const HEADER_ALIASES: Record<string, string> = {
   barcode: 'code', code: 'code', 'product code': 'code', sku: 'code',
   name: 'name', 'item name': 'name', 'product name': 'name',
   category: 'category',
   hsn: 'hsn', 'hsn code': 'hsn',
-  unit: 'unit',
   mrp: 'mrp',
   rate: 'rate', 'sale rate': 'rate', 'selling price': 'rate', 'counter rate': 'rate',
   gst: 'gstRate', gstrate: 'gstRate', 'gst rate': 'gstRate', 'gst%': 'gstRate', 'gst %': 'gstRate',
@@ -46,14 +45,13 @@ const importRowSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   category: z.string().trim().min(1, 'Category is required'),
   hsn: z.string().trim(),
-  unit: z.string().trim().min(1, 'Unit is required'),
-  mrp: z.coerce.number(),
+  mrp: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : v), z.coerce.number().nullable()),
   rate: z.coerce.number(),
   gstRate: z.coerce.number(),
   stock: z.coerce.number(),
   lowStockThreshold: z.coerce.number(),
 })
-  .refine((v) => Number.isFinite(v.mrp) && v.mrp > 0, { message: 'MRP must be a positive number', path: ['mrp'] })
+  .refine((v) => v.mrp === null || (Number.isFinite(v.mrp) && v.mrp > 0), { message: 'MRP must be a positive number', path: ['mrp'] })
   .refine((v) => Number.isFinite(v.rate) && v.rate > 0, { message: 'Rate must be a positive number', path: ['rate'] })
   .refine((v) => Number.isFinite(v.gstRate) && v.gstRate >= 0, { message: 'GST rate must be 0 or more', path: ['gstRate'] })
   .refine((v) => Number.isFinite(v.stock) && v.stock >= 0, { message: 'Stock must be 0 or more', path: ['stock'] })
@@ -106,7 +104,6 @@ const buildRow = (raw: Record<string, unknown>, index: number, seenCodes: Set<st
       name: result.data.name,
       category: result.data.category,
       hsn: result.data.hsn,
-      unit: result.data.unit,
       mrp: result.data.mrp,
       rate: result.data.rate,
       gstRate: result.data.gstRate,

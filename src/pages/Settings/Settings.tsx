@@ -9,6 +9,7 @@ import { useDispatch } from '../../redux/store'
 import { saveShop } from '../../redux/shopSlice'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
+import { PaymentTypesEditor } from './PaymentTypesEditor'
 import styles from '../../css/pages/Settings.module.css'
 
 const SettingsSection = ({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) => (
@@ -94,7 +95,8 @@ export const Settings = () => {
         }
       />
       <PageContent>
-        <Card>
+        <div className={styles.sectionsGrid}>
+          <Card>
           <SettingsSection title="Shop profile" desc="Printed on every invoice. Changing these does not alter bills already raised.">
             <div className={styles.fieldsGrid2}>
               <TextField label="Shop name" {...register('name')} size="small" error={Boolean(errors.name)} helperText={errors.name?.message || ' '} />
@@ -110,7 +112,9 @@ export const Settings = () => {
               <TextField label="GSTIN" {...register('gstin', { onChange: forceUpperCase })} size="small" fullWidth error={Boolean(errors.gstin)} helperText={errors.gstin?.message || ' '} />
             </div>
           </SettingsSection>
+          </Card>
 
+          <Card>
           <SettingsSection title="Invoice & numbering" desc="Printed on every invoice.">
             <div className={styles.numberGrid}>
               <TextField label="Prefix" {...register('invoicePrefix')} size="small" error={Boolean(errors.invoicePrefix)} helperText={errors.invoicePrefix?.message || ' '} />
@@ -122,9 +126,17 @@ export const Settings = () => {
                 helperText={errors.nextInvoiceNumber?.message || ' '}
               />
             </div>
-            <TextField label="Declaration printed on invoice" {...register('declaration')} size="small" fullWidth multiline minRows={2} />
+            <TextField label="Declaration printed on invoice" {...register('declaration')} size="small" fullWidth multiline minRows={4} />
           </SettingsSection>
+          </Card>
 
+          <Card>
+          <SettingsSection title="Payment types" desc="Ways a customer can pay. Switched-off types disappear from the billing screen; Mixed lets one bill split across types. Saved as you edit — the Save button above is not needed.">
+            <PaymentTypesEditor />
+          </SettingsSection>
+          </Card>
+
+          <Card>
           <SettingsSection title="Season target" desc="Shown on the Super Admin dashboard as season progress.">
             <div className={styles.targetField}>
               <TextField
@@ -137,7 +149,8 @@ export const Settings = () => {
               />
             </div>
           </SettingsSection>
-        </Card>
+          </Card>
+        </div>
       </PageContent>
 
     </>

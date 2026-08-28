@@ -2,13 +2,19 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, CircularProgress, Typography } from '@mui/material'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
+import TodayOutlinedIcon from '@mui/icons-material/TodayOutlined'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { Mono } from '../../components/Mono'
+import { KpiCard } from '../../components/KpiCard'
 import { ListFooter } from '../../components/ListFooter'
 import { getBillTotals } from '../../utils/billing'
-import { formatCurrency } from '../../utils/format'
-import { billPrintPath } from '../../utils/routes'
+import { formatCurrency, formatInt } from '../../utils/format'
+import { ROUTES, billPrintPath } from '../../utils/routes'
 import { downloadXlsx } from '../../utils/xlsx'
 import { api } from '../../services/api'
 import { useSession } from '../../hooks/useSession'
@@ -98,17 +104,29 @@ export const Reports = () => {
         title="Reports"
         crumb={`${result.total} bills · ${scopeName}`}
         actions={
-          <Button
-            size="small"
-            startIcon={exporting ? <CircularProgress size={14} /> : <FileDownloadOutlinedIcon />}
-            onClick={handleExport}
-            disabled={result.total === 0 || exporting}
-          >
-            {exporting ? 'Exporting…' : 'Export'}
-          </Button>
+          <>
+            <Button size="small" startIcon={<TodayOutlinedIcon />} onClick={() => navigate(ROUTES.dailyStatement)}>
+              Daily statement
+            </Button>
+            <Button
+              size="small"
+              startIcon={exporting ? <CircularProgress size={14} /> : <FileDownloadOutlinedIcon />}
+              onClick={handleExport}
+              disabled={result.total === 0 || exporting}
+            >
+              {exporting ? 'Exporting…' : 'Export'}
+            </Button>
+          </>
         }
       />
       <PageContent>
+        <div className={styles.kpiRow}>
+          <KpiCard label="Sales (paid)" value={formatCurrency(result.totals.grand)} icon={PaymentsOutlinedIcon} tone="primary" />
+          <KpiCard label="Bills" value={formatInt(result.total)} icon={ReceiptLongOutlinedIcon} tone="info" />
+          <KpiCard label="GST collected" value={formatCurrency(result.totals.gst)} icon={AccountBalanceOutlinedIcon} tone="paid" />
+          <KpiCard label="Discounts given" value={formatCurrency(result.totals.discount)} icon={LocalOfferOutlinedIcon} tone="ember" />
+        </div>
+
         <ReportFilterBar
           filters={filters}
           onChange={updateFilters}

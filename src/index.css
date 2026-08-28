@@ -63,6 +63,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Slightly larger UI on big monitors; screen-only so print sheets keep exact metrics. */
+@media screen and (min-width: 1600px) {
+  body {
+    zoom: 1.07;
+  }
+}
+
 /* Top loading bar — brand sapphire-to-amber, above every MUI layer */
 #nprogress .bar {
   background: linear-gradient(90deg, #2e5c8a, #059669);

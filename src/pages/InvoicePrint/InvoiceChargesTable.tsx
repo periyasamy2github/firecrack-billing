@@ -8,14 +8,18 @@ interface InvoiceChargesTableProps {
   gst: boolean
   cgstLabel: string
   sgstLabel: string
+  /** e.g. "10%" — printed beside the ₹ discount so both figures appear. */
+  discountPercent?: string | null
 }
 
 // One charges breakdown for both invoice kinds — the tax rows only appear when GST applies.
-export const InvoiceChargesTable = ({ totals, gst, cgstLabel, sgstLabel }: InvoiceChargesTableProps) => {
+export const InvoiceChargesTable = ({ totals, gst, cgstLabel, sgstLabel, discountPercent }: InvoiceChargesTableProps) => {
   const rows: [string, string][] = [
-    ['MRP value', formatAmount(totals.mrpValue)],
+    ...(totals.hasMrp ? [['MRP value', formatAmount(totals.mrpValue)] as [string, string]] : []),
     ['Sub total', formatAmount(totals.gross)],
-    ...(totals.billDiscountAmount > 0 ? [['Bill discount', `− ${formatAmount(totals.billDiscountAmount)}`] as [string, string]] : []),
+    ...(totals.billDiscountAmount > 0
+      ? [[`Bill discount${discountPercent ? ` (${discountPercent})` : ''}`, `− ${formatAmount(totals.billDiscountAmount)}`] as [string, string]]
+      : []),
     ...(gst
       ? [
           ['Taxable value', formatAmount(totals.taxable)] as [string, string],

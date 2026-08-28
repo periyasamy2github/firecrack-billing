@@ -1,6 +1,6 @@
 ﻿import { Typography } from '@mui/material'
 import type { Bill } from '../../types'
-import { computeLineAmounts, getBillTotals, halfGstRateLabel } from '../../utils/billing'
+import { computeLineAmounts, discountPercentLabel, getBillTotals, halfGstRateLabel } from '../../utils/billing'
 import { formatAmount, formatCurrency } from '../../utils/format'
 import { useSession } from '../../hooks/useSession'
 import styles from '../../css/pages/ThermalReceipt.module.css'
@@ -58,18 +58,25 @@ export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
       })}
       <Dash />
       <Row label="Items / Qty" value={`${totals.itemCount} / ${totals.qtyCount}`} />
-      <Row label="MRP value" value={formatAmount(totals.mrpValue)} />
+      {totals.hasMrp && <Row label="MRP value" value={formatAmount(totals.mrpValue)} />}
       <Row label="Sub total" value={formatAmount(totals.gross)} />
-      {totals.billDiscountAmount > 0 && <Row label="Bill discount" value={`-${formatAmount(totals.billDiscountAmount)}`} />}
+      {totals.billDiscountAmount > 0 && (
+        <Row
+          label={`Bill discount${discountPercentLabel(totals, bill.billDiscount) ? ` (${discountPercentLabel(totals, bill.billDiscount)})` : ''}`}
+          value={`-${formatAmount(totals.billDiscountAmount)}`}
+        />
+      )}
       {gst && <Row label="Taxable" value={formatAmount(totals.taxable)} />}
       {gst && <Row label={halfRate ? `CGST ${halfRate}` : 'CGST'} value={formatAmount(totals.cgst)} />}
       {gst && <Row label={halfRate ? `SGST ${halfRate}` : 'SGST'} value={formatAmount(totals.sgst)} />}
       <Row label="Round off" value={formatAmount(totals.roundOff)} />
       <Dash />
       <Row label="TOTAL" value={formatCurrency(totals.grandTotal)} bold />
-      <Row label="Paid by" value={bill.paymentMethod ?? '—'} />
+      {bill.payments.length > 1
+        ? bill.payments.map((payment) => <Row key={payment.typeId} label={`Paid · ${payment.type}`} value={formatAmount(payment.amount)} />)
+        : <Row label="Paid by" value={bill.paymentMethod ?? '—'} />}
       <Dash />
-      {showMrpSaved && (
+      {showMrpSaved && totals.hasMrp && (
         <>
           <Typography className={styles.savedLine}>
             YOU SAVED {formatCurrency(totals.mrpValue - totals.gross + totals.billDiscountAmount)}

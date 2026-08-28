@@ -34,10 +34,10 @@ export const ProductsTable = ({ rows, loading, filteredCount, viewingAllCounters
             {viewingAllCounters && <TableCell>Branch</TableCell>}
             <TableCell>Item name</TableCell>
             <TableCell>Category</TableCell>
-            <TableCell>Unit</TableCell>
             <TableCell align="right">MRP</TableCell>
             <TableCell align="right">Rate</TableCell>
             <TableCell align="right">Stock</TableCell>
+            <TableCell align="right">Sold</TableCell>
             <TableCell>Status</TableCell>
             <TableCell align="right" />
           </TableRow>
@@ -52,14 +52,14 @@ export const ProductsTable = ({ rows, loading, filteredCount, viewingAllCounters
                 {viewingAllCounters && <TableCell>{p.counter}</TableCell>}
                 <TableCell><Typography className={styles.itemName}>{p.name}</Typography></TableCell>
                 <TableCell>{p.category}</TableCell>
-                <TableCell className={styles.unitCell}>{p.unit}</TableCell>
-                <TableCell align="right"><Mono sx={{ color: 'text.secondary' }}>{formatAmount(p.mrp)}</Mono></TableCell>
+                <TableCell align="right"><Mono sx={{ color: 'text.secondary' }}>{p.mrp != null ? formatAmount(p.mrp) : '—'}</Mono></TableCell>
                 <TableCell align="right"><Mono sx={{ fontWeight: 600 }}>{formatAmount(p.rate)}</Mono></TableCell>
                 <TableCell align="right">
                   <Mono sx={{ fontWeight: 650, color: status.tone === 'due' ? 'var(--due)' : status.tone === 'hold' ? 'var(--ember-ink)' : 'var(--ink)' }}>
                     {p.stock}
                   </Mono>
                 </TableCell>
+                <TableCell align="right"><Mono sx={{ color: 'text.secondary' }}>{p.salesCount ?? 0}</Mono></TableCell>
                 <TableCell><StatusPill tone={status.tone} label={status.label} /></TableCell>
                 <TableCell align="right">
                   {canManage && (isPending(key) ? (

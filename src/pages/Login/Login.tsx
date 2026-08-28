@@ -8,12 +8,14 @@ import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import { AuthShell } from '../../components/AuthShell'
 import { useDispatch } from '../../redux/store'
 import { loadSession } from '../../redux/sessionSlice'
 import { api, setToken } from '../../services/api'
 import { useSession } from '../../hooks/useSession'
 import { useToast } from '../../hooks/useToast'
+import { usePwaInstall } from '../../hooks/usePwaInstall'
 import { errorMessage } from '../../utils/errorMessage'
 import type { User } from '../../types'
 import { ROUTES } from '../../utils/routes'
@@ -40,6 +42,7 @@ export const Login = () => {
   })
 
   const showToast = useToast()
+  const { canInstall, showIosHint, install } = usePwaInstall()
 
   const routeAfterLogin = (user: User) => {
     if (user.role !== 'Super Admin' && !user.counterId) {
@@ -134,6 +137,23 @@ export const Login = () => {
         >
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
+
+        {canInstall && (
+          <Button
+            type="button"
+            variant="outlined"
+            size="small"
+            fullWidth
+            startIcon={<DownloadOutlinedIcon />}
+            onClick={() => { void install() }}
+            className={styles.installButton}
+          >
+            Install SparkBill on this computer
+          </Button>
+        )}
+        {showIosHint && (
+          <Typography className={styles.iosHint}>Install the app: tap Share, then "Add to Home Screen".</Typography>
+        )}
 
         <div className={styles.footerRow}>
           <Button

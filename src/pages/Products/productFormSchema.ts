@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { productCategories } from '../../data/products'
 import type { Product } from '../../types'
 
 const DEFAULT_HSN = '3604 90 00'
@@ -14,13 +13,11 @@ const productFormSchema = (takenCodes: Set<string>, excludeCode: string | null) 
     code: z.string().trim().min(1, 'Barcode is required'),
     name: z.string().trim().min(1, 'Name is required'),
     category: z.string().trim().min(1, 'Pick a category'),
-    unit: z.string().trim().min(1, 'Unit is required'),
-    mrp: positiveNumber('MRP must be a positive number'),
+    mrp: z.string().refine((v) => v.trim() === '' || (/^\d+(\.\d+)?$/.test(v.trim()) && Number(v) > 0), 'MRP must be a positive number'),
     rate: positiveNumber('Rate must be a positive number'),
     gstRate: nonNegativeNumber('GST % must be 0 or more'),
     stock: nonNegativeNumber('Stock must be 0 or more'),
   })
-    .refine((v) => productCategories.includes(v.category), { message: 'Pick a category', path: ['category'] })
     .refine((v) => {
       const key = v.code.trim().toUpperCase()
       return key === (excludeCode ?? '') || !takenCodes.has(key)
@@ -53,7 +50,6 @@ export interface ProductFormValues {
   code: string
   name: string
   category: string
-  unit: string
   mrp: string
   rate: string
   gstRate: string
@@ -61,15 +57,14 @@ export interface ProductFormValues {
 }
 
 export const emptyProductForm = (): ProductFormValues => ({
-  code: '', name: '', category: '', unit: '', mrp: '', rate: '', gstRate: String(DEFAULT_GST_RATE), stock: '',
+  code: '', name: '', category: '', mrp: '', rate: '', gstRate: String(DEFAULT_GST_RATE), stock: '',
 })
 
 export const toProductFormValues = (p: Product): ProductFormValues => ({
   code: p.code,
   name: p.name,
   category: p.category,
-  unit: p.unit,
-  mrp: String(p.mrp),
+  mrp: p.mrp == null ? '' : String(p.mrp),
   rate: String(p.rate),
   gstRate: String(p.gstRate),
   stock: String(p.stock),
@@ -80,9 +75,8 @@ export const fromProductFormValues = (v: ProductFormValues, existing: Product | 
   code: v.code.trim(),
   counterId: existing?.counterId ?? counterId,
   name: v.name.trim(),
-  category: v.category,
-  unit: v.unit.trim(),
-  mrp: Number(v.mrp),
+  category: v.category.trim(),
+  mrp: v.mrp.trim() === '' ? null : Number(v.mrp),
   rate: Number(v.rate),
   gstRate: Number(v.gstRate),
   stock: Number(v.stock),

@@ -2,6 +2,8 @@
 import { createRoot } from 'react-dom/client'
 import 'nprogress/nprogress.css'
 import './index.css'
+// Captures the one-shot beforeinstallprompt before lazy chunks load.
+import './hooks/usePwaInstall'
 import App from './App.tsx'
 import { ThemeModeProvider } from './theme/ThemeModeContext'
 import { Provider } from 'react-redux'

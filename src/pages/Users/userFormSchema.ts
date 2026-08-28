@@ -9,11 +9,11 @@ export const userSchema = (users: User[], editingId: string | null, isNew: boole
     mobile: z.string().trim().min(1, 'Mobile is required'),
     password: z.string(),
     confirmPassword: z.string(),
-    role: z.enum(['Counter Staff', 'Super Admin']),
+    role: z.enum(['Staff', 'Super Admin']),
     counterId: z.string(),
     active: z.boolean(),
   })
-    .refine((v) => v.role !== 'Counter Staff' || v.counterId.length > 0, { message: 'Pick a counter', path: ['counterId'] })
+    .refine((v) => v.role !== 'Staff' || v.counterId.length > 0, { message: 'Pick a counter', path: ['counterId'] })
     .refine((v) => !isNew || v.password.length >= 6, { message: 'At least 6 characters', path: ['password'] })
     .refine((v) => !isNew || v.password === v.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
     .refine((v) => !users.some((u) => u.staffId.toLowerCase() === v.staffId.toLowerCase() && u.id !== editingId), { message: 'That staff ID is already in use', path: ['staffId'] })
@@ -46,7 +46,7 @@ export const emptyUserForm = (): UserFormValues => ({
   email: '',
   password: '',
   confirmPassword: '',
-  role: 'Counter Staff',
+  role: 'Staff',
   counterId: '',
   active: true,
 })

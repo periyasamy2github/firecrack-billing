@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Switch, TextField, Typography } from '@mui/material'
@@ -13,13 +13,16 @@ import { BillSummaryRail } from './BillSummaryRail'
 import { ProductSearchField } from './ProductSearchField'
 import { ShortcutsBar } from './ShortcutsBar'
 import { newBillSchema, type NewBillFormValues } from './newBillSchema'
-import type { BillDiscountType, BillLineItem, PaymentMethod, Product } from '../../types'
+import { MIXED } from './PaymentMethodToggle'
+import type { BillDiscountType, BillLineItem, BillPayment, Product } from '../../types'
 import { formatBillDate, formatBillTime } from '../../utils/format'
 import { computeBillTotals, halfGstRateLabel } from '../../utils/billing'
-import { billPrintPath } from '../../utils/routes'
+import { ROUTES, billPrintPath } from '../../utils/routes'
 import { useSession } from '../../hooks/useSession'
 import { useDispatch, useSelector } from '../../redux/store'
-import { createBill, type NewBillInput } from '../../redux/billsSlice'
+import { createBill, updateBill, type NewBillInput } from '../../redux/billsSlice'
+import { api } from '../../services/api'
+import type { Bill } from '../../types'
 import { loadProducts } from '../../redux/productsSlice'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { useToast } from '../../hooks/useToast'
@@ -27,7 +30,10 @@ import styles from '../../css/pages/NewBill.module.css'
 
 export const NewBill = () => {
   const navigate = useNavigate()
-  const { nextBillNo, billingCounter, counterScope, isSuperAdmin, currentUser } = useSession()
+  const params = useParams<{ billId: string }>()
+  const editBillId = params.billId ?? ''
+  const editing = Boolean(editBillId)
+  const { nextBillNo, billingCounter, counterScope, isSuperAdmin, currentUser, activePaymentTypes } = useSession()
   const dispatch = useDispatch()
   const products = useSelector((state) => state.products.items)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -38,13 +44,22 @@ export const NewBill = () => {
 
   const [items, setItems] = useState<BillLineItem[]>([])
   const [customerName, setCustomerName] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
+  // A payment type's id, or MIXED with per-type amounts that must add up to the total.
+  const [paymentSelection, setPaymentSelection] = useState<string>('')
+  const [mixedAmounts, setMixedAmounts] = useState<Record<string, string>>({})
   const [gstApplicable, setGstApplicable] = useState(false)
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [saving, setSaving] = useState(false)
 
+  // Edit mode: the bill loads by its encrypted id, prefills everything, and saves via PUT.
+  const [editBill, setEditBill] = useState<Bill | null>(null)
+  const [editNotFound, setEditNotFound] = useState(false)
+  // What this bill already holds per product code — its stock is spoken for, so qty may go that far above shelf stock.
+  const originalQty = useRef<Record<string, number>>({})
+
   // The whole catalogue loads once so search and scanning read from memory. Empty id = no counter exists yet.
-  const billingCounterId = (counterScope === 'all' ? billingCounter?.id : counterScope) ?? ''
+  const selectedCounterId = (counterScope === 'all' ? billingCounter?.id : counterScope) ?? ''
+  const billingCounterId = editing ? (editBill?.counterId ?? '') : selectedCounterId
   const [loadingProducts, setLoadingProducts] = useState(true)
   useEffect(() => {
     if (!billingCounterId) return
@@ -57,12 +72,58 @@ export const NewBill = () => {
     defaultValues: { customerMobile: '', billDiscountValue: '' },
   })
 
+  useEffect(() => {
+    if (!editing) return
+    api.loadBill(editBillId)
+      .then((bill) => {
+        if (bill.status !== 'Paid') {
+          setEditNotFound(true)
+          return
+        }
+        setEditBill(bill)
+        setItems(bill.items)
+        originalQty.current = Object.fromEntries(bill.items.map((item) => [item.product.code, item.qty]))
+        setCustomerName(bill.customerName === 'Walk-in' ? '' : bill.customerName)
+        setGstApplicable(bill.gstApplicable)
+        if (bill.billDiscount) {
+          setBillDiscountType(bill.billDiscount.type)
+          resetForm({ customerMobile: bill.customerMobile, billDiscountValue: String(bill.billDiscount.value) })
+        } else {
+          resetForm({ customerMobile: bill.customerMobile, billDiscountValue: '' })
+        }
+        if (bill.payments.length > 1) {
+          setPaymentSelection(MIXED)
+          setMixedAmounts(Object.fromEntries(bill.payments.map((payment) => [payment.typeId, String(payment.amount)])))
+        } else if (bill.payments.length === 1) {
+          setPaymentSelection(bill.payments[0].typeId)
+        }
+      })
+      .catch(() => setEditNotFound(true))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editBillId])
+
   const customerMobile = watch('customerMobile')
   const billDiscountValue = watch('billDiscountValue')
 
   const billDiscount = billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined
   const totals = computeBillTotals(items, gstApplicable, billDiscount)
   const showToast = useToast()
+
+  // Cash (or whichever type comes first) is preselected once the types arrive.
+  const effectiveSelection = paymentSelection || activePaymentTypes[0]?.id || ''
+
+  const buildPayments = (): BillPayment[] => {
+    if (effectiveSelection !== MIXED) {
+      const type = activePaymentTypes.find((t) => t.id === effectiveSelection)
+      return type ? [{ typeId: type.id, type: type.name, amount: totals.grandTotal }] : []
+    }
+    return activePaymentTypes
+      .map((type) => ({ typeId: type.id, type: type.name, amount: Number(mixedAmounts[type.id]) || 0 }))
+      .filter((payment) => payment.amount > 0)
+  }
+
+  const mixedTendered = activePaymentTypes.reduce((sum, type) => sum + (Number(mixedAmounts[type.id]) || 0), 0)
+  const paymentsReady = effectiveSelection === MIXED ? mixedTendered === totals.grandTotal && totals.grandTotal > 0 : Boolean(effectiveSelection)
 
   const addItem = (product: Product) =>
     setItems((prev) => {
@@ -72,14 +133,18 @@ export const NewBill = () => {
     })
 
   // Never let a line exceed what's on the shelf — createBill rejects the whole bill otherwise.
+  // While editing, this bill's own quantities already left the shelf, so they count as available.
   const updateQty = (lineId: string, qty: number) =>
-    setItems((prev) => prev.map((i) => (i.lineId === lineId ? { ...i, qty: Math.min(qty, i.product.stock) } : i)))
+    setItems((prev) => prev.map((i) => (i.lineId === lineId
+      ? { ...i, qty: Math.min(qty, i.product.stock + (editing ? originalQty.current[i.product.code] ?? 0 : 0)) }
+      : i)))
   const removeItem = (lineId: string) => setItems((prev) => prev.filter((i) => i.lineId !== lineId))
 
   const clearBill = () => {
     setItems([])
     setCustomerName('')
-    setPaymentMethod('Cash')
+    setPaymentSelection('')
+    setMixedAmounts({})
     setGstApplicable(false)
     setBillDiscountType('percent')
     resetForm({ customerMobile: '', billDiscountValue: '' })
@@ -94,10 +159,10 @@ export const NewBill = () => {
       time: formatBillTime(now),
       customerName: customerName || 'Walk-in',
       customerMobile,
-      counter: currentUser?.counter ?? billingCounter?.name ?? '',
+      counter: editing ? (editBill?.counter ?? '') : (currentUser?.counter ?? billingCounter?.name ?? ''),
       billedBy: currentUser?.name ?? 'Unknown',
       items,
-      paymentMethod,
+      payments: buildPayments(),
       gstApplicable,
       billDiscount,
     }
@@ -106,11 +171,16 @@ export const NewBill = () => {
   const failed = (err: unknown) =>
     showToast((err as { message?: string })?.message ?? 'Could not save this bill', 'error')
 
+  const persistBill = () =>
+    editing
+      ? dispatch(updateBill({ billNo: editBill!.billNo, input: buildBillInput() })).unwrap()
+      : dispatch(createBill(buildBillInput())).unwrap()
+
   const saveAndPrint = async () => {
-    if (saving || items.length === 0 || !(await trigger())) return
+    if (saving || items.length === 0 || !paymentsReady || !(await trigger())) return
     setSaving(true)
     try {
-      const { bill } = await dispatch(createBill(buildBillInput())).unwrap()
+      const { bill } = await persistBill()
       navigate(billPrintPath(bill.id), { state: { bill } })
     } catch (err) {
       failed(err)
@@ -120,10 +190,15 @@ export const NewBill = () => {
   }
 
   const saveOnly = async () => {
-    if (saving || items.length === 0 || !(await trigger())) return
+    if (saving || items.length === 0 || !paymentsReady || !(await trigger())) return
     setSaving(true)
     try {
-      const { bill } = await dispatch(createBill(buildBillInput())).unwrap()
+      const { bill } = await persistBill()
+      if (editing) {
+        showToast(`Bill ${bill.billNo} updated`)
+        navigate(ROUTES.bills)
+        return
+      }
       showToast(`Bill ${bill.billNo} saved without printing`)
       clearBill()
     } catch (err) {
@@ -145,25 +220,41 @@ export const NewBill = () => {
   )
 
   // A fresh install has no counters yet — nothing to bill on until one is created.
-  if (!billingCounter) {
+  if (!editing && !billingCounter) {
     return <PageMessage title="New Bill" message="No branch is set up yet. Create one under Master → Branches, then come back to bill." />
+  }
+
+  if (editing && editNotFound) {
+    return <PageMessage title="Edit Bill" message="This bill cannot be edited — it may be cancelled or no longer exist." />
+  }
+
+  if (editing && !editBill) {
+    return <PageMessage title="Edit Bill" message="Loading bill…" />
   }
 
   return (
     <>
       <PageHeader
-        title="New Bill"
-        crumb={`${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${currentUser?.counter ?? billingCounter.name} · ${loadingProducts ? 'loading products…' : `${products.length} items ready`}`}
+        title={editing ? 'Edit Bill' : 'New Bill'}
+        crumb={editing
+          ? `${editBill!.billNo} · ${editBill!.date} · ${editBill!.counter} · editing`
+          : `${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${currentUser?.counter ?? billingCounter!.name} · ${loadingProducts ? 'loading products…' : `${products.length} items ready`}`}
         actions={
           <>
-            {isSuperAdmin && counterScope === 'all' && (
+            {!editing && isSuperAdmin && counterScope === 'all' && (
               <span className={styles.counterWarning}>
-                No branch selected — billing under {billingCounter.name}
+                No branch selected — billing under {billingCounter!.name}
               </span>
             )}
-            <Button size="small" color="error" startIcon={<CloseRoundedIcon />} onClick={clearBill} disabled={items.length === 0}>
-              Clear
-            </Button>
+            {editing ? (
+              <Button size="small" onClick={() => navigate(ROUTES.bills)}>
+                Back to bills
+              </Button>
+            ) : (
+              <Button size="small" color="error" startIcon={<CloseRoundedIcon />} onClick={clearBill} disabled={items.length === 0}>
+                Clear
+              </Button>
+            )}
           </>
         }
       />
@@ -179,7 +270,7 @@ export const NewBill = () => {
                 helperText={errors.customerMobile?.message || ' '}
               />
               <TextField label="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Walk-in" inputRef={customerNameInputRef} />
-              <TextField label="Branch" value={currentUser?.counter ?? billingCounter.name} disabled />
+              <TextField label="Branch" value={editing ? editBill!.counter : (currentUser?.counter ?? billingCounter!.name)} disabled />
               <div className={gstApplicable ? styles.gstBox : `${styles.gstBox} ${styles.gstBoxOff}`}>
                 <div>
                   <Typography className={styles.gstBoxTitle}>{gstApplicable ? 'Tax Invoice' : 'Bill of Supply'}</Typography>
@@ -212,8 +303,11 @@ export const NewBill = () => {
             totals={totals}
             gstApplicable={gstApplicable}
             halfGstRate={halfGstRateLabel(items)}
-            paymentMethod={paymentMethod}
-            onPaymentMethodChange={setPaymentMethod}
+            paymentTypes={activePaymentTypes}
+            paymentSelection={effectiveSelection}
+            onPaymentSelectionChange={setPaymentSelection}
+            mixedAmounts={mixedAmounts}
+            onMixedAmountChange={(typeId, value) => setMixedAmounts((prev) => ({ ...prev, [typeId]: value }))}
             billDiscountType={billDiscountType}
             onBillDiscountTypeChange={setBillDiscountType}
             billDiscountValue={billDiscountValue}
@@ -222,7 +316,7 @@ export const NewBill = () => {
             billDiscountInputRef={billDiscountInputRef}
             onSaveAndPrint={saveAndPrint}
             onSaveOnly={saveOnly}
-            disabled={items.length === 0 || saving}
+            disabled={items.length === 0 || saving || !paymentsReady}
             saving={saving}
           />
         </div>

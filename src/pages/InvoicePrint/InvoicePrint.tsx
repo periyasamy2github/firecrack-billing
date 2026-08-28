@@ -108,17 +108,19 @@ export const InvoicePrint = () => {
                 </Typography>
               )}
 
-              <div className={styles.optionsSection}>
-                <div className={styles.optionsStack}>
-                  <div className={styles.toggleRow}>
-                    <div className={styles.toggleRowText}>
-                      <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
-                      <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
+              {totals.hasMrp && (
+                <div className={styles.optionsSection}>
+                  <div className={styles.optionsStack}>
+                    <div className={styles.toggleRow}>
+                      <div className={styles.toggleRowText}>
+                        <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
+                        <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
+                      </div>
+                      <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
                     </div>
-                    <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
                   </div>
                 </div>
-              </div>
+              )}
 
               <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={() => window.print()} className={styles.downloadButton}>
                 Download PDF

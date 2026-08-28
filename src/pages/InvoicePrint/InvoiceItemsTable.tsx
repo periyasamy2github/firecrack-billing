@@ -13,9 +13,18 @@ interface InvoiceItemsTableProps {
 }
 
 export const InvoiceItemsTable = ({ items, gst, totals, cgstLabel, sgstLabel }: InvoiceItemsTableProps) => {
-  const columns = gst
-    ? ['#', 'Description of goods', 'HSN', 'MRP', 'Rate', 'Qty', 'Taxable', cgstLabel, sgstLabel, 'Amount']
-    : ['#', 'Description of goods', 'HSN', 'MRP', 'Rate', 'Qty', 'Amount']
+  // The MRP column disappears entirely when no line carries an MRP.
+  const showMrp = items.some((i) => i.product.mrp != null)
+  const columns = [
+    '#',
+    'Description of goods',
+    'HSN',
+    ...(showMrp ? ['MRP'] : []),
+    'Rate',
+    'Qty',
+    ...(gst ? ['Taxable', cgstLabel, sgstLabel] : []),
+    'Amount',
+  ]
 
   return (
     <Table size="small" className={styles.itemsTable}>
@@ -31,15 +40,14 @@ export const InvoiceItemsTable = ({ items, gst, totals, cgstLabel, sgstLabel }: 
       <TableBody>
         {items.map((item, idx) => {
           const { rate, taxable, gstAmount } = computeLineAmounts(item, gst)
-          const qtyLabel = `${item.qty} ${item.product.unit.includes('box') ? 'box' : item.product.unit.includes('packet') ? 'pkt' : ''}`
           return (
             <TableRow key={item.lineId}>
               <TableCell>{idx + 1}</TableCell>
               <TableCell>{item.product.name}</TableCell>
               <TableCell align="right">{item.product.hsn}</TableCell>
-              <TableCell align="right">{formatAmount(item.product.mrp)}</TableCell>
+              {showMrp && <TableCell align="right">{item.product.mrp != null ? formatAmount(item.product.mrp) : ''}</TableCell>}
               <TableCell align="right">{formatAmount(rate)}</TableCell>
-              <TableCell align="right">{qtyLabel}</TableCell>
+              <TableCell align="right">{item.qty}</TableCell>
               {gst && (
                 <>
                   <TableCell align="right">{formatAmount(taxable)}</TableCell>
@@ -54,7 +62,7 @@ export const InvoiceItemsTable = ({ items, gst, totals, cgstLabel, sgstLabel }: 
       </TableBody>
       <tfoot>
         <TableRow>
-          <TableCell colSpan={5} className={styles.footCell} />
+          <TableCell colSpan={showMrp ? 5 : 4} className={styles.footCell} />
           <TableCell align="right" className={styles.footCellBold}>{totals.qtyCount}</TableCell>
           {gst && (
             <>

@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material'
 import type { Bill } from '../../types'
-import { getBillTotals, halfGstRateLabel, hsnSummary } from '../../utils/billing'
+import { discountPercentLabel, getBillTotals, halfGstRateLabel, hsnSummary } from '../../utils/billing'
 import { amountToWordsIndian } from '../../utils/format'
 import { useSession } from '../../hooks/useSession'
 import styles from '../../css/pages/A4Invoice.module.css'
@@ -24,6 +24,7 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
   const halfRate = halfGstRateLabel(bill.items)
   const cgstLabel = halfRate ? `CGST ${halfRate}` : 'CGST'
   const sgstLabel = halfRate ? `SGST ${halfRate}` : 'SGST'
+  const discountPercent = discountPercentLabel(totals, bill.billDiscount)
 
   return (
     <div className={styles.sheet}>
@@ -40,12 +41,12 @@ export const A4Invoice = ({ bill }: A4InvoiceProps) => {
           </div>
         </div>
 
-        {gst && <InvoiceChargesTable totals={totals} gst cgstLabel={cgstLabel} sgstLabel={sgstLabel} />}
+        {gst && <InvoiceChargesTable totals={totals} gst cgstLabel={cgstLabel} sgstLabel={sgstLabel} discountPercent={discountPercent} />}
       </div>
 
       {!gst && (
         <div className={styles.noGstRow}>
-          <InvoiceChargesTable totals={totals} gst={false} cgstLabel={cgstLabel} sgstLabel={sgstLabel} />
+          <InvoiceChargesTable totals={totals} gst={false} cgstLabel={cgstLabel} sgstLabel={sgstLabel} discountPercent={discountPercent} />
         </div>
       )}
 

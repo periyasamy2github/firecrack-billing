@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { CircularProgress, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import { Mono } from '../../components/Mono'
@@ -18,12 +19,13 @@ interface BillsTableProps {
   viewingAll: boolean
   isPending: (billNo: string) => boolean
   onView: (bill: Bill) => void
+  onEdit: (bill: Bill) => void
   onReprint: (bill: Bill) => void
   onCancel: (bill: Bill) => void
   footer: ReactNode
 }
 
-export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onView, onReprint, onCancel, footer }: BillsTableProps) => {
+export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onView, onEdit, onReprint, onCancel, footer }: BillsTableProps) => {
   const colSpan = viewingAll ? 11 : 10
 
   return (
@@ -60,6 +62,11 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                     {totals.billDiscountAmount > 0 && (
                       <Tooltip title={`Bill discount ${formatCurrency(totals.billDiscountAmount)}`}>
                         <span><StatusPill tone="hold" dot={false} label="Disc" /></span>
+                      </Tooltip>
+                    )}
+                    {bill.editedAt && (
+                      <Tooltip title={`Edited ${bill.editedAt}${bill.editedBy ? ` by ${bill.editedBy}` : ''}`}>
+                        <span><StatusPill tone="mut" dot={false} label="Edited" /></span>
                       </Tooltip>
                     )}
                   </div>
@@ -102,6 +109,11 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                         </Tooltip>
                         {bill.status === 'Paid' && (
                           <>
+                            <Tooltip title="Edit bill">
+                              <IconButton size="small" onClick={() => onEdit(bill)}>
+                                <EditOutlinedIcon className={styles.actionIcon} />
+                              </IconButton>
+                            </Tooltip>
                             <Tooltip title="Reprint">
                               <IconButton size="small" onClick={() => onReprint(bill)}>
                                 <PrintOutlinedIcon className={styles.actionIcon} />

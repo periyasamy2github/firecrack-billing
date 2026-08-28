@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { useDispatch as useReduxDispatch, useSelector as useReduxSelector, type TypedUseSelectorHook } from 'react-redux'
 import countersReducer from './countersSlice'
+import paymentTypesReducer from './paymentTypesSlice'
 import productsReducer from './productsSlice'
 import sessionReducer, { saveCounterScope, signOut } from './sessionSlice'
 import shopReducer from './shopSlice'
@@ -11,6 +12,7 @@ const appReducer = combineReducers({
   session: sessionReducer,
   shop: shopReducer,
   counters: countersReducer,
+  paymentTypes: paymentTypesReducer,
   users: usersReducer,
   products: productsReducer,
   ui: uiReducer,

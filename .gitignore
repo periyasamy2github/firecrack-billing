@@ -30,3 +30,6 @@ dist-ssr
 
 # Laravel API lives on the backend branch
 backend/
+
+# vite-plugin-pwa dev output
+dev-dist/

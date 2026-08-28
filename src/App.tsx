@@ -11,6 +11,7 @@ const NewBill = lazy(() => import('./pages/NewBill/NewBill'))
 const Bills = lazy(() => import('./pages/Bills/Bills'))
 const InvoicePrint = lazy(() => import('./pages/InvoicePrint/InvoicePrint'))
 const Reports = lazy(() => import('./pages/Reports/Reports'))
+const DailyStatement = lazy(() => import('./pages/Reports/DailyStatement'))
 const Products = lazy(() => import('./pages/Products/Products'))
 const ProductImport = lazy(() => import('./pages/ProductImport/ProductImport'))
 const Users = lazy(() => import('./pages/Users/Users'))
@@ -29,9 +30,11 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/bills/new" element={<NewBill />} />
+              <Route path="/bills/:billId/edit" element={<NewBill />} />
               <Route path="/bills" element={<Bills />} />
               <Route path="/bills/:billId/print" element={<InvoicePrint />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/reports/daily-statement" element={<DailyStatement />} />
               <Route path="/products" element={<Products />} />
               <Route path="/unauthorized" element={<SystemPage type="403" />} />
               <Route element={<RequireSuperAdmin />}>

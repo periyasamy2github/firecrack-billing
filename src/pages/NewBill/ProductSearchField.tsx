@@ -78,7 +78,6 @@ export const ProductSearchField = ({ products, loading, inputRef, onAdd, onScanB
                 <div className={styles.optionName}>{p.name}</div>
                 <div className={styles.optionMetaRow}>
                   <span className={styles.optionCode}>{p.code}</span>
-                  <span className={styles.optionUnit}>· {p.unit}</span>
                   {status.tone !== 'paid' && (
                     <span className={status.tone === 'due' ? `${styles.optionStock} ${styles.optionStockDue}` : `${styles.optionStock} ${styles.optionStockWarn}`}>
                       · {p.stock} left
@@ -88,7 +87,7 @@ export const ProductSearchField = ({ products, loading, inputRef, onAdd, onScanB
               </div>
               <div className={styles.optionRight}>
                 <span className={styles.optionRate}>₹{formatAmount(p.rate)}</span>
-                <span className={styles.optionMrp}>₹{formatAmount(p.mrp)}</span>
+                {p.mrp != null && <span className={styles.optionMrp}>₹{formatAmount(p.mrp)}</span>}
               </div>
             </li>
           )

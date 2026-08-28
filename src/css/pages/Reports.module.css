@@ -37,3 +37,9 @@
 .actionIcon {
   font-size: 15px;
 }
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}

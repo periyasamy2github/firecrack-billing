@@ -2,6 +2,7 @@ import { Suspense, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { MenuItem, Select, Typography } from '@mui/material'
 import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined'
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import { BrandMark } from '../components/BrandMark'
 import { useTokens } from '../theme/ThemeModeContext'
 import { useSession } from '../hooks/useSession'
@@ -9,6 +10,7 @@ import { ShortcutsDialog } from '../components/ShortcutsDialog'
 import { PageSkeleton } from '../components/PageSkeleton'
 import { allShortcutGroups } from '../data/shortcuts'
 import { useKeyShortcuts } from '../hooks/useKeyShortcuts'
+import { usePwaInstall } from '../hooks/usePwaInstall'
 import { ROUTES } from '../utils/routes'
 import { PRIMARY_NAV, MASTER_NAV } from './navItems'
 import { NavRow } from './NavRow'
@@ -20,6 +22,7 @@ export const AppLayout = () => {
   const navigate = useNavigate()
   const { isSuperAdmin, shop, counters, counterScope, setCounterScope, selectedCounter, currentUser, signOut } = useSession()
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const { canInstall, install } = usePwaInstall()
 
   const brandSubtitle = isSuperAdmin ? (counterScope === 'all' ? 'All branches' : selectedCounter?.name) : (currentUser?.counter ?? shop.name)
 
@@ -82,6 +85,13 @@ export const AppLayout = () => {
         ))}
 
         <div className={styles.spacer} />
+
+        {canInstall && (
+          <div className={styles.shortcutsRow} onClick={() => { void install() }}>
+            <DownloadOutlinedIcon className={styles.shortcutsIcon} />
+            <Typography className={styles.shortcutsLabel}>Install app</Typography>
+          </div>
+        )}
 
         <div className={styles.shortcutsRow} onClick={() => setShortcutsOpen(true)}>
           <KeyboardOutlinedIcon className={styles.shortcutsIcon} />

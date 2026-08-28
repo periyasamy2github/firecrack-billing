@@ -11,16 +11,20 @@ export const useSession = () => {
 
   const shop = useSelector((state) => state.shop.shop)
   const counters = useSelector((state) => state.counters.items)
+  const paymentTypes = useSelector((state) => state.paymentTypes.items)
   const currentUser = useSelector((state) => state.session.user)
   const counterScope = useSelector((state) => state.session.counterScope)
 
-  const role: UserRole = currentUser?.role ?? 'Counter Staff'
+  const role: UserRole = currentUser?.role ?? 'Staff'
   // The counter the screens are showing; undefined while a Super Admin views all counters.
   const selectedCounter = counterScope === 'all' ? undefined : counters.find((counter) => counter.id === counterScope)
 
   return {
     shop,
     counters,
+    paymentTypes,
+    // The ones the billing screen offers; Settings shows all of them.
+    activePaymentTypes: paymentTypes.filter((type) => type.active),
     currentUser,
     role,
     isSuperAdmin: role === 'Super Admin',

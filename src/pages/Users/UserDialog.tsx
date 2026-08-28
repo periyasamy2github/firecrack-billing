@@ -97,8 +97,8 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
               onChange={(_, value: UserRole | null) => value && field.onChange(value)}
               className={styles.roleGroup}
             >
-              <ToggleButton value="Counter Staff" className={styles.roleButton}>
-                <StorefrontOutlinedIcon className={styles.roleIcon} /> Counter Staff
+              <ToggleButton value="Staff" className={styles.roleButton}>
+                <StorefrontOutlinedIcon className={styles.roleIcon} /> Staff
               </ToggleButton>
               <ToggleButton value="Super Admin" className={styles.roleButton}>
                 <ShieldOutlinedIcon className={styles.roleIcon} /> Super Admin
@@ -107,8 +107,8 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
           )}
         />
 
-        <div className={`${styles.detailsGrid} ${role === 'Counter Staff' ? styles.detailsGridTwoCol : styles.detailsGridOneCol}`}>
-          {role === 'Counter Staff' ? (
+        <div className={`${styles.detailsGrid} ${role === 'Staff' ? styles.detailsGridTwoCol : styles.detailsGridOneCol}`}>
+          {role === 'Staff' ? (
             <Controller
               name="counterId"
               control={control}

@@ -1,0 +1,135 @@
+.counterPicker {
+  min-width: 150px;
+}
+
+.sheetWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  color: #0f172a;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 26px 30px;
+}
+
+.sheetHeader {
+  text-align: center;
+  border-bottom: 1.5px solid #0f172a;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.shopName {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.sheetTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  margin-top: 2px;
+}
+
+.sheetMeta {
+  font-size: 11.5px;
+  color: #475569;
+  margin-top: 2px;
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.summaryBlock {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.summaryLabel {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th {
+  border-bottom: 1px solid #0f172a;
+  padding: 3px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.table td {
+  border-bottom: 1px solid #edf2f7;
+  padding: 3.5px 6px;
+}
+
+.thLeft,
+.tdLeft {
+  text-align: left;
+}
+
+.thRight,
+.tdRight {
+  text-align: right;
+}
+
+.emptyDay {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  padding: 18px 0;
+}
+
+.footerNote {
+  font-size: 9.5px;
+  color: #94a3b8;
+  text-align: right;
+  margin-top: 10px;
+}
+
+@media print {
+  .sheet {
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+}

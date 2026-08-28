@@ -1,7 +1,8 @@
 import type { RefObject } from 'react'
 import { Card, MenuItem, TextField } from '@mui/material'
 import { SearchField } from '../../components/SearchField'
-import { BILL_FILTERS, type BillFilter } from '../../utils/billFilters'
+import { billFilters, type BillFilter } from '../../utils/billFilters'
+import { useSession } from '../../hooks/useSession'
 import type { Counter } from '../../types'
 import styles from '../../css/pages/Reports.module.css'
 
@@ -22,7 +23,11 @@ interface ReportFilterBarProps {
 }
 
 // counters = null hides the counter picker (staff, or admin already narrowed by the sidebar).
-export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, searchInputRef }: ReportFilterBarProps) => (
+export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, searchInputRef }: ReportFilterBarProps) => {
+  const { paymentTypes } = useSession()
+  const paymentOptions = billFilters(paymentTypes.map((type) => type.name))
+
+  return (
   <Card className={styles.filterCard}>
     <div className={styles.filterRow}>
       <SearchField placeholder="Bill number or customer mobile… (/)" value={filters.query} onChange={(query) => onChange({ query })} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
@@ -67,10 +72,11 @@ export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, se
         size="small"
         className={styles.paymentField}
       >
-        {BILL_FILTERS.map((key) => (
+        {paymentOptions.map((key) => (
           <MenuItem key={key} value={key}>{key} ({paymentCounts[key] ?? 0})</MenuItem>
         ))}
       </TextField>
     </div>
   </Card>
-)
+  )
+}

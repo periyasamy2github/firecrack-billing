@@ -1,16 +1,24 @@
-.section {
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
+/* Each section lives in its own card on a two-column grid, so the page fits without scrolling. */
+.sectionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.section:last-child {
-  border-bottom: 0;
+@media (max-width: 1000px) {
+  .sectionsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  padding: 16px;
 }
 
 .sectionDesc {
   display: block;
   /* Clears the floating label of the first field in each section. */
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .fieldsGrid2 {
@@ -32,4 +40,18 @@
 
 .targetField {
   max-width: 260px;
+}
+
+.paymentTypesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 460px;
+}
+
+.paymentTypeRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
 }

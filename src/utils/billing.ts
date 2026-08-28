@@ -25,8 +25,11 @@ const resolveBillDiscountAmount = (gross: number, billDiscount?: BillDiscount): 
 export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, billDiscount?: BillDiscount): BillTotals => {
   let mrpValue = 0
   let gross = 0
+  let hasMrp = false
   for (const item of items) {
-    mrpValue += item.product.mrp * item.qty
+    if (item.product.mrp != null) hasMrp = true
+    // A missing MRP counts as the rate, so "MRP value" and savings stay honest.
+    mrpValue += (item.product.mrp ?? item.product.rate) * item.qty
     gross += item.product.rate * item.qty
   }
 
@@ -53,6 +56,7 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
 
   return {
     mrpValue,
+    hasMrp,
     gross,
     billDiscountAmount,
     taxable,
@@ -63,6 +67,15 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
     itemCount: items.length,
     qtyCount,
   }
+}
+
+/** The discount's other face: "10%" whichever way it was entered, so bills show % and ₹ together. */
+export const discountPercentLabel = (totals: BillTotals, billDiscount?: BillDiscount): string | null => {
+  if (!billDiscount || totals.billDiscountAmount <= 0 || totals.gross <= 0) return null
+  const percent = billDiscount.type === 'percent'
+    ? Math.min(billDiscount.value, 100)
+    : (totals.billDiscountAmount / totals.gross) * 100
+  return `${Number(percent.toFixed(2))}%`
 }
 
 export const halfGstRateLabel = (items: BillLineItem[]): string | null => {

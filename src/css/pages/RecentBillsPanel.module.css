@@ -7,3 +7,7 @@
 .counterCaption {
   display: block;
 }
+
+.billRow {
+  cursor: pointer;
+}

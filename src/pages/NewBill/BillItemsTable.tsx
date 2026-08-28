@@ -39,12 +39,12 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
             </TableCell>
             <TableCell>
               <Typography className={styles.itemName}>{item.product.name}</Typography>
-              <Typography variant="caption">{item.product.code} · {item.product.unit}</Typography>
+              <Typography variant="caption">{item.product.code}</Typography>
             </TableCell>
             <TableCell>
               <Mono sx={{ fontSize: 11, color: 'text.secondary' }}>{item.product.hsn}</Mono>
             </TableCell>
-            <TableCell align="right"><Mono sx={{ fontSize: 12, color: 'text.secondary', textDecoration: 'line-through' }}>{formatAmount(item.product.mrp)}</Mono></TableCell>
+            <TableCell align="right">{item.product.mrp != null && <Mono sx={{ fontSize: 12, color: 'text.secondary', textDecoration: 'line-through' }}>{formatAmount(item.product.mrp)}</Mono>}</TableCell>
             <TableCell align="right"><Mono sx={{ fontSize: 12, fontWeight: 600 }}>{formatAmount(rate)}</Mono></TableCell>
             <TableCell align="right">
               <TextField

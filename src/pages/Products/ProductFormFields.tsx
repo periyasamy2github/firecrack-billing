@@ -1,6 +1,8 @@
+import { useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { MenuItem, TextField } from '@mui/material'
+import { Autocomplete, TextField } from '@mui/material'
 import { productCategories } from '../../data/products'
+import { useSelector } from '../../redux/store'
 import type { ProductBatchValues, ProductFormValues } from './productFormSchema'
 import styles from '../../css/pages/ProductFormFields.module.css'
 
@@ -11,6 +13,13 @@ interface ProductFormFieldsProps {
 export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
   const { register, control, formState: { errors } } = useFormContext<ProductBatchValues>()
   const rowErrors = errors.products?.[index]
+  const products = useSelector((state) => state.products.items)
+
+  // Existing categories from the catalogue plus the stock suggestions; typing anything new is allowed.
+  const categoryOptions = useMemo(
+    () => [...new Set([...productCategories, ...products.map((p) => p.category)])].sort(),
+    [products],
+  )
 
   const field = (key: keyof ProductFormValues) => ({
     ...register(`products.${index}.${key}`),
@@ -28,21 +37,26 @@ export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
         name={`products.${index}.category`}
         control={control}
         render={({ field: category }) => (
-          <TextField
-            label="Category"
-            select
-            {...category}
-            error={Boolean(rowErrors?.category)}
-            helperText={rowErrors?.category?.message || ' '}
-            size="small"
+          <Autocomplete
+            freeSolo
+            options={categoryOptions}
+            value={category.value}
+            onChange={(_, v) => category.onChange(v ?? '')}
+            onInputChange={(_, v) => category.onChange(v)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Category"
+                error={Boolean(rowErrors?.category)}
+                helperText={rowErrors?.category?.message || ' '}
+                size="small"
+              />
+            )}
             fullWidth
-          >
-            {productCategories.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-          </TextField>
+          />
         )}
       />
-      <TextField label="Unit" {...field('unit')} placeholder="packet, box of 10…" />
-      <TextField label="MRP (₹)" {...field('mrp')} />
+      <TextField label="MRP (₹) — optional" {...field('mrp')} />
       <TextField label="Rate (₹)" {...field('rate')} />
       <TextField label="GST %" {...field('gstRate')} />
       <TextField label="Stock" {...field('stock')} />

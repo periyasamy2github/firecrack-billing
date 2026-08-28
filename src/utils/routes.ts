@@ -4,6 +4,7 @@ export const ROUTES = {
   newBill: '/bills/new',
   bills: '/bills',
   reports: '/reports',
+  dailyStatement: '/reports/daily-statement',
   products: '/products',
   productImport: '/products/import',
   users: '/users',
@@ -13,3 +14,5 @@ export const ROUTES = {
 }
 
 export const billPrintPath = (billId: string): string => `/bills/${encodeURIComponent(billId)}/print`
+
+export const billEditPath = (billId: string): string => `/bills/${encodeURIComponent(billId)}/edit`

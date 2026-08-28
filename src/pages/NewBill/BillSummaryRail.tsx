@@ -1,7 +1,8 @@
 import { Box, Button, Card, CircularProgress, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
-import type { BillDiscountType, BillTotals, PaymentMethod } from '../../types'
+import type { BillDiscountType, BillTotals, PaymentType } from '../../types'
+import { discountPercentLabel } from '../../utils/billing'
 import { formatAmount, formatCurrency, formatSignedAmount } from '../../utils/format'
 import { Mono } from '../../components/Mono'
 import { PaymentMethodToggle } from './PaymentMethodToggle'
@@ -24,8 +25,11 @@ interface BillSummaryRailProps {
   totals: BillTotals
   gstApplicable: boolean
   halfGstRate: string | null
-  paymentMethod: PaymentMethod
-  onPaymentMethodChange: (method: PaymentMethod) => void
+  paymentTypes: PaymentType[]
+  paymentSelection: string
+  onPaymentSelectionChange: (selection: string) => void
+  mixedAmounts: Record<string, string>
+  onMixedAmountChange: (typeId: string, value: string) => void
   billDiscountType: BillDiscountType
   onBillDiscountTypeChange: (type: BillDiscountType) => void
   billDiscountValue: string
@@ -42,8 +46,11 @@ export const BillSummaryRail = ({
   totals,
   gstApplicable,
   halfGstRate,
-  paymentMethod,
-  onPaymentMethodChange,
+  paymentTypes,
+  paymentSelection,
+  onPaymentSelectionChange,
+  mixedAmounts,
+  onMixedAmountChange,
   billDiscountType,
   onBillDiscountTypeChange,
   billDiscountValue,
@@ -54,7 +61,14 @@ export const BillSummaryRail = ({
   onSaveOnly,
   disabled,
   saving = false,
-}: BillSummaryRailProps) => (
+}: BillSummaryRailProps) => {
+  const discountPercent = discountPercentLabel(totals, billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined)
+  // The typed figure's other face: 10% shows its ₹ value, ₹54 shows its %.
+  const discountEquivalence = totals.billDiscountAmount > 0
+    ? (billDiscountType === 'percent' ? `= ₹${formatAmount(totals.billDiscountAmount)}` : `= ${discountPercent}`)
+    : null
+
+  return (
   <Card className={styles.card}>
     <div className={styles.headerRow}>
       <Typography className={styles.headerLabel}>
@@ -69,7 +83,7 @@ export const BillSummaryRail = ({
     </div>
 
     <div className={styles.sumList}>
-      <SumRow label="MRP value" value={formatAmount(totals.mrpValue)} />
+      {totals.hasMrp && <SumRow label="MRP value" value={formatAmount(totals.mrpValue)} />}
       <SumRow label="Sub total" value={formatAmount(totals.gross)} />
 
       <div className={styles.billDiscountRow}>
@@ -95,7 +109,10 @@ export const BillSummaryRail = ({
           className={styles.discountValueField}
         />
       </div>
-      {totals.billDiscountAmount > 0 && <SumRow label="Bill discount applied" value={`− ${formatAmount(totals.billDiscountAmount)}`} negative />}
+      {discountEquivalence && <Typography className={styles.discountEquivalence}>{discountEquivalence}</Typography>}
+      {totals.billDiscountAmount > 0 && (
+        <SumRow label={`Bill discount applied${discountPercent ? ` (${discountPercent})` : ''}`} value={`− ${formatAmount(totals.billDiscountAmount)}`} negative />
+      )}
 
       <div className={styles.divider} />
       <SumRow label="Taxable value" value={formatAmount(totals.taxable)} />
@@ -131,7 +148,14 @@ export const BillSummaryRail = ({
       </div>
     </div>
 
-    <PaymentMethodToggle value={paymentMethod} onChange={onPaymentMethodChange} />
+    <PaymentMethodToggle
+      types={paymentTypes}
+      selection={paymentSelection}
+      onSelectionChange={onPaymentSelectionChange}
+      mixedAmounts={mixedAmounts}
+      onMixedAmountChange={onMixedAmountChange}
+      grandTotal={totals.grandTotal}
+    />
 
     <div className={styles.footer}>
       <Button
@@ -149,4 +173,5 @@ export const BillSummaryRail = ({
       </Button>
     </div>
   </Card>
-)
+  )
+}
