@@ -14,8 +14,7 @@ return new class extends Migration
             $t->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
             $t->string('name');
             $t->string('hsn', 20)->default('');
-            $t->string('unit', 40);
-            $t->decimal('mrp', 12, 2);
+            $t->decimal('mrp', 12, 2)->nullable();
             $t->decimal('rate', 12, 2);
             $t->decimal('gst_rate', 5, 2);
             $t->unsignedInteger('qty');

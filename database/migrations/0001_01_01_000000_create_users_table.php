@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('mobile', 20)->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['Super Admin', 'Counter Staff'])->default('Counter Staff');
+            $table->enum('role', ['Super Admin', 'Staff'])->default('Staff');
             $table->unsignedBigInteger('counter_id')->nullable(); // one counter per staff; null for Super Admin
             $table->boolean('active')->default(true);
             $table->date('joined_on')->nullable();

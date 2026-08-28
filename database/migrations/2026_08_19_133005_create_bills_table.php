@@ -16,11 +16,14 @@ return new class extends Migration
             $t->dateTime('billed_at');
             $t->string('customer_name')->default('');
             $t->string('customer_mobile', 15)->default('');
-            $t->enum('payment_method', ['Cash', 'UPI', 'Card'])->nullable();
-            $t->enum('status', ['Paid', 'Cancelled'])->default('Paid');
+            $t->enum('status', ['Paid', 'Cancelled', 'Refund'])->default('Paid');
             $t->unsignedInteger('reprint_count')->default(0);
+            $t->timestamp('edited_at')->nullable();     // set when a saved bill is reworked
+            $t->foreignId('edited_by')->nullable()->constrained('users')->nullOnDelete();
             $t->boolean('gst_applicable')->default(false);
-            $t->decimal('discount', 12, 2)->default(0); // input: flat rupees off the gross
+            $t->decimal('discount', 12, 2)->default(0);            // applied rupees off the gross
+            $t->enum('discount_type', ['percent', 'flat'])->nullable(); // how the cashier typed it
+            $t->decimal('discount_value', 12, 2)->nullable();
             $t->decimal('tax_total', 14, 2);            // cached GST (cgst+sgst) for the GST-collected KPI
             $t->decimal('grand_total', 14, 2);          // cached headline for sales aggregation
             $t->timestamps();
