@@ -7,6 +7,7 @@ use App\Http\Resources\BillResource;
 use App\Models\Bill;
 use App\Models\BillCounter;
 use App\Models\BillItem;
+use App\Models\BillPayment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -57,7 +58,7 @@ class DashboardController extends Controller
             ->when($counterId, fn ($query) => $query->where('counter_id', $counterId));
     }
 
-    // Sales per day for the last 10 selling days, in thousands of rupees.
+    // Sales per day for the last 10 selling days, in rupees.
     private function dailyTrend($counterId): array
     {
         return $this->paidBills($counterId)
@@ -69,26 +70,29 @@ class DashboardController extends Controller
             ->sortBy('day')
             ->map(fn ($row) => [
                 'label' => date('d M', strtotime($row->day)),
-                'value' => (int) round($row->total / 1000),
+                'value' => (float) $row->total,
             ])
             ->values()
             ->all();
     }
 
-    // How much came in by Cash / UPI / Card.
+    // How much came in per payment type; a mixed bill contributes each split to its own type.
     private function paymentMix($counterId): array
     {
-        return $this->paidBills($counterId)
-            ->whereNotNull('payment_method')
-            ->selectRaw('payment_method as method, SUM(grand_total) as amount')
-            ->groupBy('payment_method')
+        return BillPayment::query()
+            ->join('bills', 'bills.id', '=', 'bill_payments.bill_id')
+            ->join('payment_types', 'payment_types.id', '=', 'bill_payments.payment_type_id')
+            ->where('bills.status', 'Paid')
+            ->when($counterId, fn ($query) => $query->where('bills.counter_id', $counterId))
+            ->selectRaw('payment_types.name as method, SUM(bill_payments.amount) as amount')
+            ->groupBy('payment_types.name')
             ->orderByDesc('amount')
             ->get()
             ->map(fn ($row) => ['method' => $row->method, 'amount' => (float) $row->amount])
             ->all();
     }
 
-    // The six products that brought in the most money.
+    // The seven products that brought in the most money.
     private function topItems($counterId): array
     {
         return BillItem::join('bills', 'bills.id', '=', 'bill_items.bill_id')
@@ -97,20 +101,20 @@ class DashboardController extends Controller
             ->selectRaw('bill_items.name as name, SUM(bill_items.rate * bill_items.qty) as amount')
             ->groupBy('bill_items.name')
             ->orderByDesc('amount')
-            ->limit(6)
+            ->limit(7)
             ->get()
             ->map(fn ($row) => ['name' => $row->name, 'amount' => (float) $row->amount])
             ->all();
     }
 
-    // The eight newest bills for the "Recent bills" panel.
+    // The ten newest bills for the "Recent bills" panel.
     private function recentBills($counterId)
     {
         return Bill::when($counterId, fn ($query) => $query->where('counter_id', $counterId))
-            ->with(['counter', 'user', 'items.product'])
+            ->with(['counter', 'user', 'items.product', 'payments.paymentType'])
             ->latest('billed_at')
             ->latest('id')
-            ->limit(8)
+            ->limit(10)
             ->get();
     }
 

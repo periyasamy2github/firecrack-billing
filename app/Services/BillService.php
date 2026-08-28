@@ -19,15 +19,18 @@ class BillService
 
             $lines = $this->deductStock((int) $data['counterId'], $data['items']);
             $totals = $this->calculateTotals($lines, $gstApplicable, $discount);
+            $this->assertPaymentsCoverTotal($data['payments'], $totals['grand_total']);
 
             $bill = new Bill([
                 'counter_id' => $data['counterId'],
                 'user_id' => $user->id,
                 'customer_name' => $data['customerName'] ?? '',
                 'customer_mobile' => $data['customerMobile'] ?? '',
-                'payment_method' => $data['paymentMethod'] ?? null,
                 'gst_applicable' => $gstApplicable,
                 'discount' => $discount,
+                // How the discount was typed in (10% vs ₹54) — kept so bills can show both figures.
+                'discount_type' => $discount > 0 ? ($data['discountType'] ?? 'flat') : null,
+                'discount_value' => $discount > 0 ? ($data['discountValue'] ?? $discount) : null,
                 'tax_total' => $totals['tax_total'],
                 'grand_total' => $totals['grand_total'],
                 'reprint_count' => 0,
@@ -38,8 +41,53 @@ class BillService
 
             $bill->save();
             $bill->items()->createMany($lines);
+            $bill->payments()->createMany(array_map(fn ($payment) => [
+                'payment_type_id' => $payment['typeId'],
+                'amount' => $payment['amount'],
+            ], $data['payments']));
 
-            return $bill->load('items');
+            return $bill->load(['items', 'payments.paymentType']);
+        });
+    }
+
+    /** Rework a paid bill in place: old stock returns, new stock leaves, totals recompute — the number stays. */
+    public function update(User $user, Bill $bill, array $data): Bill
+    {
+        $this->assertStatusIs($bill, 'Paid', 'Only a paid bill can be edited.');
+
+        return DB::transaction(function () use ($user, $bill, $data) {
+            $gstApplicable = (bool) ($data['gstApplicable'] ?? false);
+            $discount = (float) ($data['discount'] ?? 0);
+
+            $this->returnStock($bill->load('items'));
+            $bill->items()->delete();
+            $bill->payments()->delete();
+
+            $lines = $this->deductStock($bill->counter_id, $data['items']);
+            $totals = $this->calculateTotals($lines, $gstApplicable, $discount);
+            $this->assertPaymentsCoverTotal($data['payments'], $totals['grand_total']);
+
+            $bill->fill([
+                'customer_name' => $data['customerName'] ?? '',
+                'customer_mobile' => $data['customerMobile'] ?? '',
+                'gst_applicable' => $gstApplicable,
+                'discount' => $discount,
+                'discount_type' => $discount > 0 ? ($data['discountType'] ?? 'flat') : null,
+                'discount_value' => $discount > 0 ? ($data['discountValue'] ?? $discount) : null,
+                'tax_total' => $totals['tax_total'],
+                'grand_total' => $totals['grand_total'],
+            ]);
+            $bill->edited_at = now();
+            $bill->edited_by = $user->id;
+            $bill->save();
+
+            $bill->items()->createMany($lines);
+            $bill->payments()->createMany(array_map(fn ($payment) => [
+                'payment_type_id' => $payment['typeId'],
+                'amount' => $payment['amount'],
+            ], $data['payments']));
+
+            return $bill->load(['items', 'payments.paymentType']);
         });
     }
 
@@ -51,10 +99,11 @@ class BillService
         return DB::transaction(function () use ($bill) {
             $this->returnStock($bill);
             $bill->status = 'Cancelled';
-            $bill->payment_method = null;
             $bill->save();
+            // The money went back to the customer — a cancelled bill holds no payments.
+            $bill->payments()->delete();
 
-            return $bill->fresh('items');
+            return $bill->fresh(['items', 'payments.paymentType']);
         });
     }
 
@@ -63,13 +112,24 @@ class BillService
     {
         $bill->increment('reprint_count');
 
-        return $bill->fresh('items');
+        return $bill->fresh(['items', 'payments.paymentType']);
     }
 
-    /** The touched products with their new stock, so the app can refresh without a reload. */
-    public function affectedProducts(Bill $bill): array
+    /** The tendered amounts must add up to the bill's grand total, whatever mix of types is used. */
+    private function assertPaymentsCoverTotal(array $payments, float $grandTotal): void
     {
-        $productIds = $bill->items->pluck('product_id')->filter()->unique()->all();
+        $tendered = round(array_sum(array_map(fn ($payment) => (float) $payment['amount'], $payments)), 2);
+
+        if (abs($tendered - $grandTotal) > 0.009) {
+            $this->fail(422, sprintf('Payments add up to ₹%.2f but the bill total is ₹%.2f.', $tendered, $grandTotal));
+        }
+    }
+
+    /** The touched products with their new stock, so the app can refresh without a reload.
+     *  $extraProductIds covers items an edit removed — their restored stock must reach the app too. */
+    public function affectedProducts(Bill $bill, array $extraProductIds = []): array
+    {
+        $productIds = $bill->items->pluck('product_id')->filter()->merge($extraProductIds)->unique()->all();
 
         // The counter goes along too — the same barcode can exist on another counter.
         return Product::whereIn('id', $productIds)->get()
@@ -131,7 +191,6 @@ class BillService
                 'product_id' => $product->id,
                 'name' => $product->name,
                 'hsn' => $product->hsn,
-                'unit' => $product->unit,
                 'mrp' => $product->mrp,
                 'rate' => $product->rate,
                 'gst_rate' => $product->gst_rate,

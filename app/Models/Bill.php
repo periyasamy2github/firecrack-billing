@@ -16,20 +16,23 @@ class Bill extends Model
         'billed_at',
         'customer_name',
         'customer_mobile',
-        'payment_method',
         'status',
         'reprint_count',
         'gst_applicable',
         'discount',
+        'discount_type',
+        'discount_value',
         'tax_total',
         'grand_total',
     ];
 
     protected $casts = [
         'billed_at' => 'datetime',
+        'edited_at' => 'datetime',
         'gst_applicable' => 'boolean',
         'reprint_count' => 'integer',
         'discount' => 'decimal:2',
+        'discount_value' => 'decimal:2',
         'tax_total' => 'decimal:2',
         'grand_total' => 'decimal:2',
     ];
@@ -44,9 +47,29 @@ class Bill extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function editor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'edited_by');
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(BillItem::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(BillPayment::class);
+    }
+
+    /** What the payment pill shows: the single type's name, 'Mixed' for a split, null when unpaid/cancelled. */
+    public function paymentLabel(): ?string
+    {
+        if (! $this->relationLoaded('payments') || $this->payments->isEmpty()) {
+            return null;
+        }
+
+        return $this->payments->count() === 1 ? $this->payments->first()->paymentType->name : 'Mixed';
     }
 
     /** Super Admin sees every counter; staff see only their own counter's bills. */

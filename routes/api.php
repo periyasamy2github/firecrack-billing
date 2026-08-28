@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillController;
 use App\Http\Controllers\Api\CounterController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\PaymentTypeController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +18,12 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/dashboard', DashboardController::class);
+    Route::get('/reports/daily-statement', [ReportController::class, 'dailyStatement']);
 
     Route::get('/bills', [BillController::class, 'index']);
     Route::get('/bills/find', [BillController::class, 'show']);
     Route::post('/bills', [BillController::class, 'store']);
+    Route::put('/bills', [BillController::class, 'update']);
 
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/bills/cancel', [BillController::class, 'cancel']);
@@ -30,6 +34,9 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
         Route::post('/counters', [CounterController::class, 'store']);
         Route::put('/counters/{counter}', [CounterController::class, 'update']);
+
+        Route::post('/payment-types', [PaymentTypeController::class, 'store']);
+        Route::put('/payment-types/{paymentType}', [PaymentTypeController::class, 'update']);
 
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CounterResource;
+use App\Http\Resources\PaymentTypeResource;
 use App\Http\Resources\SettingResource;
 use App\Http\Resources\UserResource;
 use App\Models\BillCounter;
+use App\Models\PaymentType;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +57,7 @@ class AuthController extends Controller
             'user' => new UserResource($request->user()->load('counter')),
             'shop' => new SettingResource(Setting::current()),
             'counters' => $request->user()->isSuperAdmin() ? CounterResource::collection(BillCounter::orderBy('name')->get()) : [],
+            'paymentTypes' => PaymentTypeResource::collection(PaymentType::orderBy('sort')->orderBy('name')->get()),
         ]);
     }
 

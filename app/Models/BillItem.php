@@ -12,7 +12,6 @@ class BillItem extends Model
         'product_id',
         'name',
         'hsn',
-        'unit',
         'mrp',
         'rate',
         'gst_rate',

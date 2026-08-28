@@ -16,7 +16,6 @@ class Product extends Model
         'name',
         'category',
         'hsn',
-        'unit',
         'mrp',
         'rate',
         'gst_rate',

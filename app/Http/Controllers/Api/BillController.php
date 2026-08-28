@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BillResource;
 use App\Models\Bill;
+use App\Models\BillPayment;
+use App\Models\PaymentType;
 use App\Models\User;
 use App\Services\BillService;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -24,7 +26,7 @@ class BillController extends Controller
 
         $query = Bill::query()
             ->visibleTo($user)
-            ->with(['counter', 'user', 'items.product']);
+            ->with(['counter', 'user', 'items.product', 'payments.paymentType']);
 
         // A super admin can narrow to one counter; staff are already limited to their own.
         $scope = $request->query('scope');
@@ -45,22 +47,20 @@ class BillController extends Controller
             $query->whereDate('billed_at', '<=', $to);
         }
 
-        // Chip tallies, counted before the active filter narrows things down — one query, not six.
-        $tally = (clone $query)->selectRaw("
-            COUNT(*) as `all`,
-            SUM(payment_method = 'Cash') as cash,
-            SUM(payment_method = 'UPI') as upi,
-            SUM(payment_method = 'Card') as card,
-            SUM(status = 'Cancelled') as cancelled
-        ")->first();
+        // Chip tallies, counted before the active filter narrows things down.
+        // A mixed bill counts once under every type it used.
+        $perType = BillPayment::query()
+            ->join('payment_types', 'payment_types.id', '=', 'bill_payments.payment_type_id')
+            ->whereIn('bill_payments.bill_id', (clone $query)->select('bills.id'))
+            ->selectRaw('payment_types.name as name, COUNT(DISTINCT bill_payments.bill_id) as tally')
+            ->groupBy('payment_types.name')
+            ->pluck('tally', 'name');
 
-        $counts = [
-            'All' => (int) $tally->all,
-            'Cash' => (int) $tally->cash,
-            'UPI' => (int) $tally->upi,
-            'Card' => (int) $tally->card,
-            'Cancelled' => (int) $tally->cancelled,
-        ];
+        $counts = ['All' => (clone $query)->count()];
+        foreach (PaymentType::orderBy('sort')->orderBy('name')->pluck('name') as $typeName) {
+            $counts[$typeName] = (int) ($perType[$typeName] ?? 0);
+        }
+        $counts['Cancelled'] = (clone $query)->where('status', 'Cancelled')->count();
 
         $this->applyFilter($query, (string) $request->query('filter', 'All'));
 
@@ -110,20 +110,56 @@ class BillController extends Controller
             'counterId' => ['required', Rule::exists('counters', 'id')->where('active', true)],
             'customerName' => ['nullable', 'string', 'max:255'],
             'customerMobile' => ['nullable', 'string', 'max:15'],
-            'paymentMethod' => ['nullable', Rule::in(['Cash', 'UPI', 'Card'])],
             'gstApplicable' => ['required', 'boolean'],
             'discount' => ['nullable', 'numeric', 'gte:0'],
+            'discountType' => ['nullable', 'required_with:discountValue', Rule::in(['percent', 'flat'])],
+            'discountValue' => ['nullable', 'numeric', 'gte:0'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.code' => ['required', 'string'],
             'items.*.qty' => ['required', 'integer', 'gt:0'],
+            'payments' => ['required', 'array', 'min:1'],
+            'payments.*.typeId' => ['required', 'distinct', Rule::exists('payment_types', 'id')->where('active', true)],
+            'payments.*.amount' => ['required', 'numeric', 'gt:0'],
         ], [
             'counterId.exists' => 'This branch is closed, so it cannot take new bills.',
+            'payments.*.typeId.exists' => 'One of the payment types is switched off.',
         ]);
 
         $this->authorizeCounter($request->user(), (int) $data['counterId']);
         $bill = $this->service->create($request->user(), $data);
 
         return $this->saleResponse($bill);
+    }
+
+    /** editBill — replace a paid bill's contents; stock and totals re-adjust atomically, the number stays. */
+    public function update(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'customerName' => ['nullable', 'string', 'max:255'],
+            'customerMobile' => ['nullable', 'string', 'max:15'],
+            'gstApplicable' => ['required', 'boolean'],
+            'discount' => ['nullable', 'numeric', 'gte:0'],
+            'discountType' => ['nullable', 'required_with:discountValue', Rule::in(['percent', 'flat'])],
+            'discountValue' => ['nullable', 'numeric', 'gte:0'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.code' => ['required', 'string'],
+            'items.*.qty' => ['required', 'integer', 'gt:0'],
+            'payments' => ['required', 'array', 'min:1'],
+            'payments.*.typeId' => ['required', 'distinct', Rule::exists('payment_types', 'id')->where('active', true)],
+            'payments.*.amount' => ['required', 'numeric', 'gt:0'],
+        ], [
+            'payments.*.typeId.exists' => 'One of the payment types is switched off.',
+        ]);
+
+        $bill = $this->findByNo($request);
+        // Items the edit drops still need their restored stock echoed back to the app.
+        $oldProductIds = $bill->items()->pluck('product_id')->filter()->all();
+        $bill = $this->service->update($request->user(), $bill, $data);
+
+        return response()->json([
+            'bill' => $this->billResource($bill),
+            'products' => $this->service->affectedProducts($bill, $oldProductIds),
+        ]);
     }
 
     /** cancelBill — Paid → Cancelled, stock restored. */
@@ -144,10 +180,19 @@ class BillController extends Controller
 
     private function applyFilter($query, string $filter): void
     {
-        if (in_array($filter, ['Cash', 'UPI', 'Card'], true)) {
-            $query->where('payment_method', $filter);
-        } elseif ($filter === 'Cancelled') {
+        if ($filter === 'Cancelled') {
             $query->where('status', 'Cancelled');
+
+            return;
+        }
+
+        if ($filter === '' || $filter === 'All') {
+            return;
+        }
+
+        // Any other chip is a payment type's name; mixed bills match every type they used.
+        if ($typeId = PaymentType::where('name', $filter)->value('id')) {
+            $query->whereHas('payments', fn ($q) => $q->where('payment_type_id', $typeId));
         }
     }
 
@@ -161,7 +206,7 @@ class BillController extends Controller
 
     private function billResource(Bill $bill): BillResource
     {
-        return new BillResource($bill->load(['counter', 'user', 'items.product']));
+        return new BillResource($bill->load(['counter', 'user', 'items.product', 'payments.paymentType']));
     }
 
     private function findByNo(Request $request): Bill

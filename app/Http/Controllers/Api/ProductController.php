@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
+use App\Models\BillItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -21,8 +22,7 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:40'],
             'hsn' => ['nullable', 'string', 'max:20'],
-            'unit' => ['required', 'string', 'max:40'],
-            'mrp' => ['required', 'numeric', 'gt:0'],
+            'mrp' => ['nullable', 'numeric', 'gt:0'],
             'rate' => ['required', 'numeric', 'gt:0'],
             'gstRate' => ['required', 'numeric', 'gte:0'],
             'stock' => [$stockRequired ? 'required' : 'nullable', 'integer', 'gte:0'],
@@ -38,6 +38,12 @@ class ProductController extends Controller
 
         $products = Product::query()
             ->with('counter')
+            ->addSelect(['*'])
+            ->addSelect(['sales_count' => BillItem::query()
+                ->join('bills', 'bills.id', '=', 'bill_items.bill_id')
+                ->where('bills.status', 'Paid')
+                ->whereColumn('bill_items.product_id', 'products.id')
+                ->selectRaw('COALESCE(SUM(bill_items.qty), 0)')])
             ->when(!$user->isSuperAdmin(), fn ($query) => $query->where('counter_id', $user->counter_id))
             ->when($user->isSuperAdmin() && $scope && $scope !== 'all', fn ($query) => $query->where('counter_id', $scope))
             ->orderBy('name')
@@ -139,8 +145,7 @@ class ProductController extends Controller
             'name' => $data['name'],
             'category' => $data['category'],
             'hsn' => $data['hsn'] ?? '',
-            'unit' => $data['unit'],
-            'mrp' => $data['mrp'],
+            'mrp' => $data['mrp'] ?? null,
             'rate' => $data['rate'],
             'gst_rate' => $data['gstRate'],
             'reorder_level' => $data['lowStockThreshold'],

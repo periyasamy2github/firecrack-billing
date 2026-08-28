@@ -57,14 +57,14 @@ class UserController extends Controller
             'mobile' => ['nullable', 'string', 'max:20'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
             'password' => [$id ? 'nullable' : 'required', 'string', 'min:6'],
-            'role' => ['required', Rule::in(['Super Admin', 'Counter Staff'])],
+            'role' => ['required', Rule::in(['Super Admin', 'Staff'])],
             'counterId' => ['nullable', 'integer', 'exists:counters,id'],
             'active' => ['required', 'boolean'],
             'joinedOn' => ['nullable', 'date'],
         ];
 
-        // Counter Staff must belong to exactly one counter.
-        if ($request->input('role') === 'Counter Staff') {
+        // Staff must belong to exactly one counter.
+        if ($request->input('role') === 'Staff') {
             $rules['counterId'] = ['required', 'integer', 'exists:counters,id'];
         }
 
