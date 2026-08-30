@@ -18,11 +18,11 @@ return new class extends Migration
             $t->string('customer_mobile', 15)->default('');
             $t->enum('status', ['Paid', 'Cancelled', 'Refund'])->default('Paid');
             $t->unsignedInteger('reprint_count')->default(0);
-            $t->timestamp('edited_at')->nullable();     // set when a saved bill is reworked
+            $t->timestamp('edited_at')->nullable();     // edit audit
             $t->foreignId('edited_by')->nullable()->constrained('users')->nullOnDelete();
             $t->boolean('gst_applicable')->default(false);
             $t->decimal('discount', 12, 2)->default(0);            // applied rupees off the gross
-            $t->enum('discount_type', ['percent', 'flat'])->nullable(); // how the cashier typed it
+            $t->enum('discount_type', ['percent', 'flat'])->nullable(); // as entered
             $t->decimal('discount_value', 12, 2)->nullable();
             $t->decimal('tax_total', 14, 2);            // cached GST (cgst+sgst) for the GST-collected KPI
             $t->decimal('grand_total', 14, 2);          // cached headline for sales aggregation

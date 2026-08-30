@@ -19,7 +19,7 @@ class EnsureActive
         if ($user && ! $user->active) {
             $user->currentAccessToken()?->delete();
 
-            return response()->json(['message' => 'Session ended'], 401);
+            return response()->json(['message' => 'You have been signed out. Sign in again.'], 401);
         }
 
         return $next($request);

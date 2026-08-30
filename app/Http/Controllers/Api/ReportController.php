@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    /** GET /reports/daily-statement — one day's takings, ready to print at day close. */
+    // One day's takings for the printable statement.
     public function dailyStatement(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -58,7 +58,7 @@ class ReportController extends Controller
             ->map(fn ($row) => ['name' => $row->name, 'qty' => (int) $row->qty, 'amount' => (float) $row->amount])
             ->all();
 
-        // Whole-shop statements break the day down per counter as well.
+        // Per-counter breakdown for whole-shop statements.
         $perCounter = [];
         if ($counterId === null) {
             $totals = $dayBills()->where('status', 'Paid')

@@ -28,7 +28,6 @@ class BillService
                 'customer_mobile' => $data['customerMobile'] ?? '',
                 'gst_applicable' => $gstApplicable,
                 'discount' => $discount,
-                // How the discount was typed in (10% vs ₹54) — kept so bills can show both figures.
                 'discount_type' => $discount > 0 ? ($data['discountType'] ?? 'flat') : null,
                 'discount_value' => $discount > 0 ? ($data['discountValue'] ?? $discount) : null,
                 'tax_total' => $totals['tax_total'],
@@ -50,10 +49,10 @@ class BillService
         });
     }
 
-    /** Rework a paid bill in place: old stock returns, new stock leaves, totals recompute — the number stays. */
+    // Edit a paid bill in place; the bill number stays.
     public function update(User $user, Bill $bill, array $data): Bill
     {
-        $this->assertStatusIs($bill, 'Paid', 'Only a paid bill can be edited.');
+        $this->assertStatusIs($bill, 'Paid', "This bill can't be changed.");
 
         return DB::transaction(function () use ($user, $bill, $data) {
             $gstApplicable = (bool) ($data['gstApplicable'] ?? false);
@@ -94,13 +93,13 @@ class BillService
     /** Void a paid bill and put its stock back. */
     public function cancel(Bill $bill): Bill
     {
-        $this->assertStatusIs($bill, 'Paid', 'Only a paid bill can be cancelled.');
+        $this->assertStatusIs($bill, 'Paid', "This bill can't be cancelled.");
 
         return DB::transaction(function () use ($bill) {
             $this->returnStock($bill);
             $bill->status = 'Cancelled';
             $bill->save();
-            // The money went back to the customer — a cancelled bill holds no payments.
+            // The money back to the customer — a cancelled bill.
             $bill->payments()->delete();
 
             return $bill->fresh(['items', 'payments.paymentType']);
@@ -115,18 +114,17 @@ class BillService
         return $bill->fresh(['items', 'payments.paymentType']);
     }
 
-    /** The tendered amounts must add up to the bill's grand total, whatever mix of types is used. */
+    // Payments must add up to the grand total.
     private function assertPaymentsCoverTotal(array $payments, float $grandTotal): void
     {
         $tendered = round(array_sum(array_map(fn ($payment) => (float) $payment['amount'], $payments)), 2);
 
         if (abs($tendered - $grandTotal) > 0.009) {
-            $this->fail(422, sprintf('Payments add up to ₹%.2f but the bill total is ₹%.2f.', $tendered, $grandTotal));
+            $this->fail(422, "Payment amount doesn't match the bill total.");
         }
     }
 
-    /** The touched products with their new stock, so the app can refresh without a reload.
-     *  $extraProductIds covers items an edit removed — their restored stock must reach the app too. */
+    // Touched products with their new stock.
     public function affectedProducts(Bill $bill, array $extraProductIds = []): array
     {
         $productIds = $bill->items->pluck('product_id')->filter()->merge($extraProductIds)->unique()->all();
@@ -176,13 +174,13 @@ class BillService
             $product = Product::where('counter_id', $counterId)->where('barcode', $item['code'])->lockForUpdate()->first();
 
             if (! $product) {
-                $this->fail(422, "Unknown product: {$item['code']}");
+                $this->fail(422, 'This item is not available.');
             }
 
             $qty = (int) $item['qty'];
 
             if ($product->stock < $qty) {
-                $this->fail(409, "{$product->name} is out of stock (only {$product->stock} left)");
+                $this->fail(409, "Not enough stock for {$product->name}.");
             }
 
             $product->decrement('stock', $qty);
@@ -213,8 +211,16 @@ class BillService
     private function assignNextInvoiceNumber(Bill $bill): void
     {
         $settings = Setting::lockForUpdate()->find(1);
-        $bill->bill_no = $settings->invoice_prefix.$settings->next_number;
-        $settings->increment('next_number');
+
+        // Skip numbers already used.
+        $number = $settings->next_number;
+        while (Bill::where('bill_no', $settings->invoice_prefix.$number)->exists()) {
+            $number++;
+        }
+
+        $bill->bill_no = $settings->invoice_prefix.$number;
+        $settings->next_number = $number + 1;
+        $settings->save();
     }
 
     private function assertStatusIs(Bill $bill, string $status, string $message): void

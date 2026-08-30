@@ -47,8 +47,7 @@ class BillController extends Controller
             $query->whereDate('billed_at', '<=', $to);
         }
 
-        // Chip tallies, counted before the active filter narrows things down.
-        // A mixed bill counts once under every type it used.
+        // Chip tallies before the active filter.
         $perType = BillPayment::query()
             ->join('payment_types', 'payment_types.id', '=', 'bill_payments.payment_type_id')
             ->whereIn('bill_payments.bill_id', (clone $query)->select('bills.id'))
@@ -90,12 +89,12 @@ class BillController extends Controller
         try {
             $id = decrypt((string) $request->query('id'));
         } catch (DecryptException) {
-            abort(404, 'Bill not found');
+            abort(404, 'This bill was not found.');
         }
 
         $bill = Bill::find($id);
         if (! $bill) {
-            abort(404, 'Bill not found');
+            abort(404, 'This bill was not found.');
         }
 
         $this->authorizeBill($request->user(), $bill);
@@ -121,8 +120,8 @@ class BillController extends Controller
             'payments.*.typeId' => ['required', 'distinct', Rule::exists('payment_types', 'id')->where('active', true)],
             'payments.*.amount' => ['required', 'numeric', 'gt:0'],
         ], [
-            'counterId.exists' => 'This branch is closed, so it cannot take new bills.',
-            'payments.*.typeId.exists' => 'One of the payment types is switched off.',
+            'counterId.exists' => "This branch is closed. New bills can't be made.",
+            'payments.*.typeId.exists' => 'This payment type is turned off. Pick another.',
         ]);
 
         $this->authorizeCounter($request->user(), (int) $data['counterId']);
@@ -131,7 +130,7 @@ class BillController extends Controller
         return $this->saleResponse($bill);
     }
 
-    /** editBill — replace a paid bill's contents; stock and totals re-adjust atomically, the number stays. */
+    // editBill — update a paid bill's contents.
     public function update(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -148,11 +147,11 @@ class BillController extends Controller
             'payments.*.typeId' => ['required', 'distinct', Rule::exists('payment_types', 'id')->where('active', true)],
             'payments.*.amount' => ['required', 'numeric', 'gt:0'],
         ], [
-            'payments.*.typeId.exists' => 'One of the payment types is switched off.',
+            'payments.*.typeId.exists' => 'This payment type is turned off. Pick another.',
         ]);
 
         $bill = $this->findByNo($request);
-        // Items the edit drops still need their restored stock echoed back to the app.
+        // Include products the edit removed.
         $oldProductIds = $bill->items()->pluck('product_id')->filter()->all();
         $bill = $this->service->update($request->user(), $bill, $data);
 
@@ -190,7 +189,7 @@ class BillController extends Controller
             return;
         }
 
-        // Any other chip is a payment type's name; mixed bills match every type they used.
+        // Other chips are payment type names.
         if ($typeId = PaymentType::where('name', $filter)->value('id')) {
             $query->whereHas('payments', fn ($q) => $q->where('payment_type_id', $typeId));
         }
@@ -215,7 +214,7 @@ class BillController extends Controller
         $bill = Bill::where('bill_no', $request->input('billNo'))->first();
 
         if (! $bill) {
-            abort(404, 'Bill not found');
+            abort(404, 'This bill was not found.');
         }
 
         $this->authorizeBill($request->user(), $bill);
@@ -226,7 +225,7 @@ class BillController extends Controller
     private function authorizeCounter(User $user, int $counterId): void
     {
         if (! $user->isSuperAdmin() && $user->counter_id !== $counterId) {
-            abort(response()->json(['message' => 'You are not assigned to this branch'], 403));
+            abort(response()->json(['message' => "You don't have access to this branch."], 403));
         }
     }
 

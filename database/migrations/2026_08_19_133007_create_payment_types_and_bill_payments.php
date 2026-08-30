@@ -17,7 +17,7 @@ return new class extends Migration
             $t->timestamps();
         });
 
-        // A bill holds one row per type used; a Mixed bill holds several that sum to the total.
+        // One row per payment type used on a bill.
         Schema::create('bill_payments', function (Blueprint $t) {
             $t->id();
             $t->foreignId('bill_id')->constrained()->cascadeOnDelete();
@@ -27,7 +27,7 @@ return new class extends Migration
             $t->index('payment_type_id');
         });
 
-        // The built-in ways to pay; more can be added from Settings.
+        // Default payment types.
         $now = now();
         DB::table('payment_types')->insert([
             ['name' => 'Cash', 'active' => true, 'sort' => 1, 'created_at' => $now, 'updated_at' => $now],

@@ -28,18 +28,18 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Invalid email or password'], 401);
+            return response()->json(['message' => 'Email or password is wrong'], 401);
         }
 
         if (! $user->active) {
-            return response()->json(['message' => 'This account is disabled. Ask an Administrator.'], 403);
+            return response()->json(['message' => 'Your account is turned off. Ask the owner.'], 403);
         }
 
         $user->load('counter');
 
         // A closed counter stops trading, so its staff cannot sign in either.
         if (! $user->isSuperAdmin() && $user->counter && ! $user->counter->active) {
-            return response()->json(['message' => 'Your branch is closed. Ask an Administrator.'], 403);
+            return response()->json(['message' => 'Your branch is closed. Ask the owner.'], 403);
         }
 
         $token = $user->createToken('spa')->plainTextToken;

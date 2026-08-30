@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class PaymentTypeController extends Controller
 {
-    /** savePaymentType (create) — a new way to pay, shown last on the billing screen. */
+    // savePaymentType — add a payment type.
     public function store(Request $request): PaymentTypeResource
     {
         $data = $request->validate([
@@ -26,7 +26,7 @@ class PaymentTypeController extends Controller
         return new PaymentTypeResource($type);
     }
 
-    /** savePaymentType (edit) — rename or switch a type on/off. Types are never deleted; bills reference them. */
+    // savePaymentType — rename or toggle a type; never deleted.
     public function update(Request $request, PaymentType $paymentType): PaymentTypeResource
     {
         $data = $request->validate([

@@ -62,7 +62,7 @@ class Bill extends Model
         return $this->hasMany(BillPayment::class);
     }
 
-    /** What the payment pill shows: the single type's name, 'Mixed' for a split, null when unpaid/cancelled. */
+    // Payment label: type name, 'Mixed', or null.
     public function paymentLabel(): ?string
     {
         if (! $this->relationLoaded('payments') || $this->payments->isEmpty()) {
