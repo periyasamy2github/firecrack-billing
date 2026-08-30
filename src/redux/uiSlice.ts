@@ -3,7 +3,6 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 export type ToastSeverity = 'success' | 'error' | 'info' | 'warning'
 
 interface UiState {
-  /** Bumped on every raise so the same message twice in a row still re-shows. */
   toastId: number
   toastOpen: boolean
   toastMessage: string

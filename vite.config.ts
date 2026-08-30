@@ -14,9 +14,10 @@ export default defineConfig({
         short_name: 'SparkBill',
         description: 'Billing, stock and reports for the fireworks shop.',
         theme_color: '#1e3a5f',
-        background_color: '#f8fafc',
+        background_color: '#1e3a5f',
         display: 'standalone',
         start_url: '/',
+        launch_handler: { client_mode: 'focus-existing' },
         icons: [
           { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },

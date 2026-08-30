@@ -18,8 +18,10 @@ import { UserDialog } from './UserDialog'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
 import { UsersTable } from './UsersTable'
 import { UserDetailsDialog } from './UserDetailsDialog'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Users = () => {
+  usePageTitle('Users')
   const { counters } = useSession()
   const dispatch = useDispatch()
   const users = useSelector((state) => state.users.items)

@@ -15,8 +15,10 @@ import { errorMessage } from '../../utils/errorMessage'
 import type { Counter } from '../../types'
 import { CounterDialog } from './CounterDialog'
 import styles from '../../css/pages/Counters.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Counters = () => {
+  usePageTitle('Branches')
   const { counters } = useSession()
   const dispatch = useDispatch()
   const persistCounter = (counter: Counter) => dispatch(saveCounter(counter)).unwrap()

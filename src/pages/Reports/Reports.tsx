@@ -24,8 +24,10 @@ import { useToast } from '../../hooks/useToast'
 import { ReportFilterBar, type ReportFilters } from './ReportFilterBar'
 import { ReportsTable } from './ReportsTable'
 import styles from '../../css/pages/Reports.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Reports = () => {
+  usePageTitle('Reports')
   const navigate = useNavigate()
   const { counterScope, isSuperAdmin, counters } = useSession()
   const showToast = useToast()

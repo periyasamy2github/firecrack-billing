@@ -22,6 +22,7 @@ import { UploadStage } from './UploadStage'
 import { ReviewStage } from './ReviewStage'
 import { ImportingStage } from './ImportingStage'
 import { DoneStage } from './DoneStage'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 // Headers are matched case-insensitively on import, so these stay readable.
 export const TEMPLATE_COLUMNS = ['Barcode', 'Name', 'Category', 'HSN', 'MRP', 'Rate', 'GST Rate', 'Stock', 'Low Stock Threshold']
@@ -119,6 +120,7 @@ const downloadTemplate = () => downloadXlsx('Import-Template.xlsx', 'Products', 
 const STEPS = ['Choose file', 'Review rows', 'Import'] as const
 
 export const ProductImport = () => {
+  usePageTitle('Import Products')
   const navigate = useNavigate()
   const { counterScope } = useSession()
   const dispatch = useDispatch()

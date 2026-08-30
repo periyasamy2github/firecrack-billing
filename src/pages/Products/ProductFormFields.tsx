@@ -15,7 +15,6 @@ export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
   const rowErrors = errors.products?.[index]
   const products = useSelector((state) => state.products.items)
 
-  // Existing categories from the catalogue plus the stock suggestions; typing anything new is allowed.
   const categoryOptions = useMemo(
     () => [...new Set([...productCategories, ...products.map((p) => p.category)])].sort(),
     [products],

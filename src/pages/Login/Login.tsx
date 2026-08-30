@@ -21,6 +21,7 @@ import type { User } from '../../types'
 import { ROUTES } from '../../utils/routes'
 import styles from '../../css/pages/Login.module.css'
 import nProgress from 'nprogress'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Enter your email').email('Enter a valid email'),
@@ -30,6 +31,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export const Login = () => {
+  usePageTitle('Sign in')
   const navigate = useNavigate()
   const dispatch = useDispatch()
 

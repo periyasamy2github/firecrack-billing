@@ -3,7 +3,7 @@ import { computeBillTotals } from '../utils/billing'
 import { api } from '../services/api'
 import type { Bill, NewBillPayload } from '../types'
 
-// paymentMethod is the backend's display label and the edit audit is server-stamped — derived, never sent.
+// Derived by the backend, never sent.
 export type NewBillInput = Omit<Bill, 'id' | 'billNo' | 'status' | 'reprintCount' | 'paymentMethod' | 'editedAt' | 'editedBy'>
 
 // Cart of full products -> the API's codes + flat-₹ discount.

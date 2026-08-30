@@ -26,10 +26,8 @@ export interface User {
   staffId: string
   mobile: string
   email: string
-  /** Only present when creating/resetting; the API never returns it. */
   password?: string
   role: UserRole
-  /** The one counter a staff member belongs to (null for Super Admin). */
   counterId: string | null
   counter: string | null
   active: boolean
@@ -38,21 +36,16 @@ export interface User {
 
 export interface Product {
   code: string
-  // The same barcode can exist on two counters.
   counterId: string
   counter?: string
   name: string
-  // Free text; the dropdown only suggests.
   category: string
   hsn: string
-  /** Printed on the box — what the customer compares against. Optional; hidden on bills when absent. */
   mrp: number | null
-  /** What the counter actually charges. Sivakasi shops sell well under MRP. */
   rate: number
   gstRate: number
   stock: number
   lowStockThreshold: number
-  /** Sum of qty on Paid bills; sent by the products list endpoint only. */
   salesCount?: number
 }
 
@@ -62,7 +55,7 @@ export interface BillLineItem {
   qty: number
 }
 
-// Managed from Settings; the billing screen shows the active ones.
+// Managed from Settings.
 export interface PaymentType {
   id: string
   name: string
@@ -70,7 +63,7 @@ export interface PaymentType {
   sort: number
 }
 
-// One slice of a bill's money: the whole bill for a single-type payment, a part for Mixed.
+// One payment slice of a bill.
 export interface BillPayment {
   typeId: string
   type: string
@@ -87,7 +80,6 @@ export interface BillDiscount {
 }
 
 export interface Bill {
-  // Encrypted by the backend; goes in URLs so the raw row id is never exposed.
   id: string
   billNo: string
   counterId: string
@@ -99,21 +91,17 @@ export interface Bill {
   billedBy: string
   items: BillLineItem[]
   payments: BillPayment[]
-  /** Display label from the backend: one type's name, 'Mixed', or null (e.g. cancelled). */
   paymentMethod: string | null
   status: BillStatus
   reprintCount: number
-  /** Set when a saved bill was reworked; shows the "Edited" marker. */
   editedAt: string | null
   editedBy: string | null
-  /** Off produces a plain Bill of Supply — no CGST/SGST, no tax columns. */
   gstApplicable: boolean
   billDiscount?: BillDiscount
 }
 
 export interface BillTotals {
   mrpValue: number
-  /** Whether any line item carries an MRP — MRP rows and savings hide when false. */
   hasMrp: boolean
   gross: number
   billDiscountAmount: number
@@ -162,9 +150,7 @@ export interface NewBillPayload {
   customerMobile: string
   payments: { typeId: string; amount: number }[]
   gstApplicable: boolean
-  /** Applied ₹ — what the totals math uses. */
   discount: number
-  /** How the cashier typed it, so bills can show both % and ₹. */
   discountType: BillDiscountType | null
   discountValue: number | null
   items: { code: string; qty: number }[]
@@ -190,7 +176,7 @@ export interface BillsQuery {
   all?: boolean
 }
 
-// One day's takings for the printable end-of-day statement.
+// Data for the printable daily statement.
 export interface DailyStatementData {
   date: string
   counter: string | null

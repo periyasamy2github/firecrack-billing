@@ -13,7 +13,6 @@ interface InvoiceItemsTableProps {
 }
 
 export const InvoiceItemsTable = ({ items, gst, totals, cgstLabel, sgstLabel }: InvoiceItemsTableProps) => {
-  // The MRP column disappears entirely when no line carries an MRP.
   const showMrp = items.some((i) => i.product.mrp != null)
   const columns = [
     '#',

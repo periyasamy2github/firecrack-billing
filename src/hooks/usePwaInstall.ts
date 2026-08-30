@@ -6,7 +6,6 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-// beforeinstallprompt fires once, often before React mounts — captured at module load.
 let capturedPrompt: BeforeInstallPromptEvent | null = null
 const subscribers = new Set<(event: BeforeInstallPromptEvent | null) => void>()
 
@@ -21,7 +20,7 @@ window.addEventListener('appinstalled', () => {
   subscribers.forEach((notify) => notify(null))
 })
 
-// iOS has no install prompt; Safari only offers Share → Add to Home Screen.
+// iOS has no install prompt.
 const isIosSafari = (): boolean =>
   /iPhone|iPad|iPod/.test(window.navigator.userAgent) &&
   (window.navigator as { standalone?: boolean }).standalone !== true

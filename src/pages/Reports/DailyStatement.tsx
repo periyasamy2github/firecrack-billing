@@ -12,6 +12,7 @@ import { formatAmount, formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
 import type { DailyStatementData } from '../../types'
 import styles from '../../css/pages/DailyStatement.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 const todayIso = () => new Date().toLocaleDateString('en-CA')
 
@@ -55,6 +56,8 @@ export const DailyStatement = () => {
   }, [date, scope])
 
   const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+
+  usePageTitle(`Daily Statement · ${displayDate}`)
 
   return (
     <>

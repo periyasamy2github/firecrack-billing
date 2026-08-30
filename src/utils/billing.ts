@@ -9,7 +9,6 @@ export interface LineAmounts {
 
 export const computeLineAmounts = (item: BillLineItem, gstApplicable = true): LineAmounts => {
   const rate = item.product.rate
-  // rate is the GST-inclusive selling price — back out the tax rather than adding it on top.
   const lineTotal = rate * item.qty
   const taxable = gstApplicable ? lineTotal / (1 + item.product.gstRate / 100) : lineTotal
   const gstAmount = lineTotal - taxable
@@ -28,15 +27,12 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   let hasMrp = false
   for (const item of items) {
     if (item.product.mrp != null) hasMrp = true
-    // A missing MRP counts as the rate, so "MRP value" and savings stay honest.
     mrpValue += (item.product.mrp ?? item.product.rate) * item.qty
     gross += item.product.rate * item.qty
   }
 
   const billDiscountAmount = resolveBillDiscountAmount(gross, billDiscount)
-  // `gross` and the discount are GST-inclusive; `payable` is what the customer actually hands over.
   const payable = gross - billDiscountAmount
-  // Same factor on every line so mixed GST rates still net out correctly.
   const shrink = gross > 0 ? payable / gross : 1
 
   let gstTotal = 0
@@ -69,7 +65,7 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   }
 }
 
-/** The discount's other face: "10%" whichever way it was entered, so bills show % and ₹ together. */
+// The discount as a percent label.
 export const discountPercentLabel = (totals: BillTotals, billDiscount?: BillDiscount): string | null => {
   if (!billDiscount || totals.billDiscountAmount <= 0 || totals.gross <= 0) return null
   const percent = billDiscount.type === 'percent'

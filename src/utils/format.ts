@@ -27,7 +27,7 @@ export const formatLongDate = (value: Date): string =>
 export const formatBillDate = (value: Date): string =>
   value.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')
 
-/** 24-hour '20:38' — bills are sorted by this string, so 12-hour times would jumble the order. */
+// 24-hour time; bills sort by this string.
 export const formatBillTime = (value: Date): string =>
   value.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })
 

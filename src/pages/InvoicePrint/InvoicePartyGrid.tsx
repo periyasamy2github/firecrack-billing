@@ -22,7 +22,6 @@ export const InvoicePartyGrid = ({ bill, stateCode }: InvoicePartyGridProps) => 
         ['Invoice no.', bill.billNo],
         ['Date', `${bill.date} · ${bill.time}`],
         ['Branch', `${bill.counter} · ${bill.billedBy}`],
-        // A mixed bill spells out the split, e.g. "Cash ₹500 + UPI ₹300".
         ['Payment', bill.payments.length > 1
           ? bill.payments.map((payment) => `${payment.type} ₹${payment.amount}`).join(' + ')
           : (bill.paymentMethod ?? '—')],

@@ -21,10 +21,12 @@ import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
 import type { Product } from '../../types'
 import styles from '../../css/pages/Products.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 const CATEGORY_KEYS = ['All', ...productCategories] as const
 
 export const Products = () => {
+  usePageTitle('Products')
   const navigate = useNavigate()
   const { counters, isSuperAdmin, counterScope } = useSession()
   const dispatch = useDispatch()

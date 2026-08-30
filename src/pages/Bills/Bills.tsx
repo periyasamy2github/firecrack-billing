@@ -23,6 +23,7 @@ import { errorMessage } from '../../utils/errorMessage'
 import { BillsTable } from './BillsTable'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/Bills.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Bills = () => {
   const navigate = useNavigate()
@@ -36,6 +37,8 @@ export const Bills = () => {
 
   const { query, setQuery, filter, setFilter, page, rowsPerPage, changePage, changeRowsPerPage, result, refetch } =
     useBillsPage({ scope: counterScope })
+
+  usePageTitle(`Bills · ${result.total}`)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
   useKeyShortcuts({

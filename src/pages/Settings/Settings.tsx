@@ -11,6 +11,7 @@ import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
 import { PaymentTypesEditor } from './PaymentTypesEditor'
 import styles from '../../css/pages/Settings.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 const SettingsSection = ({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) => (
   <div className={styles.section}>
@@ -41,6 +42,7 @@ const digitsOnly = (event: FieldChange) => { event.target.value = event.target.v
 const forceUpperCase = (event: FieldChange) => { event.target.value = event.target.value.toUpperCase() }
 
 export const Settings = () => {
+  usePageTitle('Settings')
   const { shop } = useSession()
   const dispatch = useDispatch()
   const showToast = useToast()

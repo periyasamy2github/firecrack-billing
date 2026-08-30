@@ -15,6 +15,7 @@ import { ROUTES } from '../../utils/routes'
 import { api } from '../../services/api'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/InvoicePrint.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 type PrintFormat = 'thermal' | 'a4'
 
@@ -41,6 +42,7 @@ export const InvoicePrint = () => {
   const billId = params.billId ?? ''
   const [bill, setBill] = useState<Bill | null>(navState?.bill ?? null)
   const [notFound, setNotFound] = useState(false)
+  usePageTitle(bill ? `Bill ${bill.billNo}` : 'Bill')
 
   // Printing from a fresh page load (no nav state) — fetch the one bill by its encrypted id.
   useEffect(() => {

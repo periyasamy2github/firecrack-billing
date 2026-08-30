@@ -27,6 +27,7 @@ import { loadProducts } from '../../redux/productsSlice'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { useToast } from '../../hooks/useToast'
 import styles from '../../css/pages/NewBill.module.css'
+import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const NewBill = () => {
   const navigate = useNavigate()
@@ -44,20 +45,18 @@ export const NewBill = () => {
 
   const [items, setItems] = useState<BillLineItem[]>([])
   const [customerName, setCustomerName] = useState('')
-  // A payment type's id, or MIXED with per-type amounts that must add up to the total.
   const [paymentSelection, setPaymentSelection] = useState<string>('')
   const [mixedAmounts, setMixedAmounts] = useState<Record<string, string>>({})
   const [gstApplicable, setGstApplicable] = useState(false)
   const [billDiscountType, setBillDiscountType] = useState<BillDiscountType>('percent')
   const [saving, setSaving] = useState(false)
 
-  // Edit mode: the bill loads by its encrypted id, prefills everything, and saves via PUT.
   const [editBill, setEditBill] = useState<Bill | null>(null)
   const [editNotFound, setEditNotFound] = useState(false)
-  // What this bill already holds per product code — its stock is spoken for, so qty may go that far above shelf stock.
   const originalQty = useRef<Record<string, number>>({})
 
-  // The whole catalogue loads once so search and scanning read from memory. Empty id = no counter exists yet.
+  usePageTitle(editing ? (editBill ? `Edit ${editBill.billNo}` : 'Edit Bill') : `New Bill · ${nextBillNo}`)
+
   const selectedCounterId = (counterScope === 'all' ? billingCounter?.id : counterScope) ?? ''
   const billingCounterId = editing ? (editBill?.counterId ?? '') : selectedCounterId
   const [loadingProducts, setLoadingProducts] = useState(true)
@@ -102,6 +101,18 @@ export const NewBill = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editBillId])
 
+  const hasUnfinishedBill = items.length > 0
+
+  useEffect(() => {
+    if (!hasUnfinishedBill) return
+    const confirmLeave = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', confirmLeave)
+    return () => window.removeEventListener('beforeunload', confirmLeave)
+  }, [hasUnfinishedBill])
+
   const customerMobile = watch('customerMobile')
   const billDiscountValue = watch('billDiscountValue')
 
@@ -109,7 +120,6 @@ export const NewBill = () => {
   const totals = computeBillTotals(items, gstApplicable, billDiscount)
   const showToast = useToast()
 
-  // Cash (or whichever type comes first) is preselected once the types arrive.
   const effectiveSelection = paymentSelection || activePaymentTypes[0]?.id || ''
 
   const buildPayments = (): BillPayment[] => {
@@ -132,8 +142,7 @@ export const NewBill = () => {
       return [...prev, { lineId: `L${nextLineId.current++}`, product, qty: 1 }]
     })
 
-  // Never let a line exceed what's on the shelf — createBill rejects the whole bill otherwise.
-  // While editing, this bill's own quantities already left the shelf, so they count as available.
+  // Cap qty at available stock.
   const updateQty = (lineId: string, qty: number) =>
     setItems((prev) => prev.map((i) => (i.lineId === lineId
       ? { ...i, qty: Math.min(qty, i.product.stock + (editing ? originalQty.current[i.product.code] ?? 0 : 0)) }

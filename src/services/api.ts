@@ -2,6 +2,7 @@
 import axios from 'axios'
 import { store } from '../redux/store'
 import { showToast } from '../redux/uiSlice'
+import { GENERIC_ERROR, NO_CONNECTION_ERROR } from '../utils/errorMessage'
 import type {
   Bill, BillMutation, BillsPage, BillsQuery, Counter, DailyStatementData, DashboardStats, ImportResult,
   LoginResult, NewBillPayload, PaymentType, Product, SessionData, Shop, User,
@@ -32,17 +33,17 @@ client.interceptors.response.use(
   (error) => {
     const url: string = error.config?.url ?? ''
 
-    // Signing out with an already-dead token is fine — nothing to show, nowhere to bounce.
     if (url.includes('/logout')) return Promise.reject(error)
 
-    // A 401 on anything other than the login attempt means our token died — bounce to login.
     if (error.response?.status === 401 && !url.includes('/login')) {
       setToken(null)
       window.location.assign(`${import.meta.env.BASE_URL}login`)
       return Promise.reject(new Error('Your session has ended. Please sign in again.'))
     }
 
-    const message = error.response?.data?.message ?? 'Something went wrong'
+    const message = error.response
+      ? (error.response.status >= 500 ? GENERIC_ERROR : (error.response.data?.message ?? GENERIC_ERROR))
+      : NO_CONNECTION_ERROR
     store.dispatch(showToast({ message, severity: 'error' }))
     return Promise.reject(new Error(message))
   },

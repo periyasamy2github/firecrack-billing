@@ -16,21 +16,18 @@ export const useSession = () => {
   const counterScope = useSelector((state) => state.session.counterScope)
 
   const role: UserRole = currentUser?.role ?? 'Staff'
-  // The counter the screens are showing; undefined while a Super Admin views all counters.
   const selectedCounter = counterScope === 'all' ? undefined : counters.find((counter) => counter.id === counterScope)
 
   return {
     shop,
     counters,
     paymentTypes,
-    // The ones the billing screen offers; Settings shows all of them.
     activePaymentTypes: paymentTypes.filter((type) => type.active),
     currentUser,
     role,
     isSuperAdmin: role === 'Super Admin',
     counterScope,
     selectedCounter,
-    // A bill is always raised on one counter: the selected one, or the first when viewing all.
     billingCounter: selectedCounter ?? counters[0],
     nextBillNo: `${shop.invoicePrefix}${shop.nextInvoiceNumber}`,
     setCounterScope: (scope: CounterScope) => dispatch(setCounterScopeAction(scope)),

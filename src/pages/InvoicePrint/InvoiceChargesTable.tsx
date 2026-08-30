@@ -8,7 +8,6 @@ interface InvoiceChargesTableProps {
   gst: boolean
   cgstLabel: string
   sgstLabel: string
-  /** e.g. "10%" — printed beside the ₹ discount so both figures appear. */
   discountPercent?: string | null
 }
 

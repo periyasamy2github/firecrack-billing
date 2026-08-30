@@ -11,7 +11,6 @@ import styles from '../../css/pages/BillSummaryRail.module.css'
 
 export const MIXED = 'mixed'
 
-// The three built-ins keep their icons; anything added from Settings gets the wallet.
 const ICONS: Record<string, typeof PaymentsOutlinedIcon> = {
   Cash: PaymentsOutlinedIcon,
   UPI: QrCode2OutlinedIcon,
@@ -20,7 +19,6 @@ const ICONS: Record<string, typeof PaymentsOutlinedIcon> = {
 
 interface PaymentMethodToggleProps {
   types: PaymentType[]
-  /** A payment type's id, or MIXED when the bill splits across types. */
   selection: string
   onSelectionChange: (selection: string) => void
   mixedAmounts: Record<string, string>

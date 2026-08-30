@@ -68,6 +68,11 @@ body {
   body {
     zoom: 1.07;
   }
+
+  /* Toasts keep their original size — cancel the body zoom. */
+  .MuiSnackbar-root {
+    zoom: 0.935;
+  }
 }
 
 /* Top loading bar — brand sapphire-to-amber, above every MUI layer */
