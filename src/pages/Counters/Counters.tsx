@@ -84,6 +84,8 @@ export const Counters = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Branch</TableCell>
+                  <TableCell>Code</TableCell>
+                  <TableCell align="right">Next bill no.</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell align="right">Active</TableCell>
                   <TableCell align="right" />
@@ -93,6 +95,8 @@ export const Counters = () => {
                 {counters.map((c) => (
                   <TableRow key={c.id} hover>
                     <TableCell><Typography className={styles.counterName}>{c.name}</Typography></TableCell>
+                    <TableCell><Typography className={styles.counterName}>{c.code ?? '—'}</Typography></TableCell>
+                    <TableCell align="right"><Typography className={styles.counterName}>{c.code ? `${c.code}-${String(c.nextNumber).padStart(3, '0')}` : c.nextNumber}</Typography></TableCell>
                     <TableCell><StatusPill tone={c.active ? 'paid' : 'mut'} label={c.active ? 'Active' : 'Inactive'} /></TableCell>
                     <TableCell align="right">
                       <Switch size="small" checked={c.active} onChange={() => toggleActive(c)} disabled={isPending(c.id)} />

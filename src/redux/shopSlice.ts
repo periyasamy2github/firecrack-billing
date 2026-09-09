@@ -6,7 +6,8 @@ import { createBill } from './billsSlice'
 
 const emptyShop: Shop = {
   name: '', town: '', address: '', phone: '', gstin: '', stateCode: '',
-  invoicePrefix: '', nextInvoiceNumber: 0, declaration: '', seasonTarget: 0,
+  invoicePrefix: '', nextInvoiceNumber: 0,
+  numberingMode: 'shop', declaration: '', seasonTarget: 0,
 }
 
 export const saveShop = createAsyncThunk('shop/save', (shop: Shop) => api.saveShop(shop))

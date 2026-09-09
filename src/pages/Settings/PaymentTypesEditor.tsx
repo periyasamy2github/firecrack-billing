@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, CircularProgress, Switch, TextField, Typography } from '@mui/material'
+import { CircularProgress, IconButton, Switch, TextField, Tooltip } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import { useSession } from '../../hooks/useSession'
 import { useDispatch } from '../../redux/store'
@@ -9,7 +9,7 @@ import { errorMessage } from '../../utils/errorMessage'
 import type { PaymentType } from '../../types'
 import styles from '../../css/pages/Settings.module.css'
 
-const TypeRow = ({ type }: { type: PaymentType }) => {
+const TypeTile = ({ type }: { type: PaymentType }) => {
   const dispatch = useDispatch()
   const showToast = useToast()
   const [name, setName] = useState(type.name)
@@ -35,16 +35,23 @@ const TypeRow = ({ type }: { type: PaymentType }) => {
   }
 
   return (
-    <div className={styles.paymentTypeRow}>
+    <div className={type.active ? styles.typeTile : `${styles.typeTile} ${styles.typeTileOff}`}>
       <TextField
+        variant="standard"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onBlur={() => save({})}
-        size="small"
         disabled={saving}
+        fullWidth
+        InputProps={{ disableUnderline: true, className: styles.typeTileInput }}
       />
-      <Typography variant="caption">{type.active ? 'Shown on billing' : 'Hidden'}</Typography>
-      {saving ? <CircularProgress size={16} /> : <Switch size="small" checked={type.active} onChange={(e) => save({ active: e.target.checked })} />}
+      {saving
+        ? <CircularProgress size={16} />
+        : (
+          <Tooltip title={type.active ? 'Shown on billing' : 'Hidden from billing'}>
+            <Switch size="small" checked={type.active} onChange={(e) => save({ active: e.target.checked })} />
+          </Tooltip>
+        )}
     </div>
   )
 }
@@ -72,26 +79,23 @@ export const PaymentTypesEditor = () => {
   }
 
   return (
-    <div className={styles.paymentTypesList}>
-      {paymentTypes.map((type) => <TypeRow key={type.id} type={type} />)}
+    <div className={styles.typeGrid}>
+      {paymentTypes.map((type) => <TypeTile key={type.id} type={type} />)}
 
-      <div className={styles.paymentTypeRow}>
+      <div className={`${styles.typeTile} ${styles.typeAdd}`}>
         <TextField
+          variant="standard"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') void addType() }}
-          placeholder="New payment type…"
-          size="small"
+          placeholder="New payment type"
           disabled={adding}
+          fullWidth
+          InputProps={{ disableUnderline: true, className: styles.typeTileInput }}
         />
-        <Button
-          size="small"
-          startIcon={adding ? <CircularProgress size={14} /> : <AddRoundedIcon />}
-          onClick={addType}
-          disabled={!newName.trim() || adding}
-        >
-          Add
-        </Button>
+        <IconButton size="small" color="primary" onClick={addType} disabled={adding}>
+          {adding ? <CircularProgress size={14} /> : <AddRoundedIcon fontSize="small" />}
+        </IconButton>
       </div>
     </div>
   )

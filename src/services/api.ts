@@ -76,7 +76,7 @@ export const api = {
   cancelBill: async (billNo: string) => (await client.post<BillMutation>('/bills/cancel', { billNo })).data,
   reprintBill: async (billNo: string) => (await client.post<{ bill: Bill }>('/bills/reprint', { billNo })).data,
 
-  saveCounter: async (payload: { name: string; active: boolean }, id?: string) =>
+  saveCounter: async (payload: { name: string; code: string; nextNumber: number; active: boolean }, id?: string) =>
     id ? (await client.put<Counter>(`/counters/${id}`, payload)).data : (await client.post<Counter>('/counters', payload)).data,
 
   savePaymentType: async (payload: { name: string; active: boolean }, id?: string) =>

@@ -34,7 +34,7 @@ export const NewBill = () => {
   const params = useParams<{ billId: string }>()
   const editBillId = params.billId ?? ''
   const editing = Boolean(editBillId)
-  const { nextBillNo, billingCounter, counterScope, isSuperAdmin, currentUser, activePaymentTypes } = useSession()
+  const { billingCounter, counterScope, isSuperAdmin, currentUser, activePaymentTypes } = useSession()
   const dispatch = useDispatch()
   const products = useSelector((state) => state.products.items)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -55,7 +55,7 @@ export const NewBill = () => {
   const [editNotFound, setEditNotFound] = useState(false)
   const originalQty = useRef<Record<string, number>>({})
 
-  usePageTitle(editing ? (editBill ? `Edit ${editBill.billNo}` : 'Edit Bill') : `New Bill · ${nextBillNo}`)
+  usePageTitle(editing ? (editBill ? `Edit ${editBill.billNo}` : 'Edit Bill') : 'New Bill')
 
   const selectedCounterId = (counterScope === 'all' ? billingCounter?.id : counterScope) ?? ''
   const billingCounterId = editing ? (editBill?.counterId ?? '') : selectedCounterId
@@ -247,7 +247,7 @@ export const NewBill = () => {
         title={editing ? 'Edit Bill' : 'New Bill'}
         crumb={editing
           ? `${editBill!.billNo} · ${editBill!.date} · ${editBill!.counter} · editing`
-          : `${nextBillNo} · ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${currentUser?.counter ?? billingCounter!.name} · ${loadingProducts ? 'loading products…' : `${products.length} items ready`}`}
+          : `${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${currentUser?.counter ?? billingCounter!.name} · ${loadingProducts ? 'loading products…' : `${products.length} items ready`}`}
         actions={
           <>
             {!editing && isSuperAdmin && counterScope === 'all' && (

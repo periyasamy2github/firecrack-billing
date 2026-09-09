@@ -26,3 +26,10 @@
 .dialogActions {
   padding: 0 24px 20px;
 }
+
+.codeRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}

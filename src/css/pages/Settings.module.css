@@ -38,20 +38,49 @@
   margin-bottom: 12px;
 }
 
-.targetField {
-  max-width: 260px;
+.fullCard {
+  grid-column: 1 / -1;
 }
 
-.paymentTypesList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 460px;
-}
-
-.paymentTypeRow {
+.typeGrid {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.typeTile {
+  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.typeTileOff {
+  opacity: 0.55;
+}
+
+.typeTileOff:focus-within {
+  opacity: 1;
+}
+
+.typeTileInput input {
+  font-size: 0.875rem;
+  padding: 4px 0;
+}
+
+.typeAdd {
+  border-style: dashed;
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.typeAdd input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.numberingMode {
+  margin-bottom: 14px;
 }

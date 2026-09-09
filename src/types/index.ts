@@ -9,6 +9,7 @@ export interface Shop {
   stateCode: string
   invoicePrefix: string
   nextInvoiceNumber: number
+  numberingMode: 'shop' | 'branch'
   declaration: string
   seasonTarget: number
 }
@@ -16,6 +17,8 @@ export interface Shop {
 export interface Counter {
   id: string
   name: string
+  code: string | null
+  nextNumber: number
   active: boolean
 }
 

@@ -7,6 +7,8 @@ import styles from '../../css/pages/Counters.module.css'
 
 const counterSchema = z.object({
   name: z.string().trim().min(1, 'Branch name is required'),
+  code: z.string().trim().min(2, 'At least 2 letters').max(6, 'At most 6 letters').regex(/^[A-Za-z0-9]+$/, 'Letters and digits only'),
+  nextNumber: z.string().trim().refine((value) => value === '' || (/^\d+$/.test(value) && Number(value) >= 1), 'Enter a number of at least 1'),
 })
 
 type CounterFormValues = z.infer<typeof counterSchema>
@@ -21,13 +23,13 @@ interface CounterDialogProps {
 export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialogProps) => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CounterFormValues>({
     resolver: zodResolver(counterSchema),
-    defaultValues: { name: counter?.name ?? '' },
+    defaultValues: { name: counter?.name ?? '', code: counter?.code ?? '', nextNumber: counter ? String(counter.nextNumber) : '' },
   })
 
-  const save = ({ name }: CounterFormValues) =>
+  const save = ({ name, code, nextNumber }: CounterFormValues) =>
     onSubmit(counter
-      ? { ...counter, name: name.trim() }
-      : { id: `c${Date.now()}`, name: name.trim(), active: true })
+      ? { ...counter, name: name.trim(), code: code.trim().toUpperCase(), nextNumber: nextNumber ? Number(nextNumber) : counter.nextNumber }
+      : { id: `c${Date.now()}`, name: name.trim(), code: code.trim().toUpperCase(), nextNumber: nextNumber ? Number(nextNumber) : 1, active: true })
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -44,6 +46,23 @@ export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialo
           error={Boolean(errors.name)}
           helperText={errors.name?.message || ' '}
         />
+        <div className={styles.codeRow}>
+          <TextField
+            label="Code"
+            {...register('code')}
+            required
+            placeholder="ERD"
+            inputProps={{ style: { textTransform: 'uppercase' } }}
+            error={Boolean(errors.code)}
+            helperText={errors.code?.message || 'Used for per-branch bill numbers, e.g. ERD-001'}
+          />
+          <TextField
+            label="Next bill number"
+            {...register('nextNumber')}
+            error={Boolean(errors.nextNumber)}
+            helperText={errors.nextNumber?.message || 'Optional — runs automatically'}
+          />
+        </div>
       </DialogContent>
       <DialogActions className={styles.dialogActions}>
         <Button onClick={onClose} disabled={isSubmitting}>Cancel</Button>

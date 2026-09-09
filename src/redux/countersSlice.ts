@@ -7,7 +7,7 @@ import type { RootState } from './store'
 export const saveCounter = createAsyncThunk('counters/save', (counter: Counter, { getState }) => {
   const state = getState() as RootState
   const existing = state.counters.items.some((c) => c.id === counter.id)
-  return api.saveCounter({ name: counter.name, active: counter.active }, existing ? counter.id : undefined)
+  return api.saveCounter({ name: counter.name, code: counter.code ?? '', nextNumber: counter.nextNumber, active: counter.active }, existing ? counter.id : undefined)
 })
 
 const upsert = (items: Counter[], incoming: Counter) => {
@@ -26,7 +26,7 @@ const countersSlice = createSlice({
         const { user, counters } = action.payload
         // Staff get an empty list; they already know their counter.
         state.items = user.counterId
-          ? [{ id: user.counterId, name: user.counter ?? '', active: true }]
+          ? [{ id: user.counterId, name: user.counter ?? '', code: null, nextNumber: 1, active: true }]
           : counters
       })
       .addCase(saveCounter.fulfilled, (state, action) => {

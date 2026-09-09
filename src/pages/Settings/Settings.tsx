@@ -1,7 +1,7 @@
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Button, Card, CircularProgress, TextField, Typography } from '@mui/material'
+import { Button, Card, CircularProgress, MenuItem, TextField, Typography } from '@mui/material'
 import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { useSession } from '../../hooks/useSession'
@@ -31,6 +31,7 @@ const settingsSchema = z.object({
   invoicePrefix: z.string().trim().min(1, 'Prefix is required'),
   declaration: z.string(),
   nextInvoiceNumber: positiveInteger('Enter a valid invoice number'),
+  numberingMode: z.enum(['shop', 'branch']),
   seasonTarget: positiveInteger('Enter a valid season target'),
 })
 
@@ -47,7 +48,7 @@ export const Settings = () => {
   const dispatch = useDispatch()
   const showToast = useToast()
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SettingsFormValues>({
+  const { register, control, watch, handleSubmit, formState: { errors, isSubmitting } } = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       name: shop.name,
@@ -56,6 +57,7 @@ export const Settings = () => {
       gstin: shop.gstin,
       invoicePrefix: shop.invoicePrefix,
       nextInvoiceNumber: String(shop.nextInvoiceNumber),
+      numberingMode: shop.numberingMode,
       declaration: shop.declaration,
       seasonTarget: String(shop.seasonTarget),
     },
@@ -71,6 +73,7 @@ export const Settings = () => {
         gstin: values.gstin.trim(),
         invoicePrefix: values.invoicePrefix.trim(),
         nextInvoiceNumber: Number(values.nextInvoiceNumber),
+        numberingMode: values.numberingMode,
         declaration: values.declaration,
         seasonTarget: Number(values.seasonTarget),
       })).unwrap()
@@ -112,12 +115,30 @@ export const Settings = () => {
                 helperText={errors.address?.message || ' '}
               />
               <TextField label="GSTIN" {...register('gstin', { onChange: forceUpperCase })} size="small" fullWidth error={Boolean(errors.gstin)} helperText={errors.gstin?.message || ' '} />
+              <TextField
+                label="Season sales target (₹)"
+                {...register('seasonTarget', { onChange: digitsOnly })}
+                size="small"
+                error={Boolean(errors.seasonTarget)}
+                helperText={errors.seasonTarget?.message || 'Shown on the dashboard as season progress'}
+              />
             </div>
           </SettingsSection>
           </Card>
 
           <Card>
-          <SettingsSection title="Invoice & numbering" desc="Printed on every invoice.">
+          <SettingsSection title="Invoice & numbering" desc="Printed on every invoice. Per-branch numbering takes its codes and counters from the Branches page.">
+            <Controller
+              name="numberingMode"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} label="Bill numbering" select size="small" fullWidth className={styles.numberingMode}>
+                  <MenuItem value="shop">One series for the whole shop</MenuItem>
+                  <MenuItem value="branch">Separate series per branch (ERD-001, CHE-001)</MenuItem>
+                </TextField>
+              )}
+            />
+            {watch('numberingMode') === 'shop' && (
             <div className={styles.numberGrid}>
               <TextField label="Prefix" {...register('invoicePrefix')} size="small" error={Boolean(errors.invoicePrefix)} helperText={errors.invoicePrefix?.message || ' '} />
               <TextField
@@ -128,28 +149,14 @@ export const Settings = () => {
                 helperText={errors.nextInvoiceNumber?.message || ' '}
               />
             </div>
+            )}
             <TextField label="Declaration printed on invoice" {...register('declaration')} size="small" fullWidth multiline minRows={4} />
           </SettingsSection>
           </Card>
 
-          <Card>
+          <Card className={styles.fullCard}>
           <SettingsSection title="Payment types" desc="Ways a customer can pay. Switched-off types disappear from the billing screen; Mixed lets one bill split across types. Saved as you edit — the Save button above is not needed.">
             <PaymentTypesEditor />
-          </SettingsSection>
-          </Card>
-
-          <Card>
-          <SettingsSection title="Season target" desc="Shown on the Super Admin dashboard as season progress.">
-            <div className={styles.targetField}>
-              <TextField
-                label="Season sales target (₹)"
-                {...register('seasonTarget', { onChange: digitsOnly })}
-                size="small"
-                fullWidth
-                error={Boolean(errors.seasonTarget)}
-                helperText={errors.seasonTarget?.message || ' '}
-              />
-            </div>
           </SettingsSection>
           </Card>
         </div>
