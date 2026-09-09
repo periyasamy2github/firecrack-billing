@@ -24,10 +24,12 @@ class ReportController extends Controller
         $counterId = $user->isSuperAdmin()
             ? (($scope && $scope !== 'all') ? (int) $scope : null)
             : $user->counter_id;
+        $userId = $user->isSuperAdmin() ? null : $user->id;
 
         $date = $data['date'];
         $dayBills = fn () => Bill::whereDate('billed_at', $date)
-            ->when($counterId, fn ($query) => $query->where('counter_id', $counterId));
+            ->when($counterId, fn ($query) => $query->where('counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('user_id', $userId));
 
         $summary = $dayBills()->where('status', 'Paid')
             ->selectRaw('COUNT(*) as bills, COALESCE(SUM(grand_total), 0) as sales, COALESCE(SUM(discount), 0) as discount, COALESCE(SUM(tax_total), 0) as gst')
@@ -39,6 +41,7 @@ class ReportController extends Controller
             ->where('bills.status', 'Paid')
             ->whereDate('bills.billed_at', $date)
             ->when($counterId, fn ($query) => $query->where('bills.counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('bills.user_id', $userId))
             ->selectRaw('payment_types.name as type, SUM(bill_payments.amount) as amount, COUNT(DISTINCT bill_payments.bill_id) as bills')
             ->groupBy('payment_types.name')
             ->orderByDesc('amount')
@@ -51,6 +54,7 @@ class ReportController extends Controller
             ->where('bills.status', 'Paid')
             ->whereDate('bills.billed_at', $date)
             ->when($counterId, fn ($query) => $query->where('bills.counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('bills.user_id', $userId))
             ->selectRaw('bill_items.name as name, SUM(bill_items.qty) as qty, SUM(bill_items.rate * bill_items.qty) as amount')
             ->groupBy('bill_items.name')
             ->orderByDesc('amount')

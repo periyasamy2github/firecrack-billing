@@ -72,13 +72,13 @@ class Bill extends Model
         return $this->payments->count() === 1 ? $this->payments->first()->paymentType->name : 'Mixed';
     }
 
-    /** Super Admin sees every counter; staff see only their own counter's bills. */
-    public function scopeVisibleTo(Builder $query, User $user): Builder
+    // Super Admin can see every bill; staff only the bills they created.
+    public function scopeForUser(Builder $query, User $user): Builder
     {
         if ($user->isSuperAdmin()) {
             return $query;
         }
 
-        return $query->where('counter_id', $user->counter_id);
+        return $query->where('user_id', $user->id);
     }
 }

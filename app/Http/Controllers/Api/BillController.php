@@ -25,7 +25,7 @@ class BillController extends Controller
         $user = $request->user();
 
         $query = Bill::query()
-            ->visibleTo($user)
+            ->forUser($user)
             ->with(['counter', 'user', 'items.product', 'payments.paymentType']);
 
         // A super admin can narrow to one counter; staff are already limited to their own.
@@ -231,6 +231,8 @@ class BillController extends Controller
 
     private function authorizeBill(User $user, Bill $bill): void
     {
-        $this->authorizeCounter($user, $bill->counter_id);
+        if (! $user->isSuperAdmin() && $bill->user_id !== $user->id) {
+            abort(response()->json(['message' => "You don't have access to this bill."], 403));
+        }
     }
 }

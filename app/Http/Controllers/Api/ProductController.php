@@ -20,7 +20,7 @@ class ProductController extends Controller
         return [
             'code' => ['required', 'string', 'max:60'],
             'name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:40'],
+            'category' => ['nullable', 'string', 'max:40'],
             'hsn' => ['nullable', 'string', 'max:20'],
             'mrp' => ['nullable', 'numeric', 'gt:0'],
             'rate' => ['required', 'numeric', 'gt:0'],
@@ -143,7 +143,7 @@ class ProductController extends Controller
 
         $product->fill([
             'name' => $data['name'],
-            'category' => $data['category'],
+            'category' => $data['category'] ?? '',
             'hsn' => $data['hsn'] ?? '',
             'mrp' => $data['mrp'] ?? null,
             'rate' => $data['rate'],

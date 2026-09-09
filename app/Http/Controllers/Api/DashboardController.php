@@ -18,13 +18,14 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // Staff see their own counter. A super admin sees all counters, or the one they clicked.
+        // Staff see only their own bills. A super admin sees all counters, or the one they clicked.
         $scope = $request->query('scope');
         $counterId = $user->isSuperAdmin()
             ? (($scope && $scope !== 'all') ? $scope : null)
-            : $user->counter_id;
+            : null;
+        $userId = $user->isSuperAdmin() ? null : $user->id;
 
-        $totals = $this->paidBills($counterId)
+        $totals = $this->paidBills($counterId, $userId)
             ->selectRaw('COUNT(*) as bills, COALESCE(SUM(grand_total), 0) as sales, COALESCE(SUM(tax_total), 0) as gst')
             ->first();
 
@@ -36,10 +37,10 @@ class DashboardController extends Controller
             'billCount' => $billCount,
             'avgBill' => $billCount ? (int) round($sales / $billCount) : 0,
             'gstCollected' => (float) $totals->gst,
-            'trend' => $this->dailyTrend($counterId),
-            'paymentMix' => $this->paymentMix($counterId),
-            'topItems' => $this->topItems($counterId),
-            'recentBills' => BillResource::collection($this->recentBills($counterId)),
+            'trend' => $this->dailyTrend($counterId, $userId),
+            'paymentMix' => $this->paymentMix($counterId, $userId),
+            'topItems' => $this->topItems($counterId, $userId),
+            'recentBills' => BillResource::collection($this->recentBills($counterId, $userId)),
         ];
 
         if ($user->isSuperAdmin()) {
@@ -51,17 +52,18 @@ class DashboardController extends Controller
         return response()->json($data);
     }
 
-    // Paid bills, limited to one counter (or all counters when $counterId is null).
-    private function paidBills($counterId)
+    // Paid bills, narrowed to one counter and, for staff, their own bills.
+    private function paidBills($counterId, $userId = null)
     {
         return Bill::where('status', 'Paid')
-            ->when($counterId, fn ($query) => $query->where('counter_id', $counterId));
+            ->when($counterId, fn ($query) => $query->where('counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('user_id', $userId));
     }
 
     // Sales per day for the last 10 selling days, in rupees.
-    private function dailyTrend($counterId): array
+    private function dailyTrend($counterId, $userId = null): array
     {
-        return $this->paidBills($counterId)
+        return $this->paidBills($counterId, $userId)
             ->selectRaw('DATE(billed_at) as day, SUM(grand_total) as total')
             ->groupBy('day')
             ->orderByDesc('day')
@@ -77,13 +79,14 @@ class DashboardController extends Controller
     }
 
     // How much came in per payment type; a mixed bill contributes each split to its own type.
-    private function paymentMix($counterId): array
+    private function paymentMix($counterId, $userId = null): array
     {
         return BillPayment::query()
             ->join('bills', 'bills.id', '=', 'bill_payments.bill_id')
             ->join('payment_types', 'payment_types.id', '=', 'bill_payments.payment_type_id')
             ->where('bills.status', 'Paid')
             ->when($counterId, fn ($query) => $query->where('bills.counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('bills.user_id', $userId))
             ->selectRaw('payment_types.name as method, SUM(bill_payments.amount) as amount')
             ->groupBy('payment_types.name')
             ->orderByDesc('amount')
@@ -93,11 +96,12 @@ class DashboardController extends Controller
     }
 
     // The seven products that brought in the most money.
-    private function topItems($counterId): array
+    private function topItems($counterId, $userId = null): array
     {
         return BillItem::join('bills', 'bills.id', '=', 'bill_items.bill_id')
             ->where('bills.status', 'Paid')
             ->when($counterId, fn ($query) => $query->where('bills.counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('bills.user_id', $userId))
             ->selectRaw('bill_items.name as name, SUM(bill_items.rate * bill_items.qty) as amount')
             ->groupBy('bill_items.name')
             ->orderByDesc('amount')
@@ -108,9 +112,10 @@ class DashboardController extends Controller
     }
 
     // The ten newest bills for the "Recent bills" panel.
-    private function recentBills($counterId)
+    private function recentBills($counterId, $userId = null)
     {
         return Bill::when($counterId, fn ($query) => $query->where('counter_id', $counterId))
+            ->when($userId, fn ($query) => $query->where('user_id', $userId))
             ->with(['counter', 'user', 'items.product', 'payments.paymentType'])
             ->latest('billed_at')
             ->latest('id')
