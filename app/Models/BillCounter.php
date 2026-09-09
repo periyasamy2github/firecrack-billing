@@ -12,11 +12,13 @@ class BillCounter extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'next_number' => 'integer',
     ];
 
     public function users(): HasMany

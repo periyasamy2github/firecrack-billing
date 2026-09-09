@@ -15,6 +15,7 @@ class Setting extends Model
         'state_code',
         'invoice_prefix',
         'next_number',
+        'numbering_mode',
         'declaration',
         'season_target',
     ];

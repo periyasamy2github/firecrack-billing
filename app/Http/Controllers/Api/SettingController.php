@@ -19,6 +19,7 @@ class SettingController extends Controller
             'gstin' => ['nullable', 'string', 'regex:/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/'],
             'invoicePrefix' => ['required', 'string', 'max:40'],
             'nextInvoiceNumber' => ['required', 'integer', 'min:1'],
+            'numberingMode' => ['required', \Illuminate\Validation\Rule::in(['shop', 'branch'])],
             'declaration' => ['required', 'string'],
             'seasonTarget' => ['required', 'numeric', 'min:0'],
         ]);
@@ -31,6 +32,7 @@ class SettingController extends Controller
             'gstin' => $data['gstin'],
             'invoice_prefix' => $data['invoicePrefix'],
             'next_number' => $data['nextInvoiceNumber'],
+            'numbering_mode' => $data['numberingMode'],
             'declaration' => $data['declaration'],
             'season_target' => $data['seasonTarget'],
         ]);

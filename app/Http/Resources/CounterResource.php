@@ -12,6 +12,8 @@ class CounterResource extends JsonResource
         return [
             'id' => (string) $this->id, // the SPA uses string ids throughout
             'name' => $this->name,
+            'code' => $this->code,
+            'nextNumber' => $this->next_number,
             'active' => $this->active,
         ];
     }

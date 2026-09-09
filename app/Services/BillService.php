@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bill;
+use App\Models\BillCounter;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
@@ -212,6 +213,12 @@ class BillService
     {
         $settings = Setting::lockForUpdate()->find(1);
 
+        if ($settings->numbering_mode === 'branch') {
+            $this->assignBranchNumber($bill);
+
+            return;
+        }
+
         // Skip numbers already used.
         $number = $settings->next_number;
         while (Bill::where('bill_no', $settings->invoice_prefix.$number)->exists()) {
@@ -221,6 +228,21 @@ class BillService
         $bill->bill_no = $settings->invoice_prefix.$number;
         $settings->next_number = $number + 1;
         $settings->save();
+    }
+
+    private function assignBranchNumber(Bill $bill): void
+    {
+        $counter = BillCounter::lockForUpdate()->find($bill->counter_id);
+
+        // Skip numbers already used.
+        $number = $counter->next_number;
+        while (Bill::where('bill_no', sprintf('%s-%03d', $counter->code, $number))->exists()) {
+            $number++;
+        }
+
+        $bill->bill_no = sprintf('%s-%03d', $counter->code, $number);
+        $counter->next_number = $number + 1;
+        $counter->save();
     }
 
     private function assertStatusIs(Bill $bill, string $status, string $message): void

@@ -15,10 +15,20 @@ class CounterController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('counters', 'name')],
+            'code' => ['required', 'string', 'alpha_num', 'max:6', Rule::unique('counters', 'code')],
+            'nextNumber' => ['nullable', 'integer', 'min:1'],
             'active' => ['required', 'boolean'],
         ]);
 
-        return new CounterResource(BillCounter::create($data));
+        $counter = BillCounter::create([
+            'name' => $data['name'],
+            'code' => strtoupper($data['code']),
+            'active' => $data['active'],
+        ]);
+        $counter->next_number = $data['nextNumber'] ?? 1;
+        $counter->save();
+
+        return new CounterResource($counter);
     }
 
     /** saveCounter (existing) — rename or activate/deactivate a counter. */
@@ -26,10 +36,20 @@ class CounterController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('counters', 'name')->ignore($counter->id)],
+            'code' => ['required', 'string', 'alpha_num', 'max:6', Rule::unique('counters', 'code')->ignore($counter->id)],
+            'nextNumber' => ['nullable', 'integer', 'min:1'],
             'active' => ['required', 'boolean'],
         ]);
 
-        $counter->update($data);
+        $counter->fill([
+            'name' => $data['name'],
+            'code' => strtoupper($data['code']),
+            'active' => $data['active'],
+        ]);
+        if (isset($data['nextNumber'])) {
+            $counter->next_number = $data['nextNumber'];
+        }
+        $counter->save();
 
         return new CounterResource($counter);
     }
