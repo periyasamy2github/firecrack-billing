@@ -37,6 +37,7 @@ class BillController extends Controller
         if ($search = trim((string) $request->query('search', ''))) {
             $query->where(fn ($q) => $q
                 ->where('bill_no', 'like', "%{$search}%")
+                ->orWhere('customer_name', 'like', "%{$search}%")
                 ->orWhere('customer_mobile', 'like', "%{$search}%"));
         }
 
@@ -59,6 +60,7 @@ class BillController extends Controller
         foreach (PaymentType::orderBy('sort')->orderBy('name')->pluck('name') as $typeName) {
             $counts[$typeName] = (int) ($perType[$typeName] ?? 0);
         }
+        $counts['Mixed'] = (clone $query)->has('payments', '>', 1)->count();
         $counts['Cancelled'] = (clone $query)->where('status', 'Cancelled')->count();
 
         $this->applyFilter($query, (string) $request->query('filter', 'All'));
@@ -181,6 +183,12 @@ class BillController extends Controller
     {
         if ($filter === 'Cancelled') {
             $query->where('status', 'Cancelled');
+
+            return;
+        }
+
+        if ($filter === 'Mixed') {
+            $query->has('payments', '>', 1);
 
             return;
         }
