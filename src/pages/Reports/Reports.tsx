@@ -72,11 +72,11 @@ export const Reports = () => {
     const all = await api.loadBills({ scope, search: query, filter, from: range.dateFrom || undefined, to: range.dateTo || undefined, all: true })
 
     const headers = showCounterColumn
-      ? ['Bill no.', 'Branch', 'Date', 'Customer', 'Mobile', 'Total', 'Payment', 'Status']
-      : ['Bill no.', 'Date', 'Customer', 'Mobile', 'Total', 'Payment', 'Status']
+      ? ['Bill no.', 'Branch', 'Date', 'Customer', 'Mobile', 'Created by', 'Total', 'Payment', 'Status']
+      : ['Bill no.', 'Date', 'Customer', 'Mobile', 'Created by', 'Total', 'Payment', 'Status']
 
     const rows = all.data.map((bill) => {
-      const row = [bill.billNo, bill.date, bill.customerName || 'Walk-in', bill.customerMobile, formatCurrency(getBillTotals(bill).grandTotal), bill.paymentMethod ?? '—', bill.status]
+      const row = [bill.billNo, bill.date, bill.customerName || 'Walk-in', bill.customerMobile, bill.billedBy, formatCurrency(getBillTotals(bill).grandTotal), bill.paymentMethod ?? '—', bill.status]
       return showCounterColumn ? [row[0], bill.counter, ...row.slice(1)] : row
     })
 

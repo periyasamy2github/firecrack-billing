@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CircularProgress, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { CircularProgress, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Tooltip, Typography } from '@mui/material'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
@@ -8,7 +8,8 @@ import { Mono } from '../../components/Mono'
 import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { TableCard, TableEmptyRow, TableLoadingRow } from '../../components/TableCard'
 import { getBillTotals } from '../../utils/billing'
-import { formatCurrency } from '../../utils/format'
+import { formatAmount, formatCurrency } from '../../utils/format'
+import { useBillSort } from '../../hooks/useBillSort'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/Bills.module.css'
 
@@ -27,33 +28,35 @@ interface BillsTableProps {
 
 export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onView, onEdit, onReprint, onCancel, footer }: BillsTableProps) => {
   const colSpan = viewingAll ? 11 : 10
+  const { sortedBills, sortKey, sortDir, toggleSort } = useBillSort(bills)
 
   return (
     <TableCard footer={footer}>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Bill no.</TableCell>
-            {viewingAll && <TableCell>Branch</TableCell>}
-            <TableCell>Customer</TableCell>
-            <TableCell align="right">Items</TableCell>
-            <TableCell align="right">Qty</TableCell>
-            <TableCell align="right">Total</TableCell>
-            <TableCell>Payment</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Created</TableCell>
-            <TableCell>Created by</TableCell>
+            <TableCell><TableSortLabel active={sortKey === 'billNo'} direction={sortKey === 'billNo' ? sortDir : 'asc'} onClick={() => toggleSort('billNo')}>Bill no.</TableSortLabel></TableCell>
+            {viewingAll && <TableCell><TableSortLabel active={sortKey === 'counter'} direction={sortKey === 'counter' ? sortDir : 'asc'} onClick={() => toggleSort('counter')}>Branch</TableSortLabel></TableCell>}
+            <TableCell><TableSortLabel active={sortKey === 'customer'} direction={sortKey === 'customer' ? sortDir : 'asc'} onClick={() => toggleSort('customer')}>Customer</TableSortLabel></TableCell>
+            <TableCell align="right"><TableSortLabel active={sortKey === 'items'} direction={sortKey === 'items' ? sortDir : 'asc'} onClick={() => toggleSort('items')}>Items</TableSortLabel></TableCell>
+            <TableCell align="right"><TableSortLabel active={sortKey === 'qty'} direction={sortKey === 'qty' ? sortDir : 'asc'} onClick={() => toggleSort('qty')}>Qty</TableSortLabel></TableCell>
+            <TableCell align="right"><TableSortLabel active={sortKey === 'total'} direction={sortKey === 'total' ? sortDir : 'asc'} onClick={() => toggleSort('total')}>Total</TableSortLabel></TableCell>
+            <TableCell><TableSortLabel active={sortKey === 'payment'} direction={sortKey === 'payment' ? sortDir : 'asc'} onClick={() => toggleSort('payment')}>Payment</TableSortLabel></TableCell>
+            <TableCell><TableSortLabel active={sortKey === 'status'} direction={sortKey === 'status' ? sortDir : 'asc'} onClick={() => toggleSort('status')}>Status</TableSortLabel></TableCell>
+            <TableCell><TableSortLabel active={sortKey === 'date'} direction={sortKey === 'date' ? sortDir : 'asc'} onClick={() => toggleSort('date')}>Created</TableSortLabel></TableCell>
+            <TableCell><TableSortLabel active={sortKey === 'billedBy'} direction={sortKey === 'billedBy' ? sortDir : 'asc'} onClick={() => toggleSort('billedBy')}>Created by</TableSortLabel></TableCell>
             <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {!loading && bills.map((bill) => {
+          {!loading && sortedBills.map((bill) => {
             const totals = getBillTotals(bill)
             return (
               <TableRow key={bill.billNo} hover>
                 <TableCell>
                   <div className={styles.billNoCell}>
-                    <Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono>
+                    <Mono sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{bill.billNo}</Mono>
+                    <div className={styles.billTags}>
                     {bill.gstApplicable && (
                       <Tooltip title={`GST ${formatCurrency(totals.cgst + totals.sgst)}`}>
                         <span><StatusPill tone="info" dot={false} label="GST" /></span>
@@ -69,6 +72,7 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                         <span><StatusPill tone="mut" dot={false} label="Edited" /></span>
                       </Tooltip>
                     )}
+                    </div>
                   </div>
                 </TableCell>
                 {viewingAll && <TableCell><Typography className={styles.counterCell}>{bill.counter}</Typography></TableCell>}
@@ -84,7 +88,14 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                   </Mono>
                 </TableCell>
                 <TableCell>
-                  {bill.paymentMethod ? <StatusPill tone="paid" dot={false} label={bill.paymentMethod} /> : <StatusPill tone="mut" dot={false} label="—" />}
+                  {bill.payments.length > 1 ? (
+                  <>
+                    <StatusPill tone="paid" dot={false} label="Mixed" />
+                    <Mono sx={{ display: 'block', fontSize: 10, color: 'text.secondary' }}>
+                      {bill.payments.map((payment) => `${payment.type} ₹${formatAmount(payment.amount)}`).join(' · ')}
+                    </Mono>
+                  </>
+                ) : bill.paymentMethod ? <StatusPill tone="paid" dot={false} label={bill.paymentMethod} /> : <StatusPill tone="mut" dot={false} label="—" />}
                 </TableCell>
                 <TableCell>
                   <div className={styles.statusRow}>

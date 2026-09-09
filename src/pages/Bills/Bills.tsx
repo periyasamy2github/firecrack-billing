@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Chip, Typography } from '@mui/material'
+import { Button, Card, Chip, TextField, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import { useConfirm } from 'material-ui-confirm'
 import { PageHeader } from '../../components/PageHeader'
@@ -35,8 +35,9 @@ export const Bills = () => {
   const showToast = useToast()
   const { isPending, run } = usePendingAction()
 
+  const [range, setRange] = useState({ from: '', to: '' })
   const { query, setQuery, filter, setFilter, page, rowsPerPage, changePage, changeRowsPerPage, result, refetch } =
-    useBillsPage({ scope: counterScope })
+    useBillsPage({ scope: counterScope, from: range.from || undefined, to: range.to || undefined })
 
   usePageTitle(`Bills · ${result.total}`)
 
@@ -107,7 +108,9 @@ export const Bills = () => {
       <PageContent>
         <Card className={styles.filterCard}>
           <div className={styles.filterRow}>
-            <SearchField placeholder="Bill number or customer mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
+            <SearchField placeholder="Bill no, customer name or mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
+            <TextField label="From" type="date" value={range.from} onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))} size="small" InputLabelProps={{ shrink: true }} />
+            <TextField label="To" type="date" value={range.to} onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))} size="small" InputLabelProps={{ shrink: true }} />
             {filters.map((key) => (
               <Chip
                 key={key}

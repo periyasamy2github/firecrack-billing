@@ -30,7 +30,7 @@ export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, se
   return (
   <Card className={styles.filterCard}>
     <div className={styles.filterRow}>
-      <SearchField placeholder="Bill number or customer mobile… (/)" value={filters.query} onChange={(query) => onChange({ query })} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
+      <SearchField placeholder="Bill no, customer name or mobile… (/)" value={filters.query} onChange={(query) => onChange({ query })} inputRef={searchInputRef} sx={{ flex: 1, minWidth: 260 }} />
       <TextField
         label="From"
         type="date"
