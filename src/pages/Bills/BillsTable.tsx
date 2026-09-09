@@ -99,7 +99,7 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                 </TableCell>
                 <TableCell>
                   <div className={styles.statusRow}>
-                    <StatusPill tone={BILL_STATUS_TONE[bill.status]} label={bill.status === 'Paid' && bill.reprintCount > 0 ? `Reprinted ×${bill.reprintCount}` : bill.status} />
+                    <StatusPill tone={BILL_STATUS_TONE[bill.status]} label={bill.status} />
                   </div>
                 </TableCell>
                 <TableCell>
