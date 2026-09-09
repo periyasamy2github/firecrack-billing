@@ -41,18 +41,22 @@ export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
         </Typography>
       )}
       <Dash />
-      <Row label="Bill" value={bill.billNo.split('/').pop() ?? bill.billNo} />
+      <Row label="Bill No" value={bill.billNo} />
       <Row label="Date" value={`${bill.date} ${bill.time}`} />
-      <Row label="Branch" value={bill.counter.replace('Branch ', '').replace('Counter ', '').split(' ')[0] + ' · ' + bill.billedBy.split(' ')[0]} />
       <Dash />
-      <Row label="Item" value="Qty × Rate      Amt" bold={false} />
+      <div className={`${styles.itemLine} ${styles.itemHead}`}>
+        <span>Item</span>
+        <span className={styles.itemQty}>Qty × Rate</span>
+        <span className={styles.itemAmount}>Amt</span>
+      </div>
       <Dash />
       {bill.items.map((item) => {
         const { rate, amount } = computeLineAmounts(item, gst)
         return (
-          <div key={item.lineId} className={styles.itemBlock}>
-            <div>{item.product.name}</div>
-            <Row label="" value={`${item.qty} × ${formatAmount(rate)}    ${formatAmount(amount)}`} />
+          <div key={item.lineId} className={styles.itemLine}>
+            <span className={styles.itemName}>{item.product.name}</span>
+            <span className={styles.itemQty}>{item.qty} × {formatAmount(rate)}</span>
+            <span className={styles.itemAmount}>{formatAmount(amount)}</span>
           </div>
         )
       })}

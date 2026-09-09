@@ -36,3 +36,8 @@
   background-color: var(--inset);
   color: var(--muted);
 }
+
+.info {
+  background-color: var(--primary-soft);
+  color: var(--info);
+}

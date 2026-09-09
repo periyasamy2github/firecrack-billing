@@ -12,7 +12,7 @@ const productFormSchema = (takenCodes: Set<string>, excludeCode: string | null) 
   z.object({
     code: z.string().trim().min(1, 'Barcode is required'),
     name: z.string().trim().min(1, 'Name is required'),
-    category: z.string().trim().min(1, 'Pick a category'),
+    category: z.string().trim(),
     mrp: z.string().refine((v) => v.trim() === '' || (/^\d+(\.\d+)?$/.test(v.trim()) && Number(v) > 0), 'MRP must be a positive number'),
     rate: positiveNumber('Rate must be a positive number'),
     gstRate: nonNegativeNumber('GST % must be 0 or more'),

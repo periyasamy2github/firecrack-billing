@@ -1,7 +1,7 @@
 ﻿import styles from '../css/components/StatusPill.module.css'
 import type { Bill } from '../types'
 
-export type PillTone = 'paid' | 'due' | 'hold' | 'mut'
+export type PillTone = 'paid' | 'due' | 'hold' | 'mut' | 'info'
 
 export const BILL_STATUS_TONE: Record<Bill['status'], PillTone> = { Paid: 'paid', Cancelled: 'due' }
 

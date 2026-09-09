@@ -16,7 +16,7 @@ export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
   const products = useSelector((state) => state.products.items)
 
   const categoryOptions = useMemo(
-    () => [...new Set([...productCategories, ...products.map((p) => p.category)])].sort(),
+    () => [...new Set([...productCategories, ...products.map((p) => p.category)])].filter(Boolean).sort(),
     [products],
   )
 
@@ -45,7 +45,7 @@ export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Category"
+                label="Category — optional"
                 error={Boolean(rowErrors?.category)}
                 helperText={rowErrors?.category?.message || ' '}
                 size="small"

@@ -63,8 +63,25 @@
   font-family: inherit;
 }
 
-.itemBlock {
+.itemLine {
+  display: grid;
+  grid-template-columns: 1fr 68px 56px;
+  gap: 6px;
+  align-items: start;
   margin-bottom: 3.2px;
+}
+
+.itemHead {
+  margin-bottom: 0;
+}
+
+.itemName {
+  word-break: break-word;
+}
+
+.itemAmount {
+  text-align: right;
+  white-space: nowrap;
 }
 
 .savedLine {
@@ -120,4 +137,18 @@
   .cancelledBanner {
     font-size: 13px;
   }
+}
+
+@media print {
+  .sheet {
+    width: 100%;
+    margin: 0;
+    padding: 2mm 3mm;
+    border: 0;
+  }
+}
+
+.itemQty {
+  text-align: right;
+  white-space: nowrap;
 }

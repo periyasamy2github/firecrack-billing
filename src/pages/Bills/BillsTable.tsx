@@ -56,7 +56,7 @@ export const BillsTable = ({ bills, loading, error, viewingAll, isPending, onVie
                     <Mono sx={{ fontWeight: 600 }}>{bill.billNo}</Mono>
                     {bill.gstApplicable && (
                       <Tooltip title={`GST ${formatCurrency(totals.cgst + totals.sgst)}`}>
-                        <span><StatusPill tone="paid" dot={false} label="GST" /></span>
+                        <span><StatusPill tone="info" dot={false} label="GST" /></span>
                       </Tooltip>
                     )}
                     {totals.billDiscountAmount > 0 && (

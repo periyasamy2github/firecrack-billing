@@ -44,7 +44,7 @@ const normalizeHeader = (h: string) => h.trim().toLowerCase().replace(/\s+/g, ' 
 const importRowSchema = z.object({
   code: z.string().trim().min(1, 'Barcode is required'),
   name: z.string().trim().min(1, 'Name is required'),
-  category: z.string().trim().min(1, 'Category is required'),
+  category: z.string().trim(),
   hsn: z.string().trim(),
   mrp: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : v), z.coerce.number().nullable()),
   rate: z.coerce.number(),

@@ -130,6 +130,8 @@ export const InvoicePrint = () => {
             </div>
           </Card>
 
+          <style>{`@media print { @page { size: ${activeFormat === 'thermal' ? '80mm auto' : 'A4 portrait'}; margin: 0; } }`}</style>
+
           <div className={`${styles.previewCol} print-area`}>
             <Typography variant="caption" className={`${styles.previewCaption} ${PREVIEW_CAPTION_CLASS[activeFormat]}`}>
               {activeFormat === 'thermal' ? '80mm — Customer receipt' : 'A4 — Tax Invoice'}
