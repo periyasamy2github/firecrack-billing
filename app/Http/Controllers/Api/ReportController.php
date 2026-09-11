@@ -62,7 +62,6 @@ class ReportController extends Controller
             ->map(fn ($row) => ['name' => $row->name, 'qty' => (int) $row->qty, 'amount' => (float) $row->amount])
             ->all();
 
-        // Per-counter breakdown for whole-shop statements.
         $perCounter = [];
         if ($counterId === null) {
             $totals = $dayBills()->where('status', 'Paid')

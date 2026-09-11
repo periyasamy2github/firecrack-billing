@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    /** Validation for one product, in the frontend's camelCase field names. */
+    // Validation rules for one product.
     private function rules(bool $stockRequired): array
     {
         return [
@@ -30,7 +30,7 @@ class ProductController extends Controller
         ];
     }
 
-    /** GET /products — the catalogue for one counter (staff) or all/one counter (super admin). */
+    // Product list for one counter, or every counter for a super admin.
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
@@ -52,7 +52,6 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
-    /** saveProduct — add a product or edit it; the stock field saves along with the rest. */
     public function store(Request $request): ProductResource
     {
         $data = $request->validate($this->rules(stockRequired: false));
@@ -62,7 +61,7 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
-    /** deleteProduct — soft delete within the product's counter; bill lines keep their snapshot. */
+    // Soft delete; bill lines keep their product snapshot.
     public function destroy(Request $request, string $code): JsonResponse
     {
         $counterId = $this->resolveCounterId($request->user(), $request->integer('counterId') ?: null);
@@ -71,7 +70,7 @@ class ProductController extends Controller
         return response()->json(['code' => $code]);
     }
 
-    /** importProducts — bulk upsert into one counter; per-row errors are collected, not fatal. */
+    // Bulk upsert; row errors are collected instead of failing the import.
     public function import(Request $request): JsonResponse
     {
         $counterId = $this->resolveCounterId($request->user(), $request->integer('counterId') ?: null);
@@ -109,7 +108,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /** Staff work in their own counter; a Super Admin must say which counter the products belong to. */
+    // Staff use their own counter; a super admin passes counterId.
     private function resolveCounterId(User $user, ?int $requested): int
     {
         if (! $user->isSuperAdmin()) {
@@ -134,7 +133,6 @@ class ProductController extends Controller
             $product->restore();
         }
 
-        // Stock saves whenever the form sends it; a brand-new product without one starts at 0.
         if (isset($data['stock'])) {
             $product->stock = $data['stock'];
         } elseif (! $product->exists) {

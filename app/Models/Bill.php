@@ -62,7 +62,6 @@ class Bill extends Model
         return $this->hasMany(BillPayment::class);
     }
 
-    // Payment label: type name, 'Mixed', or null.
     public function paymentLabel(): ?string
     {
         if (! $this->relationLoaded('payments') || $this->payments->isEmpty()) {
@@ -72,7 +71,7 @@ class Bill extends Model
         return $this->payments->count() === 1 ? $this->payments->first()->paymentType->name : 'Mixed';
     }
 
-    // Super Admin can see every bill; staff only the bills they created.
+    // Super admins see every bill, staff only their own.
     public function scopeForUser(Builder $query, User $user): Builder
     {
         if ($user->isSuperAdmin()) {

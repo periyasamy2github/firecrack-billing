@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 
 class PaymentTypeController extends Controller
 {
-    // savePaymentType — add a payment type.
     public function store(Request $request): PaymentTypeResource
     {
         $data = $request->validate([
@@ -26,7 +25,6 @@ class PaymentTypeController extends Controller
         return new PaymentTypeResource($type);
     }
 
-    // savePaymentType — rename or toggle a type; never deleted.
     public function update(Request $request, PaymentType $paymentType): PaymentTypeResource
     {
         $data = $request->validate([

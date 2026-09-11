@@ -37,7 +37,6 @@ class AuthController extends Controller
 
         $user->load('counter');
 
-        // A closed counter stops trading, so its staff cannot sign in either.
         if (! $user->isSuperAdmin() && $user->counter && ! $user->counter->active) {
             return response()->json(['message' => 'Your branch is closed. Ask the owner.'], 403);
         }
@@ -50,7 +49,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // The signed-in user info
     public function me(Request $request): JsonResponse
     {
         return response()->json([
@@ -61,7 +59,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // Sign out - revoke only the current device's token.
+    // Revokes only the current device's token.
     public function logout(Request $request): Response
     {
         $request->user()->currentAccessToken()->delete();

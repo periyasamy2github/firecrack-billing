@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BillCounter extends Model
 {
-    // Class renamed from Counter; the table + columns keep their original names.
+    // Maps to the existing counters table.
     protected $table = 'counters';
 
     protected $fillable = [

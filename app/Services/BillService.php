@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class BillService
 {
-    /** Record a completed sale: number it, take the stock, total it, and save — all or nothing. */
+    // Saves a sale with its stock changes in one transaction.
     public function create(User $user, array $data): Bill
     {
         return DB::transaction(function () use ($user, $data) {
@@ -50,7 +50,7 @@ class BillService
         });
     }
 
-    // Edit a paid bill in place; the bill number stays.
+    // Edits a paid bill, keeping its number.
     public function update(User $user, Bill $bill, array $data): Bill
     {
         $this->assertStatusIs($bill, 'Paid', "This bill can't be changed.");
@@ -91,7 +91,7 @@ class BillService
         });
     }
 
-    /** Void a paid bill and put its stock back. */
+    // Cancels a paid bill and restores its stock.
     public function cancel(Bill $bill): Bill
     {
         $this->assertStatusIs($bill, 'Paid', "This bill can't be cancelled.");
@@ -100,14 +100,12 @@ class BillService
             $this->returnStock($bill);
             $bill->status = 'Cancelled';
             $bill->save();
-            // The money back to the customer — a cancelled bill.
             $bill->payments()->delete();
 
             return $bill->fresh(['items', 'payments.paymentType']);
         });
     }
 
-    /** Count one more printout of a bill. */
     public function reprint(Bill $bill): Bill
     {
         $bill->increment('reprint_count');
@@ -115,7 +113,6 @@ class BillService
         return $bill->fresh(['items', 'payments.paymentType']);
     }
 
-    // Payments must add up to the grand total.
     private function assertPaymentsCoverTotal(array $payments, float $grandTotal): void
     {
         $tendered = round(array_sum(array_map(fn ($payment) => (float) $payment['amount'], $payments)), 2);
@@ -125,12 +122,10 @@ class BillService
         }
     }
 
-    // Touched products with their new stock.
     public function affectedProducts(Bill $bill, array $extraProductIds = []): array
     {
         $productIds = $bill->items->pluck('product_id')->filter()->merge($extraProductIds)->unique()->all();
 
-        // The counter goes along too — the same barcode can exist on another counter.
         return Product::whereIn('id', $productIds)->get()
             ->map(fn (Product $product) => [
                 'code' => $product->barcode,
@@ -140,8 +135,7 @@ class BillService
             ->all();
     }
 
-    /** Prices are GST-inclusive, so tax is taken out of the rate rather than added on top.
-     *  Only these two numbers are stored — the app works the rest out from the bill's items. */
+    // Prices are GST-inclusive, so tax is extracted from the rate.
     private function calculateTotals(array $lines, bool $gstApplicable, float $flatDiscount): array
     {
         $sellingTotal = 0.0;
@@ -219,7 +213,6 @@ class BillService
             return;
         }
 
-        // Skip numbers already used.
         $number = $settings->next_number;
         while (Bill::where('bill_no', $settings->invoice_prefix.$number)->exists()) {
             $number++;
@@ -234,7 +227,6 @@ class BillService
     {
         $counter = BillCounter::lockForUpdate()->find($bill->counter_id);
 
-        // Skip numbers already used.
         $number = $counter->next_number;
         while (Bill::where('bill_no', sprintf('%s-%03d', $counter->code, $number))->exists()) {
             $number++;

@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 
 class CounterController extends Controller
 {
-    /** saveCounter (new) — create a counter. */
     public function store(Request $request): CounterResource
     {
         $data = $request->validate([
@@ -31,7 +30,6 @@ class CounterController extends Controller
         return new CounterResource($counter);
     }
 
-    /** saveCounter (existing) — rename or activate/deactivate a counter. */
     public function update(Request $request, BillCounter $counter): CounterResource
     {
         $data = $request->validate([

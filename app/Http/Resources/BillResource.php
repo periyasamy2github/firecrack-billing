@@ -12,7 +12,6 @@ class BillResource extends JsonResource
         $discount = (float) $this->discount;
 
         return [
-            // Encrypted so the URL never exposes the raw row id.
             'id' => encrypt($this->id),
             'billNo' => $this->bill_no,
             'counterId' => (string) $this->counter_id,
@@ -28,15 +27,12 @@ class BillResource extends JsonResource
                 'type' => $payment->paymentType->name,
                 'amount' => (float) $payment->amount,
             ])->values(), []),
-            // Display label for payment pills.
             'paymentMethod' => $this->paymentLabel(),
             'status' => $this->status,
             'reprintCount' => $this->reprint_count,
-            // Edit audit for the marker.
             'editedAt' => $this->edited_at?->format('d-M-Y H:i'),
             'editedBy' => $this->edited_by ? $this->editor?->name : null,
             'gstApplicable' => $this->gst_applicable,
-            // Discount as entered; older bills fall back to flat.
             'billDiscount' => $discount > 0 ? [
                 'type' => $this->discount_type ?? 'flat',
                 'value' => $this->discount_value !== null ? (float) $this->discount_value : $discount,

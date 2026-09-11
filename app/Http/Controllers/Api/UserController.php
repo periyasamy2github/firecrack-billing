@@ -12,13 +12,11 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /** GET /users — every staff member with their counter (admin only). */
     public function index(): AnonymousResourceCollection
     {
         return UserResource::collection(User::with('counter')->orderBy('name')->get());
     }
 
-    /** saveUser (new) — create a staff or admin account. */
     public function store(Request $request): UserResource
     {
         $user = User::create($this->toAttributes($this->validateUser($request, null), isCreate: true));
@@ -26,19 +24,19 @@ class UserController extends Controller
         return new UserResource($user->load('counter'));
     }
 
-    /** saveUser (existing) — edit an account; deactivating it revokes all their tokens. */
+    // Deactivating an account revokes its tokens.
     public function update(Request $request, User $user): UserResource
     {
         $user->update($this->toAttributes($this->validateUser($request, $user->id), isCreate: false));
 
         if ($user->wasChanged('active') && ! $user->active) {
-            $user->tokens()->delete(); // deactivation logs the user out everywhere
+            $user->tokens()->delete();
         }
 
         return new UserResource($user->load('counter'));
     }
 
-    /** Admin password reset — forces re-login by revoking existing tokens. */
+    // Resets the password and revokes the user's tokens.
     public function password(Request $request, User $user): Response
     {
         $request->validate(['password' => ['required', 'string', 'min:6']]);
@@ -63,7 +61,6 @@ class UserController extends Controller
             'joinedOn' => ['nullable', 'date'],
         ];
 
-        // Staff must belong to exactly one counter.
         if ($request->input('role') === 'Staff') {
             $rules['counterId'] = ['required', 'integer', 'exists:counters,id'];
         }
@@ -81,12 +78,11 @@ class UserController extends Controller
             'email' => $data['email'],
             'role' => $data['role'],
             'active' => $data['active'],
-            // Super Admins are unscoped (no counter); staff belong to one.
             'counter_id' => $data['role'] === 'Super Admin' ? null : ($data['counterId'] ?? null),
         ];
 
         if (! empty($data['password'])) {
-            $attrs['password'] = $data['password']; // 'hashed' cast on the model hashes it
+            $attrs['password'] = $data['password'];
         }
 
         if (! empty($data['joinedOn'])) {

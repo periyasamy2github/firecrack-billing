@@ -5,11 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * Reassembles the frontend BillLineItem { lineId, product, qty }. The money/description
- * fields come from the frozen line snapshot; code/category/stock come from the linked
- * product when it still exists (placeholders otherwise — a historical line stays printable).
- */
+// Money fields come from the line snapshot; product fields from the product when it still exists.
 class BillItemResource extends JsonResource
 {
     public function toArray(Request $request): array

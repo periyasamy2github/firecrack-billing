@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    /** saveShop — update the singleton settings row (also reseeds the invoice counter). */
+    // Updates the single settings row.
     public function update(Request $request): SettingResource
     {
         $data = $request->validate([

@@ -18,7 +18,6 @@ return new class extends Migration
             $t->unsignedInteger('next_number')->default(1)->after('code');
         });
 
-        // Seed a code from each branch name; the owner renames them in Branches.
         $used = [];
         foreach (DB::table('counters')->orderBy('id')->get() as $counter) {
             $code = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $counter->name) ?: 'BR', 0, 3));

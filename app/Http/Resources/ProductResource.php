@@ -11,7 +11,6 @@ class ProductResource extends JsonResource
     {
         return [
             'code' => $this->barcode,
-            // Two counters can each stock the same barcode, so the counter is part of a product's identity.
             'counterId' => (string) $this->counter_id,
             'counter' => $this->whenLoaded('counter', fn () => $this->counter->name),
             'name' => $this->name,

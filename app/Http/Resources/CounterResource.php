@@ -10,7 +10,7 @@ class CounterResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => (string) $this->id, // the SPA uses string ids throughout
+            'id' => (string) $this->id,
             'name' => $this->name,
             'code' => $this->code,
             'nextNumber' => $this->next_number,

@@ -13,12 +13,11 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    // The dashboard's totals, added up in the database so the app never downloads every bill.
+    // Dashboard totals computed in the database.
     public function __invoke(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        // Staff see only their own bills. A super admin sees all counters, or the one they clicked.
         $scope = $request->query('scope');
         $counterId = $user->isSuperAdmin()
             ? (($scope && $scope !== 'all') ? $scope : null)
@@ -52,7 +51,7 @@ class DashboardController extends Controller
         return response()->json($data);
     }
 
-    // Paid bills, narrowed to one counter and, for staff, their own bills.
+    // Paid bills for the given counter and user scope.
     private function paidBills($counterId, $userId = null)
     {
         return Bill::where('status', 'Paid')
@@ -60,7 +59,7 @@ class DashboardController extends Controller
             ->when($userId, fn ($query) => $query->where('user_id', $userId));
     }
 
-    // Sales per day for the last 10 selling days, in rupees.
+    // Sales per day for the last 10 selling days.
     private function dailyTrend($counterId, $userId = null): array
     {
         return $this->paidBills($counterId, $userId)
@@ -78,7 +77,7 @@ class DashboardController extends Controller
             ->all();
     }
 
-    // How much came in per payment type; a mixed bill contributes each split to its own type.
+    // Takings per payment type, mixed bills split per payment.
     private function paymentMix($counterId, $userId = null): array
     {
         return BillPayment::query()
@@ -95,7 +94,7 @@ class DashboardController extends Controller
             ->all();
     }
 
-    // The seven products that brought in the most money.
+    // Top products by revenue.
     private function topItems($counterId, $userId = null): array
     {
         return BillItem::join('bills', 'bills.id', '=', 'bill_items.bill_id')
@@ -111,7 +110,6 @@ class DashboardController extends Controller
             ->all();
     }
 
-    // The ten newest bills for the "Recent bills" panel.
     private function recentBills($counterId, $userId = null)
     {
         return Bill::when($counterId, fn ($query) => $query->where('counter_id', $counterId))
@@ -123,7 +121,7 @@ class DashboardController extends Controller
             ->get();
     }
 
-    // Each counter's takings in one grouped query, then matched to the counter list.
+    // Takings per counter.
     private function perCounter(): array
     {
         $totals = $this->paidBills(null)

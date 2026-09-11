@@ -19,7 +19,7 @@ class BillController extends Controller
 {
     public function __construct(private BillService $service) {}
 
-    /** GET /bills — one page of bills, filtered and searched in the database. */
+    // One page of bills with search and filters.
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
@@ -28,7 +28,6 @@ class BillController extends Controller
             ->forUser($user)
             ->with(['counter', 'user', 'items.product', 'payments.paymentType']);
 
-        // A super admin can narrow to one counter; staff are already limited to their own.
         $scope = $request->query('scope');
         if ($user->isSuperAdmin() && $scope && $scope !== 'all') {
             $query->where('counter_id', $scope);
@@ -48,7 +47,6 @@ class BillController extends Controller
             $query->whereDate('billed_at', '<=', $to);
         }
 
-        // Chip tallies before the active filter.
         $perType = BillPayment::query()
             ->join('payment_types', 'payment_types.id', '=', 'bill_payments.payment_type_id')
             ->whereIn('bill_payments.bill_id', (clone $query)->select('bills.id'))
@@ -85,7 +83,7 @@ class BillController extends Controller
         ]);
     }
 
-    /** GET /bills/find?id=… — one bill by its encrypted id, used by the print page on a fresh load. */
+    // Finds one bill by its encrypted id.
     public function show(Request $request): JsonResponse
     {
         try {
@@ -104,7 +102,6 @@ class BillController extends Controller
         return response()->json($this->billResource($bill));
     }
 
-    /** createBill — record a finalized sale. */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -132,7 +129,6 @@ class BillController extends Controller
         return $this->saleResponse($bill);
     }
 
-    // editBill — update a paid bill's contents.
     public function update(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -153,7 +149,6 @@ class BillController extends Controller
         ]);
 
         $bill = $this->findByNo($request);
-        // Include products the edit removed.
         $oldProductIds = $bill->items()->pluck('product_id')->filter()->all();
         $bill = $this->service->update($request->user(), $bill, $data);
 
@@ -163,7 +158,6 @@ class BillController extends Controller
         ]);
     }
 
-    /** cancelBill — Paid → Cancelled, stock restored. */
     public function cancel(Request $request): JsonResponse
     {
         $bill = $this->service->cancel($this->findByNo($request));
@@ -171,7 +165,6 @@ class BillController extends Controller
         return $this->saleResponse($bill);
     }
 
-    /** reprintBill — bumps reprint_count. */
     public function reprint(Request $request): JsonResponse
     {
         $bill = $this->service->reprint($this->findByNo($request));
@@ -197,7 +190,6 @@ class BillController extends Controller
             return;
         }
 
-        // Other chips are payment type names.
         if ($typeId = PaymentType::where('name', $filter)->value('id')) {
             $query->whereHas('payments', fn ($q) => $q->where('payment_type_id', $typeId));
         }

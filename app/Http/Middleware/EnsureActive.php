@@ -8,10 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureActive
 {
-    /**
-     * Reject requests whose token belongs to a user deactivated mid-session,
-     * and revoke that token so it can't be used again.
-     */
+    // Rejects and revokes the token of a user deactivated mid-session.
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();

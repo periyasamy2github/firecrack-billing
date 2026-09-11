@@ -27,7 +27,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // Crashes never leak internals to the app.
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*') && ! config('app.debug') && ! $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface && ! $e instanceof \Illuminate\Validation\ValidationException && ! $e instanceof \Illuminate\Auth\AuthenticationException) {
                 return response()->json(['message' => 'Something went wrong. Try again.'], 500);

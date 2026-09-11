@@ -25,7 +25,7 @@ class Setting extends Model
         'season_target' => 'decimal:2',
     ];
 
-    /** The shop is a singleton — always row 1. */
+    // Always row 1.
     public static function current(): self
     {
         return static::firstOrFail();
