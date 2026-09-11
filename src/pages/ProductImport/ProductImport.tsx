@@ -24,7 +24,7 @@ import { ImportingStage } from './ImportingStage'
 import { DoneStage } from './DoneStage'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
-// Headers are matched case-insensitively on import, so these stay readable.
+// Headers match case-insensitively on import.
 export const TEMPLATE_COLUMNS = ['Barcode', 'Name', 'Category', 'HSN', 'MRP', 'Rate', 'GST Rate', 'Stock', 'Low Stock Threshold']
 
 const HEADER_ALIASES: Record<string, string> = {
@@ -69,7 +69,6 @@ const buildRow = (raw: Record<string, unknown>, index: number, seenCodes: Set<st
     if (field) mapped[field] = value
   }
 
-  // Spreadsheets carry trailing empty rows — skip them instead of reporting hundreds of errors.
   const hasAnyValue = Object.values(mapped).some((value) => value !== undefined && value !== null && String(value).trim() !== '')
   if (!hasAnyValue) return null
 

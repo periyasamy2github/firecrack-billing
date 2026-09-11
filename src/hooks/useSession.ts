@@ -5,7 +5,7 @@ import type { UserRole } from '../types'
 
 export type { CounterScope }
 
-// Everything a screen needs about the signed-in user, the shop, and the counter in view.
+// Session data for the signed-in user.
 export const useSession = () => {
   const dispatch = useDispatch()
 

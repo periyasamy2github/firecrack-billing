@@ -9,8 +9,6 @@ import { Provider } from 'react-redux'
 import { ConfirmProvider } from 'material-ui-confirm'
 import { store } from './redux/store'
 
-// One confirm dialog for the whole app — pages call useConfirm() instead of owning dialog state.
-// No right-click menu inside the installed app; browser tabs keep it.
 window.addEventListener('contextmenu', (event) => {
   const installedApp = window.matchMedia('(display-mode: standalone)').matches
     || (window.navigator as { standalone?: boolean }).standalone === true

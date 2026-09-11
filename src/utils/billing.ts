@@ -65,7 +65,6 @@ export const computeBillTotals = (items: BillLineItem[], gstApplicable = true, b
   }
 }
 
-// The discount as a percent label.
 export const discountPercentLabel = (totals: BillTotals, billDiscount?: BillDiscount): string | null => {
   if (!billDiscount || totals.billDiscountAmount <= 0 || totals.gross <= 0) return null
   const percent = billDiscount.type === 'percent'

@@ -8,7 +8,7 @@ import { FireworksArt } from './FireworksArt'
 import shopBadge from '../assets/logo-2.png'
 import styles from '../css/components/AuthShell.module.css'
 
-// Nothing is fetched before sign-in, so the shop identity comes from VITE_SHOP_* in .env at build time.
+// Shop identity comes from VITE_SHOP_* at build time.
 const SHOP = {
   name: import.meta.env.VITE_SHOP_NAME || 'SparkBill',
   town: import.meta.env.VITE_SHOP_TOWN || '',

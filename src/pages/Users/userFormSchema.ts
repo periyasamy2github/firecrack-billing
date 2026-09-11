@@ -34,7 +34,6 @@ export interface UserFormValues {
   password: string
   confirmPassword: string
   role: UserRole
-  // Id, not name — names change.
   counterId: string
   active: boolean
 }
@@ -66,7 +65,7 @@ export const toUserFormValues = (user: User): UserFormValues => ({
 const initialsFrom = (name: string): string =>
   name.trim().split(/\s+/).slice(0, 2).map((word) => word[0]?.toUpperCase()).join('')
 
-// `existing` carries the fields the form never shows, so editing never resets them.
+// existing carries hidden fields forward when editing.
 export const fromUserFormValues = (values: UserFormValues, existing: User | null): User => {
   const shared = {
     name: values.name.trim(),

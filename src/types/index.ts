@@ -58,7 +58,6 @@ export interface BillLineItem {
   qty: number
 }
 
-// Managed from Settings.
 export interface PaymentType {
   id: string
   name: string
@@ -66,7 +65,6 @@ export interface PaymentType {
   sort: number
 }
 
-// One payment slice of a bill.
 export interface BillPayment {
   typeId: string
   type: string
@@ -117,9 +115,8 @@ export interface BillTotals {
   qtyCount: number
 }
 
-// ---- API shapes (what the Laravel backend sends and receives) ----
+// ---- API shapes ----
 
-// Loaded once at boot from /me.
 export interface SessionData {
   user: User
   shop: Shop
@@ -140,13 +137,12 @@ export interface ImportResult {
   errors: { row: number; code: string; message: string }[]
 }
 
-// Bill changes echo back the touched products' new stock.
+// Bill responses include updated stock for touched products.
 export interface BillMutation {
   bill: Bill
   products: { code: string; counterId: string; stock: number }[]
 }
 
-// billNo, status and totals are filled in by the API.
 export interface NewBillPayload {
   counterId: string
   customerName: string
@@ -159,7 +155,7 @@ export interface NewBillPayload {
   items: { code: string; qty: number }[]
 }
 
-// Laravel's paginator shape, plus chip tallies and paid totals.
+// Paginator shape plus filter counts and totals.
 export interface BillsPage {
   data: Bill[]
   meta?: { total: number }
@@ -167,7 +163,6 @@ export interface BillsPage {
   totals: { discount: number; gst: number; grand: number }
 }
 
-// Sent as axios params; anything undefined is not sent.
 export interface BillsQuery {
   scope: string
   page?: number
@@ -179,7 +174,6 @@ export interface BillsQuery {
   all?: boolean
 }
 
-// Data for the printable daily statement.
 export interface DailyStatementData {
   date: string
   counter: string | null
@@ -195,7 +189,6 @@ export interface DailyStatementData {
   bills: { billNo: string; time: string; counter: string; customerName: string; billedBy: string; grandTotal: number; payment: string | null; status: string }[]
 }
 
-// Worked out by the backend.
 export interface DashboardStats {
   sales: number
   billCount: number

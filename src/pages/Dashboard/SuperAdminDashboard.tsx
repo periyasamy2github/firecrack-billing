@@ -32,7 +32,6 @@ export const SuperAdminDashboard = () => {
     setLoadError('')
     api.loadDashboard(counterScope)
       .then(setStats)
-      // Otherwise the skeleton spins forever.
       .catch((err) => setLoadError(errorMessage(err, 'Could not load your dashboard')))
   }, [counterScope])
 

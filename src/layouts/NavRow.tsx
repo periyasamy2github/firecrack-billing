@@ -7,7 +7,6 @@ import styles from '../css/layouts/AppLayout.module.css'
 export const NavRow = ({ item }: { item: NavItem }) => {
   const { pathname } = useLocation()
   const Icon = item.icon
-  // New Bill is its own row, so Bills must not light up while /bills/new is open.
   const isActive =
     item.to === '/'
       ? pathname === '/'

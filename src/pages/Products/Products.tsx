@@ -38,7 +38,6 @@ export const Products = () => {
   const { isPending, run } = usePendingAction()
   const [loading, setLoading] = useState(true)
 
-  // Adding or importing needs one counter in scope.
   const viewingAllCounters = counterScope === 'all'
   const currentCounterName = counters.find((counter) => counter.id === counterScope)?.name ?? ''
   const pickCounterHint = viewingAllCounters ? 'Pick a branch first — products belong to one branch' : ''
@@ -73,7 +72,6 @@ export const Products = () => {
     })
     if (!confirmed) return
 
-    // Follows the product's own counter, so it works in the all-counters view.
     await run(`${counterId}:${code}`, async () => {
       try {
         await dispatch(deleteProduct({ code, counterId })).unwrap()
@@ -94,7 +92,6 @@ export const Products = () => {
         return
       }
 
-      // Manual add saves row by row; bulk upload is the Import page.
       for (const row of rows) {
         await dispatch(saveProduct({ product: row, counterId: counterScope })).unwrap()
       }

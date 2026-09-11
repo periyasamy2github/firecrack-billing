@@ -39,7 +39,7 @@ export const Counters = () => {
 
   const closeDialog = () => setOpen(false)
 
-  // Await before closing so the dialog stays open if saving fails.
+  // Awaits so the dialog stays open when saving fails.
   const save = async (counter: Counter) => {
     const wasEditing = Boolean(editing)
     try {

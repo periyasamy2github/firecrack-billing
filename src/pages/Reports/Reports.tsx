@@ -33,7 +33,6 @@ export const Reports = () => {
   const showToast = useToast()
   const [range, setRange] = useState({ dateFrom: '', dateTo: '', counterId: 'all' })
 
-  // Only narrow here when the sidebar is on all counters, or the two would disagree.
   const canPickCounter = isSuperAdmin && counterScope === 'all'
   const scope = canPickCounter ? range.counterId : counterScope
   const showCounterColumn = scope === 'all'
@@ -42,7 +41,6 @@ export const Reports = () => {
   const { query, setQuery, filter, setFilter, page, rowsPerPage, changePage, changeRowsPerPage, result } =
     useBillsPage({ scope, from: range.dateFrom || undefined, to: range.dateTo || undefined })
 
-  // Search and payment live in useBillsPage; dates and counter are this page's own.
   const filters: ReportFilters = { ...range, query, payment: filter }
   const updateFilters = ({ query: nextQuery, payment, ...nextRange }: Partial<ReportFilters>) => {
     if (nextQuery !== undefined) setQuery(nextQuery)

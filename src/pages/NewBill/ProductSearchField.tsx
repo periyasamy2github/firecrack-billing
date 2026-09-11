@@ -7,7 +7,7 @@ import { formatAmount } from '../../utils/format'
 import type { Product } from '../../types'
 import styles from '../../css/pages/NewBill.module.css'
 
-// Only the first 30 matches are rendered, so typing stays instant however big the catalogue is.
+// Renders only the first 30 matches.
 const filterProducts = createFilterOptions<Product>({
   limit: 30,
   stringify: (p) => `${p.code} ${p.name}`,
@@ -38,7 +38,6 @@ export const ProductSearchField = ({ products, loading, inputRef, onAdd, onScanB
         const scanned = query.trim()
         if (!scanned) return
 
-        // A scan before the catalogue lands would silently do nothing.
         if (loading) {
           e.preventDefault()
           e.stopPropagation()
@@ -46,7 +45,6 @@ export const ProductSearchField = ({ products, loading, inputRef, onAdd, onScanB
           return
         }
 
-        // Only swallow Enter on an exact barcode; the dropdown needs it otherwise.
         const exact = products.find((p) => p.code.toLowerCase() === scanned.toLowerCase())
         if (exact) {
           e.preventDefault()

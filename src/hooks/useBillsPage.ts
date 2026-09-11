@@ -27,7 +27,6 @@ export const useBillsPage = ({ scope, from, to }: UseBillsPageOptions) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // A new search starts at page 1.
   useEffect(() => {
     setPage(0)
   }, [scope, query, filter, from, to])
@@ -37,7 +36,6 @@ export const useBillsPage = ({ scope, from, to }: UseBillsPageOptions) => {
     setLoading(true)
     setError('')
 
-    // 'All' means no payment/status filter.
     api.loadBills({
       scope,
       page: page + 1,

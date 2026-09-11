@@ -44,7 +44,6 @@ export const InvoicePrint = () => {
   const [notFound, setNotFound] = useState(false)
   usePageTitle(bill ? `Bill ${bill.billNo}` : 'Bill')
 
-  // Printing from a fresh page load (no nav state) — fetch the one bill by its encrypted id.
   useEffect(() => {
     if (navState?.bill) return
     api.loadBill(billId).then(setBill).catch(() => setNotFound(true))
@@ -68,7 +67,6 @@ export const InvoicePrint = () => {
   }
 
   const totals = getBillTotals(bill)
-  // A4 is the GST tax-invoice layout, so a Bill of Supply only prints as a thermal receipt.
   const formats = bill.gstApplicable ? FORMAT_OPTIONS : FORMAT_OPTIONS.filter((option) => option.key === 'thermal')
   const activeFormat: PrintFormat = formats.some((option) => option.key === format) ? format : 'thermal'
 

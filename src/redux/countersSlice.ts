@@ -24,7 +24,6 @@ const countersSlice = createSlice({
     builder
       .addCase(loadSession.fulfilled, (state, action) => {
         const { user, counters } = action.payload
-        // Staff get an empty list; they already know their counter.
         state.items = user.counterId
           ? [{ id: user.counterId, name: user.counter ?? '', code: null, nextNumber: 1, active: true }]
           : counters

@@ -18,7 +18,7 @@ const appReducer = combineReducers({
   ui: uiReducer,
 })
 
-// Signing out wipes every slice, so nothing from the last user lingers in memory for the next one.
+// Logout resets every slice.
 const rootReducer: typeof appReducer = (state, action) => appReducer(signOut.match(action) ? undefined : state, action)
 
 export const store = configureStore({ reducer: rootReducer })

@@ -24,7 +24,6 @@ const shopSlice = createSlice({
       .addCase(saveShop.fulfilled, (state, action) => {
         state.shop = action.payload
       })
-      // Advance locally so New Bill shows the next number.
       .addCase(createBill.fulfilled, (state) => {
         state.shop.nextInvoiceNumber += 1
       })

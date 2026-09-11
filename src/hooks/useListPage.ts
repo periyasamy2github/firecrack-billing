@@ -8,7 +8,7 @@ interface ListPageOptions<T, F extends string> {
   matchesFilter?: (row: T, filter: F) => boolean
 }
 
-// Search, filter and paging for a list already held in full. Bills page on the server.
+// Search, filter and paging over a fully loaded list.
 export const useListPage = <T, F extends string = string>({
   rows,
   matchesSearch,

@@ -1,7 +1,7 @@
 import type { Product } from '../types'
 import type { PillTone } from '../components/StatusPill'
 
-// Dropdown suggestions; category itself is free text.
+// Category suggestions; free text is allowed.
 export const productCategories = ['Sparklers', 'Flower Pots', 'Chakkar', 'Rockets', 'Bombs', 'Fancy', 'Gift Boxes']
 
 export const stockStatus = (p: Product): { label: string; tone: PillTone } => {

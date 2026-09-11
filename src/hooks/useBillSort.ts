@@ -15,7 +15,7 @@ const VALUES: Record<string, (bill: Bill) => string | number> = {
   status: (bill) => bill.status,
 }
 
-// Sorts the rows already on screen; the page order from the server stays when no column is picked.
+// Client-side sort of the rows on the current page.
 export const useBillSort = (bills: Bill[]) => {
   const [sortKey, setSortKey] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')

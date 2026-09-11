@@ -1,4 +1,4 @@
-// Styled .xlsx downloads. The SheetJS fork is loaded on demand so list pages stay light until someone exports.
+// Styled .xlsx export; SheetJS loads on demand.
 export const HEADER_STYLE = {
   font: { bold: true, sz: 11, color: { rgb: '1F3B2C' } },
   fill: { fgColor: { rgb: 'E2EFDA' } },

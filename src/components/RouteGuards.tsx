@@ -14,7 +14,6 @@ export const RequireAuth = () => {
   const { currentUser } = useSession()
   const token = getToken()
 
-  // On a fresh load / refresh with a live token, hydrate the store before rendering.
   useEffect(() => {
     if (token && status === 'idle') void dispatch(loadSession())
   }, [token, status, dispatch])

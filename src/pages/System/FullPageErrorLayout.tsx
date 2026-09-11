@@ -21,7 +21,6 @@ interface FullPageErrorLayoutProps {
   onHome: () => void
 }
 
-// Full-screen error page (404, 500) shown outside the app layout.
 export const FullPageErrorLayout = ({ code, title, subtitle, icon: Icon, onHome }: FullPageErrorLayoutProps) => {
   const theme = useTheme()
 

@@ -63,7 +63,7 @@ export const Users = () => {
     setEditingUser(null)
   }
 
-  // Await before closing so the dialog stays open if saving fails.
+  // Awaits so the dialog stays open when saving fails.
   const submitUser = async (user: User) => {
     const wasEditing = Boolean(editingUser)
     try {

@@ -3,7 +3,6 @@ import { api } from '../services/api'
 import type { User } from '../types'
 import type { RootState } from './store'
 
-// Users page only; boot never loads the full staff list.
 export const loadUsers = createAsyncThunk('users/load', () => api.loadUsers())
 
 export const saveUser = createAsyncThunk('users/save', (user: User, { getState }) => {

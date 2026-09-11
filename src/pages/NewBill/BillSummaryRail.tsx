@@ -63,7 +63,6 @@ export const BillSummaryRail = ({
   saving = false,
 }: BillSummaryRailProps) => {
   const discountPercent = discountPercentLabel(totals, billDiscountValue ? { type: billDiscountType, value: Number(billDiscountValue) } : undefined)
-  // The typed figure's other face: 10% shows its ₹ value, ₹54 shows its %.
   const discountEquivalence = totals.billDiscountAmount > 0
     ? (billDiscountType === 'percent' ? `= ₹${formatAmount(totals.billDiscountAmount)}` : `= ${discountPercent}`)
     : null

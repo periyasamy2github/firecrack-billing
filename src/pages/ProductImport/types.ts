@@ -1,6 +1,6 @@
 import type { Product } from '../../types'
 
-// Whether a row updates or creates a product is the backend's call, made at import time.
+// The backend decides update vs create per row.
 export type Outcome = 'ready' | 'error'
 
 export interface ImportRow {

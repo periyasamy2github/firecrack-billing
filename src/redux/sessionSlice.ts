@@ -2,10 +2,9 @@ import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/tool
 import { api } from '../services/api'
 import type { User } from '../types'
 
-// 'all' shows every counter (Super Admin only); otherwise one counter's id.
+// 'all' or one counter id.
 export type CounterScope = 'all' | string
 
-// Who is signed in, whether /me has finished loading, and which counter the screens are showing.
 interface SessionState {
   user: User | null
   status: 'idle' | 'loading' | 'ready' | 'error'
@@ -13,10 +12,9 @@ interface SessionState {
   counterScope: CounterScope
 }
 
-// GET /me — the signed-in user, the shop and the counters. The shop and counters slices listen to this too.
 export const loadSession = createAsyncThunk('session/load', () => api.loadSession())
 
-// Only the chosen counter survives a reload; identity always comes back from the server.
+// Only the counter scope is persisted.
 const SCOPE_KEY = 'sparkbill:counter-scope'
 const RETIRED_KEYS = ['sparkbill:session:v1', 'sparkbill:view:v1']
 

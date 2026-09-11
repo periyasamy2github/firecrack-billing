@@ -1,4 +1,4 @@
-// Everything that talks to the Laravel backend: the axios client, the bearer token, and one method per endpoint.
+// Axios client and one method per backend endpoint.
 import axios from 'axios'
 import { store } from '../redux/store'
 import { showToast } from '../redux/uiSlice'

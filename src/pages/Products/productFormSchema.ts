@@ -70,7 +70,7 @@ export const toProductFormValues = (p: Product): ProductFormValues => ({
   stock: String(p.stock),
 })
 
-// `existing` carries hidden fields forward so editing never resets them.
+// existing carries hidden fields forward when editing.
 export const fromProductFormValues = (v: ProductFormValues, existing: Product | null, counterId: string): Product => ({
   code: v.code.trim(),
   counterId: existing?.counterId ?? counterId,

@@ -1,4 +1,4 @@
-// A chip per payment type plus the two fixed ones; type names come from Settings.
+// Filter chips: payment types plus Mixed and Cancelled.
 export type BillFilter = string
 
 export const billFilters = (paymentTypeNames: string[]): BillFilter[] => ['All', ...paymentTypeNames, 'Mixed', 'Cancelled']

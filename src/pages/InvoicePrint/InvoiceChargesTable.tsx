@@ -11,7 +11,7 @@ interface InvoiceChargesTableProps {
   discountPercent?: string | null
 }
 
-// One charges breakdown for both invoice kinds — the tax rows only appear when GST applies.
+// Charges table for both invoice formats.
 export const InvoiceChargesTable = ({ totals, gst, cgstLabel, sgstLabel, discountPercent }: InvoiceChargesTableProps) => {
   const rows: [string, string][] = [
     ...(totals.hasMrp ? [['MRP value', formatAmount(totals.mrpValue)] as [string, string]] : []),

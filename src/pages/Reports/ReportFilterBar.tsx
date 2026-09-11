@@ -22,7 +22,7 @@ interface ReportFilterBarProps {
   searchInputRef: RefObject<HTMLInputElement | null>
 }
 
-// counters = null hides the counter picker (staff, or admin already narrowed by the sidebar).
+// counters null hides the branch picker.
 export const ReportFilterBar = ({ filters, onChange, counters, paymentCounts, searchInputRef }: ReportFilterBarProps) => {
   const { paymentTypes } = useSession()
   const paymentOptions = billFilters(paymentTypes.map((type) => type.name))

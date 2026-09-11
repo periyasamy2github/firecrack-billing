@@ -142,7 +142,6 @@ export const NewBill = () => {
       return [...prev, { lineId: `L${nextLineId.current++}`, product, qty: 1 }]
     })
 
-  // Cap qty at available stock.
   const updateQty = (lineId: string, qty: number) =>
     setItems((prev) => prev.map((i) => (i.lineId === lineId
       ? { ...i, qty: Math.min(qty, i.product.stock + (editing ? originalQty.current[i.product.code] ?? 0 : 0)) }
@@ -228,7 +227,6 @@ export const NewBill = () => {
     { allowInInputs: ['F2', 'F3', 'F7', 'F9', 'F10'] },
   )
 
-  // A fresh install has no counters yet — nothing to bill on until one is created.
   if (!editing && !billingCounter) {
     return <PageMessage title="New Bill" message="No branch is set up yet. Create one under Master → Branches, then come back to bill." />
   }
