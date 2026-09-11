@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillController;
 use App\Http\Controllers\Api\CounterController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PaymentTypeController;
 use App\Http\Controllers\Api\ProductController;
@@ -26,6 +27,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::put('/bills', [BillController::class, 'update']);
 
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/customers', [CustomerController::class, 'index']);
     Route::post('/bills/cancel', [BillController::class, 'cancel']);
     Route::post('/bills/reprint', [BillController::class, 'reprint']);
 

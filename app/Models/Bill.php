@@ -68,7 +68,7 @@ class Bill extends Model
             return null;
         }
 
-        return $this->payments->count() === 1 ? $this->payments->first()->paymentType->name : 'Mixed';
+        return $this->payments->count() === 1 ? $this->payments->first()->paymentType?->name : 'Mixed';
     }
 
     // Super admins see every bill, staff only their own.

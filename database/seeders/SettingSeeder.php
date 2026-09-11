@@ -2,14 +2,19 @@
 
 namespace Database\Seeders;
 
+use App\Models\PaymentType;
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
 
-// The app needs exactly one shop row; real details are entered on the Settings page.
+// Seeds the shop row and the standard payment types; real details are entered on the Settings page.
 class SettingSeeder extends Seeder
 {
     public function run(): void
     {
+        foreach (['Cash', 'UPI', 'Card'] as $name) {
+            PaymentType::firstOrCreate(['name' => $name], ['active' => true]);
+        }
+
         if (Setting::exists()) {
             return;
         }

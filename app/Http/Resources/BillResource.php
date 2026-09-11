@@ -24,7 +24,7 @@ class BillResource extends JsonResource
             'items' => BillItemResource::collection($this->whenLoaded('items')),
             'payments' => $this->whenLoaded('payments', fn () => $this->payments->map(fn ($payment) => [
                 'typeId' => (string) $payment->payment_type_id,
-                'type' => $payment->paymentType->name,
+                'type' => $payment->paymentType?->name ?? '',
                 'amount' => (float) $payment->amount,
             ])->values(), []),
             'paymentMethod' => $this->paymentLabel(),
