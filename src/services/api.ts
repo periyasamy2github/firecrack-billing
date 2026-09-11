@@ -4,6 +4,7 @@ import { store } from '../redux/store'
 import { showToast } from '../redux/uiSlice'
 import { GENERIC_ERROR, NO_CONNECTION_ERROR } from '../utils/errorMessage'
 import type {
+  Customer,
   Bill, BillMutation, BillsPage, BillsQuery, Counter, DailyStatementData, DashboardStats, ImportResult,
   LoginResult, NewBillPayload, PaymentType, Product, SessionData, Shop, User,
 } from '../types'
@@ -63,6 +64,7 @@ export const api = {
 
   loadProducts: async (scope: string) => (await client.get<Product[]>('/products', { params: { scope } })).data,
   loadUsers: async () => (await client.get<User[]>('/users')).data,
+  loadCustomers: async () => (await client.get<Customer[]>('/customers')).data,
 
   saveShop: async (shop: Shop) => (await client.put<Shop>('/shop', shop)).data,
 

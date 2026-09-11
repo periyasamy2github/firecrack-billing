@@ -117,6 +117,15 @@ export interface BillTotals {
 
 // ---- API shapes ----
 
+// One row of the customer list, built from bills.
+export interface Customer {
+  mobile: string
+  name: string
+  bills: number
+  spent: number
+  lastBilledAt: string
+}
+
 export interface SessionData {
   user: User
   shop: Shop

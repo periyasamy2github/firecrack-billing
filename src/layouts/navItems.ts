@@ -3,6 +3,7 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined'
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
 import PointOfSaleOutlinedIcon from '@mui/icons-material/PointOfSaleOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
@@ -21,6 +22,7 @@ export const PRIMARY_NAV: NavItem[] = [
   { label: 'New Bill', to: '/bills/new', icon: ReceiptLongOutlinedIcon, shortcut: 'N' },
   { label: 'Bills', to: '/bills', icon: ListAltOutlinedIcon },
   { label: 'Reports', to: '/reports', icon: BarChartOutlinedIcon },
+  { label: 'Customers', to: '/customers', icon: PeopleAltOutlinedIcon },
 ]
 
 export const MASTER_NAV: NavItem[] = [
