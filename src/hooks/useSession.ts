@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from '../redux/store'
 import { setCounterScope as setCounterScopeAction, signOut as signOutAction, type CounterScope } from '../redux/sessionSlice'
+import { showToast } from '../redux/uiSlice'
 import { api, setToken } from '../services/api'
 import type { UserRole } from '../types'
 
@@ -35,6 +36,7 @@ export const useSession = () => {
       await api.logout().catch(() => undefined) // revoke while the token is still attached
       setToken(null)
       dispatch(signOutAction())
+      dispatch(showToast({ message: 'You have signed out successfully', severity: 'success' }))
     },
   }
 }
