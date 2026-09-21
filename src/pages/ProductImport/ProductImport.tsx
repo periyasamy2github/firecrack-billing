@@ -41,12 +41,18 @@ const HEADER_ALIASES: Record<string, string> = {
 
 const normalizeHeader = (h: string) => h.trim().toLowerCase().replace(/\s+/g, ' ')
 
+const cellText = (schema: z.ZodType<string>) =>
+  z.preprocess((v) => (typeof v === 'number' ? String(v) : typeof v === 'string' ? v.replace(/\s+/g, ' ') : v), schema)
+
 const importRowSchema = z.object({
-  code: z.string().trim().min(1, 'Barcode is required'),
-  name: z.string().trim().min(1, 'Name is required'),
-  category: z.string().trim(),
-  hsn: z.string().trim(),
-  mrp: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : v), z.coerce.number().nullable()),
+  code: cellText(z.string().trim().min(1, 'Barcode is required')),
+  name: cellText(z.string().trim().min(1, 'Name is required')),
+  category: cellText(z.string().trim()),
+  hsn: cellText(z.string().trim()),
+  mrp: z.preprocess((v) => {
+    const text = typeof v === 'string' ? v.trim() : v
+    return text === '' || text === null || text === undefined || Number(text) === 0 ? null : text
+  }, z.coerce.number().nullable()),
   rate: z.coerce.number(),
   gstRate: z.coerce.number(),
   stock: z.coerce.number(),
