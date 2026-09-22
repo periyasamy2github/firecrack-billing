@@ -5,12 +5,12 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import type { ReactNode } from 'react'
 import { BrandMark } from './BrandMark'
 import { FireworksArt } from './FireworksArt'
-import shopBadge from '../assets/logo-2.png'
+import shopBadge from '../assets/logo.svg'
 import styles from '../css/components/AuthShell.module.css'
 
 // Shop identity comes from VITE_SHOP_* at build time.
 const SHOP = {
-  name: import.meta.env.VITE_SHOP_NAME || 'SparkBill',
+  name: import.meta.env.VITE_SHOP_NAME || 'CrackerBooks',
   town: import.meta.env.VITE_SHOP_TOWN || '',
   gstin: import.meta.env.VITE_SHOP_GSTIN || '',
 }
@@ -42,7 +42,7 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
         <div className={styles.logo}>
           <BrandMark className={styles.logoIcon} />
         </div>
-        <Typography className={styles.brandName}>SparkBill</Typography>
+        <Typography className={styles.brandName}>CrackerBooks</Typography>
       </div>
 
       <img src={shopBadge} alt="" className={styles.shopBadge} />
@@ -79,7 +79,7 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
           <div className={styles.logo}>
             <BrandMark className={styles.logoIcon} />
           </div>
-          <Typography className={styles.compactBrandName}>SparkBill</Typography>
+          <Typography className={styles.compactBrandName}>CrackerBooks</Typography>
         </div>
 
         {children}

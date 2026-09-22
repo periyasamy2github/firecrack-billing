@@ -1,4 +1,4 @@
-import logoMark from '../assets/logo-1.png'
+import logoMark from '../assets/logo.svg'
 
 export const BrandMark = ({ className }: { className?: string }) => (
   <img src={logoMark} alt="" className={className} />

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 export const usePageTitle = (title: string) => {
   useEffect(() => {
-    document.title = `${title} — SparkBill`
-    return () => { document.title = 'SparkBill — Fireworks Billing' }
+    document.title = `${title} — CrackerBooks`
+    return () => { document.title = 'CrackerBooks — Fireworks Billing' }
   }, [title])
 }

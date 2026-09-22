@@ -150,7 +150,7 @@ export const Login = () => {
             onClick={() => { void install() }}
             className={styles.installButton}
           >
-            Install SparkBill on this computer
+            Install CrackerBooks on this computer
           </Button>
         )}
         {showIosHint && (
