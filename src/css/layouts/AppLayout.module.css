@@ -179,14 +179,16 @@
   margin-top: 0.8px;
 }
 
+/* Fixed light tone: sits on the themable dark rail, so it can't follow
+   --secondary (a light-surface accent that goes invisible on dark). */
 .roleIcon {
   font-size: 11px;
-  color: var(--secondary);
+  color: #e2e8f0;
 }
 
 .roleLabel {
   font-size: 10px;
-  color: var(--secondary);
+  color: #e2e8f0;
   line-height: 1.2;
   font-weight: 700;
   white-space: nowrap;
@@ -282,7 +284,7 @@
 }
 
 .navIconActive {
-  color: var(--secondary);
+  color: #fff;
   opacity: 1;
 }
 

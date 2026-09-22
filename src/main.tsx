@@ -22,12 +22,12 @@ const confirmDefaults = {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeModeProvider>
-      <Provider store={store}>
+    <Provider store={store}>
+      <ThemeModeProvider>
         <ConfirmProvider defaultOptions={confirmDefaults}>
           <App />
         </ConfirmProvider>
-      </Provider>
-    </ThemeModeProvider>
+      </ThemeModeProvider>
+    </Provider>
   </StrictMode>,
 )

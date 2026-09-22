@@ -1,7 +1,7 @@
 import { createTheme, type Theme } from '@mui/material/styles'
-import { fontFamily, radius, tokens as t } from './tokens'
+import { fontFamily, radius, tokens, type ColorTokens } from './tokens'
 
-export const buildMuiTheme = (): Theme =>
+export const buildMuiTheme = (t: ColorTokens = tokens): Theme =>
   createTheme({
     palette: {
       mode: 'light',

@@ -85,6 +85,75 @@
   margin-bottom: 14px;
 }
 
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.themeTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+  cursor: pointer;
+}
+
+.themeTileActive {
+  border-color: var(--primary);
+  background-color: var(--primary-soft);
+}
+
+.themeSwatch {
+  display: flex;
+  width: 44px;
+  height: 26px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.themeSwatchHalf {
+  flex: 1;
+}
+
+.themeLabel {
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.customColorRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.customColorField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.customColorLabel {
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.customColorInput {
+  width: 46px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background-color: var(--card);
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .fieldsGrid2,
   .numberGrid {

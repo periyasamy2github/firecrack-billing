@@ -9,6 +9,7 @@ import { useDispatch } from '../../redux/store'
 import { saveShop } from '../../redux/shopSlice'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
+import { THEME_PRESETS, buildCustomPreset } from '../../theme/themePresets'
 import { PaymentTypesEditor } from './PaymentTypesEditor'
 import styles from '../../css/pages/Settings.module.css'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -33,6 +34,9 @@ const settingsSchema = z.object({
   nextInvoiceNumber: positiveInteger('Enter a valid invoice number'),
   numberingMode: z.enum(['shop', 'branch']),
   seasonTarget: positiveInteger('Enter a valid season target'),
+  theme: z.enum(['corporate', 'royal', 'teal', 'indigo', 'charcoal', 'custom']),
+  themeColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Pick a color'),
+  themeRailColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Pick a color'),
 })
 
 type SettingsFormValues = z.infer<typeof settingsSchema>
@@ -60,8 +64,13 @@ export const Settings = () => {
       numberingMode: shop.numberingMode,
       declaration: shop.declaration,
       seasonTarget: String(shop.seasonTarget),
+      theme: shop.theme,
+      themeColor: shop.themeColor || '#1E40AF',
+      themeRailColor: shop.themeRailColor || '#0F172A',
     },
   })
+
+  const customPreset = buildCustomPreset(watch('themeColor'), watch('themeRailColor'))
 
   const handleSave = async (values: SettingsFormValues) => {
     try {
@@ -76,6 +85,9 @@ export const Settings = () => {
         numberingMode: values.numberingMode,
         declaration: values.declaration,
         seasonTarget: Number(values.seasonTarget),
+        theme: values.theme,
+        themeColor: values.themeColor,
+        themeRailColor: values.themeRailColor,
       })).unwrap()
       showToast('Settings saved')
     } catch (err) {
@@ -151,6 +163,60 @@ export const Settings = () => {
             </div>
             )}
             <TextField label="Declaration printed on invoice" {...register('declaration')} size="small" fullWidth multiline minRows={4} />
+          </SettingsSection>
+          </Card>
+
+          <Card className={styles.fullCard}>
+          <SettingsSection title="Appearance" desc="Theme color for the whole shop — every user and device gets this look after you save.">
+            <Controller
+              name="theme"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <div className={styles.themeGrid}>
+                    {[...THEME_PRESETS, customPreset].map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        className={field.value === preset.id ? `${styles.themeTile} ${styles.themeTileActive}` : styles.themeTile}
+                        onClick={() => field.onChange(preset.id)}
+                      >
+                        <span className={styles.themeSwatch}>
+                          <span className={styles.themeSwatchHalf} style={{ backgroundColor: preset.railBg }} />
+                          <span className={styles.themeSwatchHalf} style={{ backgroundImage: preset.gradientBrand }} />
+                        </span>
+                        <Typography className={styles.themeLabel}>{preset.label}</Typography>
+                      </button>
+                    ))}
+                  </div>
+                  {field.value === 'custom' && (
+                    <div className={styles.customColorRow}>
+                      <div className={styles.customColorField}>
+                        <Typography className={styles.customColorLabel}>Brand color</Typography>
+                        <Controller
+                          name="themeColor"
+                          control={control}
+                          render={({ field: colorField }) => (
+                            <input type="color" value={colorField.value} onChange={(e) => colorField.onChange(e.target.value)} className={styles.customColorInput} />
+                          )}
+                        />
+                      </div>
+                      <div className={styles.customColorField}>
+                        <Typography className={styles.customColorLabel}>Left menu</Typography>
+                        <Controller
+                          name="themeRailColor"
+                          control={control}
+                          render={({ field: colorField }) => (
+                            <input type="color" value={colorField.value} onChange={(e) => colorField.onChange(e.target.value)} className={styles.customColorInput} />
+                          )}
+                        />
+                      </div>
+                      <Typography variant="caption">Buttons, tints and gradients follow the brand color; the menu keeps its own shade (darkened if needed so text stays readable).</Typography>
+                    </div>
+                  )}
+                </>
+              )}
+            />
           </SettingsSection>
           </Card>
 

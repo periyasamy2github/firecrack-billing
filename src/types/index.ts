@@ -1,5 +1,7 @@
 export type UserRole = 'Staff' | 'Super Admin'
 
+export type ThemeName = 'corporate' | 'royal' | 'teal' | 'indigo' | 'charcoal' | 'custom'
+
 export interface Shop {
   name: string
   town: string
@@ -12,6 +14,9 @@ export interface Shop {
   numberingMode: 'shop' | 'branch'
   declaration: string
   seasonTarget: number
+  theme: ThemeName
+  themeColor: string
+  themeRailColor: string
 }
 
 export interface Counter {
