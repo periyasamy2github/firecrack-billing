@@ -5,7 +5,7 @@ import { newBillShortcuts } from '../../data/shortcuts'
 import styles from '../../css/pages/NewBill.module.css'
 
 export const ShortcutsBar = ({ startedAt }: { startedAt: number }) => (
-  <div className={styles.shortcutsBar}>
+  <div className={`${styles.shortcutsBar} kbd-only`}>
     {newBillShortcuts.items.map(({ key, label }) => (
       <div key={key} className={styles.shortcutItem}>
         <KeyBadge label={key} />

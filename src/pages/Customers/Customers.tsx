@@ -6,9 +6,11 @@ import { SearchField } from '../../components/SearchField'
 import { ListFooter } from '../../components/ListFooter'
 import { Mono } from '../../components/Mono'
 import { TableCard, TableEmptyRow, TableLoadingRow } from '../../components/TableCard'
+import { CustomerCardList } from './CustomerCardList'
 import { useDispatch, useSelector } from '../../redux/store'
 import { loadCustomers } from '../../redux/customersSlice'
 import { useListPage } from '../../hooks/useListPage'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { formatBillDate, formatCurrency, formatInt } from '../../utils/format'
 import type { Customer } from '../../types'
@@ -16,6 +18,7 @@ import styles from '../../css/pages/Customers.module.css'
 
 export const Customers = () => {
   usePageTitle('Customers')
+  const isMobile = useIsMobile()
   const dispatch = useDispatch()
   const customers = useSelector((state) => state.customers.items)
   const [loading, setLoading] = useState(true)
@@ -34,13 +37,18 @@ export const Customers = () => {
       },
     })
 
+  const listFooter = <ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />
+
   return (
     <>
       <PageHeader title="Customers" crumb={`${customers.length} customers`} />
       <PageContent>
         <SearchField placeholder="Search by name or mobile… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ maxWidth: 340 }} />
 
-        <TableCard footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}>
+        {isMobile ? (
+          <CustomerCardList customers={pageRows} loading={loading} empty={filtered.length === 0} footer={listFooter} />
+        ) : (
+        <TableCard footer={listFooter}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -66,6 +74,7 @@ export const Customers = () => {
             </TableBody>
           </Table>
         </TableCard>
+        )}
       </PageContent>
     </>
   )

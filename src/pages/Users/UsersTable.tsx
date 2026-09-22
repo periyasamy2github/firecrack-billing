@@ -7,10 +7,11 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import { Mono } from '../../components/Mono'
 import { StatusPill } from '../../components/StatusPill'
 import { TableCard, TableEmptyRow, TableLoadingRow } from '../../components/TableCard'
+import { counterShortName } from '../../utils/format'
 import type { User } from '../../types'
 import styles from '../../css/pages/Users.module.css'
 
-interface UsersTableProps {
+export interface UsersTableProps {
   rows: User[]
   loading: boolean
   filteredCount: number
@@ -53,7 +54,7 @@ export const UsersTable = ({ rows, loading, filteredCount, onView, onEdit, onRes
                 <Typography className={styles.allCountersLabel}>All branches</Typography>
               ) : (
                 <div className={styles.countersWrap}>
-                  {user.counter && <Chip size="small" label={user.counter.split(' — ')[0]} variant="outlined" />}
+                  {user.counter && <Chip size="small" label={counterShortName(user.counter)} variant="outlined" />}
                 </div>
               )}
             </TableCell>

@@ -10,18 +10,21 @@ import { useDispatch, useSelector } from '../../redux/store'
 import { loadUsers, saveUser } from '../../redux/usersSlice'
 import { api } from '../../services/api'
 import { useListPage } from '../../hooks/useListPage'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
 import type { User } from '../../types'
 
 import { UserDialog } from './UserDialog'
 import { ResetPasswordDialog } from './ResetPasswordDialog'
-import { UsersTable } from './UsersTable'
+import { UsersTable, type UsersTableProps } from './UsersTable'
+import { UserCardList } from './UserCardList'
 import { UserDetailsDialog } from './UserDetailsDialog'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Users = () => {
   usePageTitle('Users')
+  const isMobile = useIsMobile()
   const { counters } = useSession()
   const dispatch = useDispatch()
   const users = useSelector((state) => state.users.items)
@@ -89,6 +92,18 @@ export const Users = () => {
     showToast(`Password reset for ${name}`)
   }
 
+  const listFooter = <ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />
+
+  const listProps: UsersTableProps = {
+    rows: pageRows,
+    loading,
+    filteredCount: filtered.length,
+    onView: setViewingUser,
+    onEdit: openEdit,
+    onResetPassword: setResettingUser,
+    footer: listFooter,
+  }
+
   return (
     <>
       <PageHeader
@@ -103,15 +118,7 @@ export const Users = () => {
       <PageContent>
         <SearchField placeholder="Search by name or staff ID… (/)" value={query} onChange={setQuery} inputRef={searchInputRef} sx={{ maxWidth: 340 }} />
 
-        <UsersTable
-          rows={pageRows}
-          loading={loading}
-          filteredCount={filtered.length}
-          onView={setViewingUser}
-          onEdit={openEdit}
-          onResetPassword={setResettingUser}
-          footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}
-        />
+        {isMobile ? <UserCardList {...listProps} /> : <UsersTable {...listProps} />}
       </PageContent>
 
       {formOpen && (

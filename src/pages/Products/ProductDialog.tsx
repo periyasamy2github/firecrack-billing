@@ -4,6 +4,7 @@ import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogT
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import { ProductFormFields } from './ProductFormFields'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { emptyProductForm, fromProductFormValues, productBatchSchema, toProductFormValues, type ProductBatchValues } from './productFormSchema'
 import type { Product } from '../../types'
 import styles from '../../css/pages/ProductDialog.module.css'
@@ -19,6 +20,7 @@ interface ProductDialogProps {
 }
 
 export const ProductDialog = ({ mode, open, onClose, product, existingCodes, counterId, onSubmit }: ProductDialogProps) => {
+  const isMobile = useIsMobile()
   const isAdd = mode === 'add'
   const excludeCode = mode === 'edit' ? product?.code.toUpperCase() ?? null : null
 
@@ -41,7 +43,7 @@ export const ProductDialog = ({ mode, open, onClose, product, existingCodes, cou
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth={isAdd ? 'md' : 'sm'}>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth={isAdd ? 'md' : 'sm'} fullScreen={isMobile}>
       <DialogTitle>{isAdd ? 'Add products' : `Edit product — ${product?.name}`}</DialogTitle>
       <FormProvider {...form}>
         <DialogContent className={styles.dialogContentTop}>

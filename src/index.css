@@ -9,27 +9,27 @@
   --inset: #e9eef3;
   --line: #e2e8f0;
   --line-soft: #edf2f7;
-  --primary: #1e3a5f;
-  --primary-soft: #e8eff6;
+  --primary: #2563eb;
+  --primary-soft: #dbeafe;
   --on-primary: #ffffff;
-  --secondary: #b45309;
-  --secondary-soft: #fef3c7;
-  --ember: #c2410c;
-  --ember-soft: #ffedd5;
-  --ember-ink: #7c2d12;
+  --secondary: #7c3aed;
+  --secondary-soft: #ede9fe;
+  --ember: #d97706;
+  --ember-soft: #fef3c7;
+  --ember-ink: #92400e;
   --paid: #059669;
   --paid-soft: #d1fae5;
   --paid-ink: #065f46;
   --due: #dc2626;
   --due-soft: #fee2e2;
   --due-ink: #991b1b;
-  --info: #2563eb;
-  --rail-bg: #0f172a;
-  --rail-fg: #94a3b8;
-  --rail-active: #1e293b;
-  --rail-line: #334155;
-  --glow-primary: 0 0 14px rgba(30, 58, 95, 0.2);
-  --gradient-brand: linear-gradient(135deg, #2e5c8a 0%, #16324f 100%);
+  --info: #0284c7;
+  --rail-bg: #172554;
+  --rail-fg: #a5b4d9;
+  --rail-active: #1e3a8a;
+  --rail-line: #2b4390;
+  --glow-primary: 0 0 14px rgba(37, 99, 235, 0.2);
+  --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
 
   --font-sans: 'DM Sans', ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-heading: 'Space Grotesk', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
@@ -57,6 +57,7 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
 }
 
 .num {
@@ -65,13 +66,33 @@ body {
 
 /* Top loading bar — brand sapphire-to-amber, above every MUI layer */
 #nprogress .bar {
-  background: linear-gradient(90deg, #2e5c8a, #059669);
+  background: linear-gradient(90deg, #3b82f6, #059669);
   height: 3px;
   z-index: 2000;
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px rgba(46, 92, 138, 0.7), 0 0 5px rgba(5, 150, 105, 0.7);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 5px rgba(5, 150, 105, 0.7);
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* Keyboard-shortcut UI is desktop-only: hidden on touch devices (tablets at any
+   width) and at phone width. */
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
+  .kbd-only {
+    display: none !important;
+  }
 }
 
 @media print {

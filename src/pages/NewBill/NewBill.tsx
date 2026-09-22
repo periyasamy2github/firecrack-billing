@@ -10,6 +10,7 @@ import { PageMessage } from '../../components/PageMessage'
 import { Panel } from '../../components/Panel'
 import { BillItemsTable } from './BillItemsTable'
 import { BillSummaryRail } from './BillSummaryRail'
+import { MobileSaveBar } from './MobileSaveBar'
 import { ProductSearchField } from './ProductSearchField'
 import { ShortcutsBar } from './ShortcutsBar'
 import { newBillSchema, type NewBillFormValues } from './newBillSchema'
@@ -134,6 +135,7 @@ export const NewBill = () => {
 
   const mixedTendered = activePaymentTypes.reduce((sum, type) => sum + (Number(mixedAmounts[type.id]) || 0), 0)
   const paymentsReady = effectiveSelection === MIXED ? mixedTendered === totals.grandTotal && totals.grandTotal > 0 : Boolean(effectiveSelection)
+  const saveDisabled = items.length === 0 || saving || !paymentsReady
 
   const addItem = (product: Product) =>
     setItems((prev) => {
@@ -185,7 +187,7 @@ export const NewBill = () => {
       : dispatch(createBill(buildBillInput())).unwrap()
 
   const saveAndPrint = async () => {
-    if (saving || items.length === 0 || !paymentsReady || !(await trigger())) return
+    if (saveDisabled || !(await trigger())) return
     setSaving(true)
     try {
       const { bill } = await persistBill()
@@ -198,7 +200,7 @@ export const NewBill = () => {
   }
 
   const saveOnly = async () => {
-    if (saving || items.length === 0 || !paymentsReady || !(await trigger())) return
+    if (saveDisabled || !(await trigger())) return
     setSaving(true)
     try {
       const { bill } = await persistBill()
@@ -323,11 +325,19 @@ export const NewBill = () => {
             billDiscountInputRef={billDiscountInputRef}
             onSaveAndPrint={saveAndPrint}
             onSaveOnly={saveOnly}
-            disabled={items.length === 0 || saving || !paymentsReady}
+            disabled={saveDisabled}
             saving={saving}
           />
         </div>
       </PageContent>
+
+      <MobileSaveBar
+        grandTotal={totals.grandTotal}
+        disabled={saveDisabled}
+        saving={saving}
+        onSaveAndPrint={saveAndPrint}
+        onSaveOnly={saveOnly}
+      />
 
       <ShortcutsBar startedAt={startedAt.current} />
     </>

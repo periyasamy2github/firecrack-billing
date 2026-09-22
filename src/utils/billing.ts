@@ -1,4 +1,5 @@
 import type { Bill, BillDiscount, BillLineItem, BillTotals } from '../types'
+import { formatAmount } from './format'
 
 export interface LineAmounts {
   rate: number
@@ -81,6 +82,9 @@ export const halfGstRateLabel = (items: BillLineItem[]): string | null => {
 }
 
 export const getBillTotals = (bill: Bill): BillTotals => computeBillTotals(bill.items, bill.gstApplicable, bill.billDiscount)
+
+export const mixedPaymentLabel = (bill: Bill): string =>
+  bill.payments.map((payment) => `${payment.type} ₹${formatAmount(payment.amount)}`).join(' · ')
 
 export const hsnSummary = (items: BillLineItem[], gstApplicable = true, billDiscount?: BillDiscount) => {
   let gross = 0

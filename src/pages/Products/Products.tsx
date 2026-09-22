@@ -9,13 +9,15 @@ import { PageContent } from '../../components/PageContent'
 import { SearchField } from '../../components/SearchField'
 import { ListFooter } from '../../components/ListFooter'
 import { ProductDialog } from './ProductDialog'
-import { ProductsTable } from './ProductsTable'
+import { ProductsTable, type ProductsTableProps } from './ProductsTable'
+import { ProductCardList } from './ProductCardList'
 import { productCategories } from '../../data/products'
 import { useSession } from '../../hooks/useSession'
 import { useDispatch, useSelector } from '../../redux/store'
 import { deleteProduct, loadProducts, saveProduct } from '../../redux/productsSlice'
 import { useListPage } from '../../hooks/useListPage'
 import { usePendingAction } from '../../hooks/usePendingAction'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { ROUTES } from '../../utils/routes'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
@@ -27,6 +29,7 @@ const CATEGORY_KEYS = ['All', ...productCategories] as const
 
 export const Products = () => {
   usePageTitle('Products')
+  const isMobile = useIsMobile()
   const navigate = useNavigate()
   const { counters, isSuperAdmin, counterScope } = useSession()
   const dispatch = useDispatch()
@@ -102,6 +105,20 @@ export const Products = () => {
     }
   }
 
+  const listFooter = <ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />
+
+  const listProps: ProductsTableProps = {
+    rows: pageRows,
+    loading,
+    filteredCount: filtered.length,
+    viewingAllCounters,
+    canManage: isSuperAdmin,
+    isPending,
+    onEdit: setEditingProduct,
+    onDelete: handleDelete,
+    footer: listFooter,
+  }
+
   return (
     <>
       <PageHeader
@@ -145,17 +162,7 @@ export const Products = () => {
           ))}
         </div>
 
-        <ProductsTable
-          rows={pageRows}
-          loading={loading}
-          filteredCount={filtered.length}
-          viewingAllCounters={viewingAllCounters}
-          canManage={isSuperAdmin}
-          isPending={isPending}
-          onEdit={setEditingProduct}
-          onDelete={handleDelete}
-          footer={<ListFooter count={filtered.length} page={page} rowsPerPage={rowsPerPage} onPageChange={changePage} onRowsPerPageChange={changeRowsPerPage} />}
-        />
+        {isMobile ? <ProductCardList {...listProps} /> : <ProductsTable {...listProps} />}
       </PageContent>
 
       {isSuperAdmin && (

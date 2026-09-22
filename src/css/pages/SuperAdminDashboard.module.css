@@ -187,3 +187,27 @@
   background-image: var(--gradient-brand);
   border-radius: 999px;
 }
+
+@media (max-width: 768px) {
+  .kpiGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .chartsGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .paymentPanelRow {
+    flex-wrap: wrap;
+  }
+
+  .counterProgressCell {
+    display: none;
+  }
+
+  .counterRow td {
+    padding: 8px;
+    white-space: nowrap;
+  }
+}

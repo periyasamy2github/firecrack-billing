@@ -125,6 +125,16 @@
   margin-top: 10px;
 }
 
+@media (max-width: 768px) {
+  .sheet {
+    padding: 16px 12px;
+  }
+
+  .sheetWrap {
+    overflow-x: auto;
+  }
+}
+
 @media print {
   .sheet {
     max-width: none;

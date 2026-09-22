@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 import type { Counter } from '../../types'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import styles from '../../css/pages/Counters.module.css'
 
 const counterSchema = z.object({
@@ -21,6 +22,7 @@ interface CounterDialogProps {
 }
 
 export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialogProps) => {
+  const isMobile = useIsMobile()
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CounterFormValues>({
     resolver: zodResolver(counterSchema),
     defaultValues: { name: counter?.name ?? '', code: counter?.code ?? '', nextNumber: counter ? String(counter.nextNumber) : '' },
@@ -32,7 +34,7 @@ export const CounterDialog = ({ open, counter, onClose, onSubmit }: CounterDialo
       : { id: `c${Date.now()}`, name: name.trim(), code: code.trim().toUpperCase(), nextNumber: nextNumber ? Number(nextNumber) : 1, active: true })
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" fullScreen={isMobile}>
       <DialogTitle>{counter ? 'Edit branch' : 'Add branch'}</DialogTitle>
       <DialogContent className={styles.dialogContentTop}>
         <TextField

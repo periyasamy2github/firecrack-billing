@@ -19,13 +19,16 @@ import { useBillsPage } from '../../hooks/useBillsPage'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
 import { usePendingAction } from '../../hooks/usePendingAction'
 import { useToast } from '../../hooks/useToast'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { errorMessage } from '../../utils/errorMessage'
-import { BillsTable } from './BillsTable'
+import { BillsTable, type BillsTableProps } from './BillsTable'
+import { BillCardList } from './BillCardList'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/Bills.module.css'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Bills = () => {
+  const isMobile = useIsMobile()
   const navigate = useNavigate()
   const { counterScope, paymentTypes } = useSession()
   const filters = billFilters(paymentTypes.map((type) => type.name))
@@ -96,6 +99,19 @@ export const Bills = () => {
     />
   )
 
+  const listProps: BillsTableProps = {
+    bills: result.bills,
+    loading: result.loading,
+    error: result.error,
+    viewingAll,
+    isPending,
+    onView: (bill) => navigate(billPrintPath(bill.id)),
+    onEdit: (bill) => navigate(billEditPath(bill.id)),
+    onReprint: reprintAndOpen,
+    onCancel: cancelWithConfirm,
+    footer: tableFooter,
+  }
+
   return (
     <>
       <PageHeader
@@ -124,18 +140,7 @@ export const Bills = () => {
           </div>
         </Card>
 
-        <BillsTable
-          bills={result.bills}
-          loading={result.loading}
-          error={result.error}
-          viewingAll={viewingAll}
-          isPending={isPending}
-          onView={(bill) => navigate(billPrintPath(bill.id))}
-          onEdit={(bill) => navigate(billEditPath(bill.id))}
-          onReprint={reprintAndOpen}
-          onCancel={cancelWithConfirm}
-          footer={tableFooter}
-        />
+        {isMobile ? <BillCardList {...listProps} /> : <BillsTable {...listProps} />}
       </PageContent>
     </>
   )

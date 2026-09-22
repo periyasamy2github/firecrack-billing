@@ -21,6 +21,13 @@ export const formatInt = (value: number): string => integerFormatter.format(valu
 export const formatSignedAmount = (value: number): string =>
   `${value < 0 ? '−' : '+'} ${numberFormatter.format(Math.abs(value))}`
 
+// "CHE-002" when the branch has a code, else the bare number.
+export const nextBillNoLabel = (code: string | null | undefined, nextNumber: number): string =>
+  code ? `${code}-${String(nextNumber).padStart(3, '0')}` : String(nextNumber)
+
+// User.counter is "Name — detail"; the short name is the part before the em dash.
+export const counterShortName = (counter: string): string => counter.split(' — ')[0]
+
 export const formatLongDate = (value: Date): string =>
   value.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 

@@ -8,6 +8,7 @@ import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
 import PointOfSaleOutlinedIcon from '@mui/icons-material/PointOfSaleOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import type { SvgIconComponent } from '@mui/icons-material'
+import { ROUTES } from '../utils/routes'
 
 export interface NavItem {
   label: string
@@ -31,3 +32,9 @@ export const MASTER_NAV: NavItem[] = [
   { label: 'Branches', to: '/counters', icon: PointOfSaleOutlinedIcon, superAdminOnly: true },
   { label: 'Settings', to: '/settings', icon: SettingsOutlinedIcon, superAdminOnly: true },
 ]
+
+// One rule for "is this nav item the current page", shared by the sidebar and the bottom tabs.
+export const isNavActive = (pathname: string, to: string): boolean =>
+  to === '/'
+    ? pathname === '/'
+    : pathname === to || (pathname.startsWith(`${to}/`) && pathname !== ROUTES.newBill)

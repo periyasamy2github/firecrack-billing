@@ -14,17 +14,17 @@ interface BillItemsTableProps {
 }
 
 export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: BillItemsTableProps) => (
-  <Table size="small">
+  <Table size="small" className={styles.table}>
     <TableHead>
       <TableRow>
-        <TableCell className={styles.idCol}>#</TableCell>
+        <TableCell className={`${styles.idCol} ${styles.hideMobile}`}>#</TableCell>
         <TableCell>Item</TableCell>
-        <TableCell>HSN</TableCell>
-        <TableCell align="right">MRP</TableCell>
+        <TableCell className={styles.hideMobile}>HSN</TableCell>
+        <TableCell align="right" className={styles.hideMobile}>MRP</TableCell>
         <TableCell align="right">Rate</TableCell>
         <TableCell align="right" className={styles.qtyCol}>Qty</TableCell>
-        {gstApplicable && <TableCell align="right">Taxable</TableCell>}
-        {gstApplicable && <TableCell align="right">GST</TableCell>}
+        {gstApplicable && <TableCell align="right" className={styles.hideMobile}>Taxable</TableCell>}
+        {gstApplicable && <TableCell align="right" className={styles.hideMobile}>GST</TableCell>}
         <TableCell align="right">Amount</TableCell>
         <TableCell className={styles.actionCol} />
       </TableRow>
@@ -34,17 +34,17 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
         const { rate, taxable, amount } = computeLineAmounts(item, gstApplicable)
         return (
           <TableRow key={item.lineId} hover>
-            <TableCell>
+            <TableCell className={styles.hideMobile}>
               <Typography variant="caption">{idx + 1}</Typography>
             </TableCell>
             <TableCell>
               <Typography className={styles.itemName}>{item.product.name}</Typography>
               <Typography variant="caption">{item.product.code}</Typography>
             </TableCell>
-            <TableCell>
+            <TableCell className={styles.hideMobile}>
               <Mono sx={{ fontSize: 11, color: 'text.secondary' }}>{item.product.hsn}</Mono>
             </TableCell>
-            <TableCell align="right">{item.product.mrp != null && <Mono sx={{ fontSize: 12, color: 'text.secondary', textDecoration: 'line-through' }}>{formatAmount(item.product.mrp)}</Mono>}</TableCell>
+            <TableCell align="right" className={styles.hideMobile}>{item.product.mrp != null && <Mono sx={{ fontSize: 12, color: 'text.secondary', textDecoration: 'line-through' }}>{formatAmount(item.product.mrp)}</Mono>}</TableCell>
             <TableCell align="right"><Mono sx={{ fontSize: 12, fontWeight: 600 }}>{formatAmount(rate)}</Mono></TableCell>
             <TableCell align="right">
               <TextField
@@ -56,8 +56,8 @@ export const BillItemsTable = ({ items, gstApplicable, onQtyChange, onRemove }: 
                 className={styles.numberField}
               />
             </TableCell>
-            {gstApplicable && <TableCell align="right"><Mono sx={{ fontSize: 12 }}>{formatAmount(taxable)}</Mono></TableCell>}
-            {gstApplicable && <TableCell align="right"><Typography variant="caption">{item.product.gstRate}%</Typography></TableCell>}
+            {gstApplicable && <TableCell align="right" className={styles.hideMobile}><Mono sx={{ fontSize: 12 }}>{formatAmount(taxable)}</Mono></TableCell>}
+            {gstApplicable && <TableCell align="right" className={styles.hideMobile}><Typography variant="caption">{item.product.gstRate}%</Typography></TableCell>}
             <TableCell align="right"><Mono sx={{ fontSize: 12, fontWeight: 600 }}>{formatAmount(amount)}</Mono></TableCell>
             <TableCell>
               <IconButton size="small" onClick={() => onRemove(item.lineId)} aria-label={`Remove ${item.product.name}`}>

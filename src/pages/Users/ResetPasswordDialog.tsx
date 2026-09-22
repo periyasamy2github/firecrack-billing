@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 import type { User } from '../../types'
 import { resetPasswordSchema, type ResetPasswordValues } from './userFormSchema'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import styles from '../../css/pages/Users.module.css'
 
 interface ResetPasswordDialogProps {
@@ -12,13 +13,14 @@ interface ResetPasswordDialogProps {
 }
 
 export const ResetPasswordDialog = ({ user, onClose, onSubmit }: ResetPasswordDialogProps) => {
+  const isMobile = useIsMobile()
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { newPassword: '', confirmPassword: '' },
   })
 
   return (
-    <Dialog open={Boolean(user)} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog open={Boolean(user)} onClose={onClose} fullWidth maxWidth="xs" fullScreen={isMobile}>
       <DialogTitle>Reset password{user ? ` — ${user.name}` : ''}</DialogTitle>
       <DialogContent className={styles.dialogContentFlex}>
         <TextField

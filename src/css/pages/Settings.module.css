@@ -84,3 +84,10 @@
 .numberingMode {
   margin-bottom: 14px;
 }
+
+@media (max-width: 768px) {
+  .fieldsGrid2,
+  .numberGrid {
+    grid-template-columns: 1fr;
+  }
+}

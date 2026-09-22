@@ -156,7 +156,8 @@ export const BillSummaryRail = ({
       grandTotal={totals.grandTotal}
     />
 
-    <div className={styles.footer}>
+    {/* Desktop-only: MobileSaveBar carries both save actions on phones. */}
+    <div className={`${styles.footer} desktop-only`}>
       <Button
         variant="contained"
         size="large"
@@ -165,10 +166,10 @@ export const BillSummaryRail = ({
         onClick={onSaveAndPrint}
         className={styles.printButton}
       >
-        {saving ? 'Saving…' : <>Save &amp; Print <Box component="span" className={styles.shortcutHint}>F9</Box></>}
+        {saving ? 'Saving…' : <>Save &amp; Print <Box component="span" className={`${styles.shortcutHint} kbd-only`}>F9</Box></>}
       </Button>
       <Button variant="outlined" disabled={disabled} onClick={onSaveOnly}>
-        Save without printing <Box component="span" className={styles.shortcutHintSubtle}>F10</Box>
+        Save without printing <Box component="span" className={`${styles.shortcutHintSubtle} kbd-only`}>F10</Box>
       </Button>
     </div>
   </Card>

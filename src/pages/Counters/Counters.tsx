@@ -10,15 +10,19 @@ import { useSession } from '../../hooks/useSession'
 import { useDispatch } from '../../redux/store'
 import { saveCounter } from '../../redux/countersSlice'
 import { usePendingAction } from '../../hooks/usePendingAction'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { useToast } from '../../hooks/useToast'
 import { errorMessage } from '../../utils/errorMessage'
+import { nextBillNoLabel } from '../../utils/format'
 import type { Counter } from '../../types'
 import { CounterDialog } from './CounterDialog'
+import { CounterCardList } from './CounterCardList'
 import styles from '../../css/pages/Counters.module.css'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Counters = () => {
   usePageTitle('Branches')
+  const isMobile = useIsMobile()
   const { counters } = useSession()
   const dispatch = useDispatch()
   const persistCounter = (counter: Counter) => dispatch(saveCounter(counter)).unwrap()
@@ -61,6 +65,12 @@ export const Counters = () => {
       }
     })
 
+  const footerNote = (
+    <div className={styles.footer}>
+      <Typography variant="caption">Inactive branches can't be picked at login or billed from.</Typography>
+    </div>
+  )
+
   return (
     <>
       <PageHeader
@@ -73,13 +83,10 @@ export const Counters = () => {
         }
       />
       <PageContent>
-        <TableCard
-          footer={
-            <div className={styles.footer}>
-              <Typography variant="caption">Inactive branches can't be picked at login or billed from.</Typography>
-            </div>
-          }
-        >
+        {isMobile ? (
+          <CounterCardList counters={counters} isPending={isPending} onToggleActive={toggleActive} onEdit={openEdit} footer={footerNote} />
+        ) : (
+        <TableCard footer={footerNote}>
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -96,7 +103,7 @@ export const Counters = () => {
                   <TableRow key={c.id} hover>
                     <TableCell><Typography className={styles.counterName}>{c.name}</Typography></TableCell>
                     <TableCell><Typography className={styles.counterName}>{c.code ?? '—'}</Typography></TableCell>
-                    <TableCell align="right"><Typography className={styles.counterName}>{c.code ? `${c.code}-${String(c.nextNumber).padStart(3, '0')}` : c.nextNumber}</Typography></TableCell>
+                    <TableCell align="right"><Typography className={styles.counterName}>{nextBillNoLabel(c.code, c.nextNumber)}</Typography></TableCell>
                     <TableCell><StatusPill tone={c.active ? 'paid' : 'mut'} label={c.active ? 'Active' : 'Inactive'} /></TableCell>
                     <TableCell align="right">
                       <Switch size="small" checked={c.active} onChange={() => toggleActive(c)} disabled={isPending(c.id)} />
@@ -117,6 +124,7 @@ export const Counters = () => {
               </TableBody>
             </Table>
         </TableCard>
+        )}
       </PageContent>
 
       {open && (

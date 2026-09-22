@@ -100,7 +100,7 @@ export const ProductSearchField = ({ products, loading, inputRef, onAdd, onScanB
               ...params.InputProps,
               startAdornment: <SearchRoundedIcon className={styles.searchIcon} />,
               endAdornment: (
-                <span className={styles.searchEndAdornment}>
+                <span className={`${styles.searchEndAdornment} kbd-only`}>
                   <KeyBadge label="F2" />
                 </span>
               ),

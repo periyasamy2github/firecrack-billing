@@ -1,7 +1,13 @@
 .card {
-  position: sticky;
-  top: 12px;
   overflow: hidden;
+}
+
+/* Sticky only beside the items column; in the single-column phone layout it flows normally. */
+@media (min-width: 769px) {
+  .card {
+    position: sticky;
+    top: 12px;
+  }
 }
 
 .headerRow {

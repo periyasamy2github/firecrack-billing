@@ -29,6 +29,8 @@ export const useSession = () => {
     isSuperAdmin: role === 'Super Admin',
     counterScope,
     selectedCounter,
+    // Branch-scope caption shown under the brand in both the sidebar and the mobile header.
+    scopeLabel: role === 'Super Admin' ? (counterScope === 'all' ? 'All branches' : selectedCounter?.name) : (currentUser?.counter ?? shop.name),
     billingCounter: selectedCounter ?? counters[0],
     nextBillNo: `${shop.invoicePrefix}${shop.nextInvoiceNumber}`,
     setCounterScope: (scope: CounterScope) => dispatch(setCounterScopeAction(scope)),

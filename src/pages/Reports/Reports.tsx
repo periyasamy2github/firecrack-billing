@@ -20,14 +20,17 @@ import { api } from '../../services/api'
 import { useSession } from '../../hooks/useSession'
 import { useBillsPage } from '../../hooks/useBillsPage'
 import { useKeyShortcuts } from '../../hooks/useKeyShortcuts'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { useToast } from '../../hooks/useToast'
 import { ReportFilterBar, type ReportFilters } from './ReportFilterBar'
-import { ReportsTable } from './ReportsTable'
+import { ReportsTable, type ReportsTableProps } from './ReportsTable'
+import { ReportCardList } from './ReportCardList'
 import styles from '../../css/pages/Reports.module.css'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
 export const Reports = () => {
   usePageTitle('Reports')
+  const isMobile = useIsMobile()
   const navigate = useNavigate()
   const { counterScope, isSuperAdmin, counters } = useSession()
   const showToast = useToast()
@@ -98,6 +101,15 @@ export const Reports = () => {
     />
   )
 
+  const listProps: ReportsTableProps = {
+    bills: result.bills,
+    loading: result.loading,
+    error: result.error,
+    showCounterColumn,
+    onView: (bill) => navigate(billPrintPath(bill.id)),
+    footer: tableFooter,
+  }
+
   return (
     <>
       <PageHeader
@@ -135,14 +147,7 @@ export const Reports = () => {
           searchInputRef={searchInputRef}
         />
 
-        <ReportsTable
-          bills={result.bills}
-          loading={result.loading}
-          error={result.error}
-          showCounterColumn={showCounterColumn}
-          onView={(bill) => navigate(billPrintPath(bill.id))}
-          footer={tableFooter}
-        />
+        {isMobile ? <ReportCardList {...listProps} /> : <ReportsTable {...listProps} />}
       </PageContent>
     </>
   )

@@ -1,0 +1,84 @@
+/* Shared shell for the mobile card lists — the card counterpart of TableCard. */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardListEmpty {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--muted);
+}
+
+.itemCard {
+  padding: 10px 12px;
+}
+
+.itemCardClickable {
+  cursor: pointer;
+}
+
+.itemCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardName {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.itemCardMeta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.itemCardBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.itemCardPayment {
+  min-width: 0;
+}
+
+.itemCardActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px solid var(--line-soft);
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.cardMonoStrong {
+  font-weight: 600;
+}
+
+.cardMonoSmall {
+  font-size: 11px;
+}
+
+.cardMixed {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.cardTotal {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.cardTotalCancelled {
+  text-decoration: line-through;
+  color: var(--muted);
+}

@@ -297,3 +297,20 @@
   font-size: 9.5px;
   opacity: 0.55;
 }
+
+@media (max-width: 768px) {
+  .shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+  }
+}

@@ -10,7 +10,7 @@ import { formatAmount } from '../../utils/format'
 import type { Product } from '../../types'
 import styles from '../../css/pages/Products.module.css'
 
-interface ProductsTableProps {
+export interface ProductsTableProps {
   rows: Product[]
   loading: boolean
   filteredCount: number

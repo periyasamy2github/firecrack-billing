@@ -8,3 +8,10 @@
   gap: 16px;
   min-width: 0;
 }
+
+@media (max-width: 768px) {
+  .content {
+    padding: 12px;
+    gap: 12px;
+  }
+}

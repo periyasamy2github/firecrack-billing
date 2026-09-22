@@ -4,11 +4,12 @@ import styles from '../css/components/Mono.module.css'
 
 interface MonoProps {
   children: ReactNode
+  className?: string
   sx?: SxProps<Theme>
 }
 
-export const Mono = ({ children, sx }: MonoProps) => (
-  <Box component="span" className={styles.mono} sx={sx}>
+export const Mono = ({ children, className, sx }: MonoProps) => (
+  <Box component="span" className={className ? `${styles.mono} ${className}` : styles.mono} sx={sx}>
     {children}
   </Box>
 )

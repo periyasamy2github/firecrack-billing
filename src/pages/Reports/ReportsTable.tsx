@@ -4,13 +4,13 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { Mono } from '../../components/Mono'
 import { StatusPill, BILL_STATUS_TONE } from '../../components/StatusPill'
 import { TableCard, TableEmptyRow, TableLoadingRow } from '../../components/TableCard'
-import { getBillTotals } from '../../utils/billing'
-import { formatAmount, formatCurrency } from '../../utils/format'
+import { getBillTotals, mixedPaymentLabel } from '../../utils/billing'
+import { formatCurrency } from '../../utils/format'
 import { useBillSort } from '../../hooks/useBillSort'
 import type { Bill } from '../../types'
 import styles from '../../css/pages/Reports.module.css'
 
-interface ReportsTableProps {
+export interface ReportsTableProps {
   bills: Bill[]
   loading: boolean
   error?: string
@@ -60,7 +60,7 @@ export const ReportsTable = ({ bills, loading, error, showCounterColumn, onView,
                   <>
                     <StatusPill tone="paid" dot={false} label="Mixed" />
                     <Mono sx={{ display: 'block', fontSize: 10, color: 'text.secondary' }}>
-                      {bill.payments.map((payment) => `${payment.type} ₹${formatAmount(payment.amount)}`).join(' · ')}
+                      {mixedPaymentLabel(bill)}
                     </Mono>
                   </>
                 ) : bill.paymentMethod ? <StatusPill tone="paid" dot={false} label={bill.paymentMethod} /> : <StatusPill tone="mut" dot={false} label="—" />}

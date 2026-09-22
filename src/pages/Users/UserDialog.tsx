@@ -5,6 +5,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined'
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined'
 import type { Counter, User, UserRole } from '../../types'
 import { emptyUserForm, fromUserFormValues, toUserFormValues, userSchema, type UserFormValues } from './userFormSchema'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import styles from '../../css/pages/Users.module.css'
 
 interface UserDialogProps {
@@ -17,6 +18,7 @@ interface UserDialogProps {
 }
 
 export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: UserDialogProps) => {
+  const isMobile = useIsMobile()
   const { register, control, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema(users, user?.id ?? null, !user)),
     defaultValues: user ? toUserFormValues(user) : emptyUserForm(),
@@ -25,7 +27,7 @@ export const UserDialog = ({ open, user, users, counters, onClose, onSubmit }: U
   const role = watch('role')
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" fullScreen={isMobile}>
       <DialogTitle>{user ? `Edit user — ${user.name}` : 'Add user'}</DialogTitle>
       <DialogContent className={styles.dialogContentTop}>
         <div className={styles.formGrid}>

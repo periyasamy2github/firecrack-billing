@@ -70,3 +70,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+@media (max-width: 768px) {
+  .card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .iconTile {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 10px;
+  }
+
+  .iconTile .icon {
+    font-size: 17px;
+  }
+
+  .text .label {
+    font-size: 9.5px;
+  }
+
+  .text .value {
+    font-size: 15.5px;
+  }
+}

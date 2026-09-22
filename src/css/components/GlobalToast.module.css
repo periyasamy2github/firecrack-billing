@@ -25,7 +25,7 @@
 
 /* toastr's #f89406 leaves white text at 2.3:1, so this one is darkened to pass. */
 .warning {
-  background-color: #b45309;
+  background-color: #d97706;
 }
 
 .info {

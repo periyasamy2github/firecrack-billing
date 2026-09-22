@@ -10,3 +10,17 @@
   padding: 32px 0;
   color: var(--muted);
 }
+
+/* Remaining tables swipe sideways on phones instead of squishing: the table
+   sizes to its content and every cell stays on one line. */
+@media (max-width: 768px) {
+  .scroll > table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .scroll > table th,
+  .scroll > table td {
+    white-space: nowrap;
+  }
+}
