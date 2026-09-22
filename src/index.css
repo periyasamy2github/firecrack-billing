@@ -9,11 +9,11 @@
   --inset: #e9eef3;
   --line: #e2e8f0;
   --line-soft: #edf2f7;
-  --primary: #2563eb;
-  --primary-soft: #dbeafe;
+  --primary: #1e40af;
+  --primary-soft: #e8eff6;
   --on-primary: #ffffff;
-  --secondary: #7c3aed;
-  --secondary-soft: #ede9fe;
+  --secondary: #475569;
+  --secondary-soft: #e2e8f0;
   --ember: #d97706;
   --ember-soft: #fef3c7;
   --ember-ink: #92400e;
@@ -24,12 +24,12 @@
   --due-soft: #fee2e2;
   --due-ink: #991b1b;
   --info: #0284c7;
-  --rail-bg: #172554;
-  --rail-fg: #a5b4d9;
-  --rail-active: #1e3a8a;
-  --rail-line: #2b4390;
-  --glow-primary: 0 0 14px rgba(37, 99, 235, 0.2);
-  --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --rail-bg: #0f172a;
+  --rail-fg: #94a3b8;
+  --rail-active: #1e293b;
+  --rail-line: #334155;
+  --glow-primary: 0 0 14px rgba(30, 64, 175, 0.2);
+  --gradient-brand: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
 
   --font-sans: 'DM Sans', ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-heading: 'Space Grotesk', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
@@ -66,13 +66,13 @@ body {
 
 /* Top loading bar — brand sapphire-to-amber, above every MUI layer */
 #nprogress .bar {
-  background: linear-gradient(90deg, #3b82f6, #059669);
+  background: linear-gradient(90deg, #1d4ed8, #059669);
   height: 3px;
   z-index: 2000;
 }
 
 #nprogress .peg {
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 5px rgba(5, 150, 105, 0.7);
+  box-shadow: 0 0 10px rgba(29, 78, 216, 0.7), 0 0 5px rgba(5, 150, 105, 0.7);
 }
 
 @media (max-width: 768px) {
