@@ -22,6 +22,9 @@ class SettingController extends Controller
             'numberingMode' => ['required', \Illuminate\Validation\Rule::in(['shop', 'branch'])],
             'declaration' => ['required', 'string'],
             'seasonTarget' => ['required', 'numeric', 'min:0'],
+            'theme' => ['required', \Illuminate\Validation\Rule::in(['corporate', 'royal', 'teal', 'indigo', 'charcoal', 'custom'])],
+            'themeColor' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/', 'required_if:theme,custom'],
+            'themeRailColor' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
         $setting = Setting::current();
@@ -35,6 +38,9 @@ class SettingController extends Controller
             'numbering_mode' => $data['numberingMode'],
             'declaration' => $data['declaration'],
             'season_target' => $data['seasonTarget'],
+            'theme' => $data['theme'],
+            'theme_color' => $data['themeColor'] ?? null,
+            'theme_rail_color' => $data['themeRailColor'] ?? null,
         ]);
 
         return new SettingResource($setting);

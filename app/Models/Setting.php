@@ -18,6 +18,9 @@ class Setting extends Model
         'numbering_mode',
         'declaration',
         'season_target',
+        'theme',
+        'theme_color',
+        'theme_rail_color',
     ];
 
     protected $casts = [

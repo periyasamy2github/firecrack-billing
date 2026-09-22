@@ -21,6 +21,9 @@ class SettingResource extends JsonResource
             'numberingMode' => $this->numbering_mode,
             'declaration' => $this->declaration ?? '',
             'seasonTarget' => (float) $this->season_target,
+            'theme' => $this->theme ?? 'corporate',
+            'themeColor' => $this->theme_color ?? '',
+            'themeRailColor' => $this->theme_rail_color ?? '',
         ];
     }
 }
