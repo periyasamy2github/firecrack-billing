@@ -7,6 +7,7 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import { PRIMARY_NAV, MASTER_NAV, isNavActive, type NavItem } from './navItems'
 import { useSession } from '../hooks/useSession'
 import { usePwaInstall } from '../hooks/usePwaInstall'
+import { InstallHelpDialog } from '../components/InstallHelpDialog'
 import { ROUTES } from '../utils/routes'
 import styles from '../css/layouts/MobileNav.module.css'
 
@@ -18,8 +19,9 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { isSuperAdmin, currentUser, signOut } = useSession()
-  const { canInstall, install } = usePwaInstall()
+  const { canInstall, isInstalled, install } = usePwaInstall()
   const [moreOpen, setMoreOpen] = useState(false)
+  const [installHelpOpen, setInstallHelpOpen] = useState(false)
 
   const moreItems = ALL_NAV.filter((item) => !TAB_PATHS.includes(item.to) && (!item.superAdminOnly || isSuperAdmin))
   const moreActive = moreItems.some((item) => isNavActive(pathname, item.to))
@@ -55,8 +57,8 @@ export const MobileBottomNav = () => {
               <ListItemText primary={item.label} />
             </ListItemButton>
           ))}
-          {canInstall && (
-            <ListItemButton onClick={() => { setMoreOpen(false); void install() }}>
+          {!isInstalled && (
+            <ListItemButton onClick={() => { setMoreOpen(false); if (canInstall) void install(); else setInstallHelpOpen(true) }}>
               <ListItemIcon><DownloadOutlinedIcon /></ListItemIcon>
               <ListItemText primary="Install app" />
             </ListItemButton>
@@ -69,6 +71,8 @@ export const MobileBottomNav = () => {
         </List>
         <Typography className={styles.moreBrand}>CrackerBooks</Typography>
       </Drawer>
+
+      <InstallHelpDialog open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
     </>
   )
 }

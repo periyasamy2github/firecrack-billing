@@ -36,6 +36,9 @@ export const usePwaInstall = () => {
 
   return {
     canInstall: Boolean(deferred),
+    // Already running as an installed app (browser install or TWA) — nothing to offer.
+    isInstalled: window.matchMedia('(display-mode: standalone)').matches
+      || (window.navigator as { standalone?: boolean }).standalone === true,
     showIosHint: isIosSafari(),
     install: async () => {
       if (!capturedPrompt) return

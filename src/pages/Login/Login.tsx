@@ -16,6 +16,7 @@ import { api, setToken } from '../../services/api'
 import { useSession } from '../../hooks/useSession'
 import { useToast } from '../../hooks/useToast'
 import { usePwaInstall } from '../../hooks/usePwaInstall'
+import { InstallHelpDialog } from '../../components/InstallHelpDialog'
 import { errorMessage } from '../../utils/errorMessage'
 import type { User } from '../../types'
 import { ROUTES } from '../../utils/routes'
@@ -44,7 +45,8 @@ export const Login = () => {
   })
 
   const showToast = useToast()
-  const { canInstall, showIosHint, install } = usePwaInstall()
+  const { canInstall, isInstalled, showIosHint, install } = usePwaInstall()
+  const [installHelpOpen, setInstallHelpOpen] = useState(false)
 
   const routeAfterLogin = (user: User) => {
     if (user.role !== 'Super Admin' && !user.counterId) {
@@ -140,22 +142,23 @@ export const Login = () => {
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
 
-        {canInstall && (
+        {!isInstalled && (
           <Button
             type="button"
             variant="outlined"
             size="small"
             fullWidth
             startIcon={<DownloadOutlinedIcon />}
-            onClick={() => { void install() }}
+            onClick={() => { if (canInstall) void install(); else setInstallHelpOpen(true) }}
             className={styles.installButton}
           >
-            Install CrackerBooks on this computer
+            Install the CrackerBooks app
           </Button>
         )}
         {showIosHint && (
           <Typography className={styles.iosHint}>Install the app: tap Share, then "Add to Home Screen".</Typography>
         )}
+        <InstallHelpDialog open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
 
         <div className={styles.footerRow}>
           <Button

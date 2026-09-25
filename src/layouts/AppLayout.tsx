@@ -6,6 +6,7 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import { BrandMark } from '../components/BrandMark'
 import { useSession } from '../hooks/useSession'
 import { ShortcutsDialog } from '../components/ShortcutsDialog'
+import { InstallHelpDialog } from '../components/InstallHelpDialog'
 import { PageSkeleton } from '../components/PageSkeleton'
 import { allShortcutGroups } from '../data/shortcuts'
 import { useKeyShortcuts } from '../hooks/useKeyShortcuts'
@@ -23,7 +24,8 @@ export const AppLayout = () => {
   const navigate = useNavigate()
   const { isSuperAdmin, scopeLabel, currentUser, signOut } = useSession()
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
-  const { canInstall, install } = usePwaInstall()
+  const [installHelpOpen, setInstallHelpOpen] = useState(false)
+  const { canInstall, isInstalled, install } = usePwaInstall()
 
   const navKeys: Record<string, string> = {
     n: ROUTES.newBill,
@@ -67,8 +69,8 @@ export const AppLayout = () => {
 
         <div className={styles.spacer} />
 
-        {canInstall && (
-          <div className={styles.shortcutsRow} onClick={() => { void install() }}>
+        {!isInstalled && (
+          <div className={styles.shortcutsRow} onClick={() => { if (canInstall) void install(); else setInstallHelpOpen(true) }}>
             <DownloadOutlinedIcon className={styles.shortcutsIcon} />
             <Typography className={styles.shortcutsLabel}>Install app</Typography>
           </div>
@@ -97,6 +99,7 @@ export const AppLayout = () => {
       <MobileBottomNav />
 
       <ShortcutsDialog open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} groups={allShortcutGroups} />
+      <InstallHelpDialog open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
     </div>
   )
 }
