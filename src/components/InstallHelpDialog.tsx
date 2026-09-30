@@ -21,14 +21,14 @@ export const InstallHelpDialog = ({ open, onClose }: InstallHelpDialogProps) => 
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" fullScreen={isMobile}>
-      <DialogTitle>Install CrackerBooks</DialogTitle>
+      <DialogTitle>Install AgniBooks</DialogTitle>
       <DialogContent className={styles.content}>
         <Typography className={styles.intro}>
-          Installing puts CrackerBooks on your home screen and opens it full screen like an app.
+          Installing puts AgniBooks on your home screen and opens it full screen like an app.
         </Typography>
         <InstallStep device="Android phone (Chrome)" steps="Open the browser menu ⋮ and tap “Install app” or “Add to Home screen”." />
         <InstallStep device="iPhone / iPad (Safari)" steps="Tap Share, then “Add to Home Screen”." />
-        <InstallStep device="Computer (Chrome, Edge, Brave)" steps="Click the install icon at the right end of the address bar, or find “Install CrackerBooks” in the browser menu." />
+        <InstallStep device="Computer (Chrome, Edge, Brave)" steps="Click the install icon at the right end of the address bar, or find “Install AgniBooks” in the browser menu." />
       </DialogContent>
       <DialogActions className={styles.actions}>
         <Button onClick={onClose}>Close</Button>

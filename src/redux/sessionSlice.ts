@@ -15,8 +15,8 @@ interface SessionState {
 export const loadSession = createAsyncThunk('session/load', () => api.loadSession())
 
 // Only the counter scope is persisted.
-const SCOPE_KEY = 'sparkbill:counter-scope'
-const RETIRED_KEYS = ['sparkbill:session:v1', 'sparkbill:view:v1']
+const SCOPE_KEY = 'agnibooks:counter-scope'
+const RETIRED_KEYS = ['sparkbill:session:v1', 'sparkbill:view:v1', 'sparkbill:counter-scope']
 
 const loadCounterScope = (): CounterScope => {
   RETIRED_KEYS.forEach((key) => window.localStorage.removeItem(key))

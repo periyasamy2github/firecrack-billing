@@ -10,7 +10,7 @@ import styles from '../css/components/AuthShell.module.css'
 
 // Shop identity comes from VITE_SHOP_* at build time.
 const SHOP = {
-  name: import.meta.env.VITE_SHOP_NAME || 'CrackerBooks',
+  name: import.meta.env.VITE_SHOP_NAME || 'AgniBooks',
   town: import.meta.env.VITE_SHOP_TOWN || '',
   gstin: import.meta.env.VITE_SHOP_GSTIN || '',
 }
@@ -42,7 +42,7 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
         <div className={styles.logo}>
           <BrandMark className={styles.logoIcon} />
         </div>
-        <Typography className={styles.brandName}>CrackerBooks</Typography>
+        <Typography className={styles.brandName}>AgniBooks</Typography>
       </div>
 
       <img src={shopBadge} alt="" className={styles.shopBadge} />
@@ -79,7 +79,7 @@ export const AuthShell = ({ children, footer }: { children: ReactNode; footer?: 
           <div className={styles.logo}>
             <BrandMark className={styles.logoIcon} />
           </div>
-          <Typography className={styles.compactBrandName}>CrackerBooks</Typography>
+          <Typography className={styles.compactBrandName}>AgniBooks</Typography>
         </div>
 
         {children}

@@ -69,7 +69,7 @@ export const MobileBottomNav = () => {
             <ListItemText primary="Sign out" secondary={currentUser?.name} />
           </ListItemButton>
         </List>
-        <Typography className={styles.moreBrand}>CrackerBooks</Typography>
+        <Typography className={styles.moreBrand}>AgniBooks</Typography>
       </Drawer>
 
       <InstallHelpDialog open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />

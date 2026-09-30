@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png'],
       manifest: {
-        name: 'CrackerBooks — Fireworks Billing',
-        short_name: 'CrackerBooks',
+        name: 'AgniBooks — Fireworks Billing',
+        short_name: 'AgniBooks',
         description: 'Billing, stock and reports for the fireworks shop.',
         theme_color: '#0f172a',
         background_color: '#0f172a',

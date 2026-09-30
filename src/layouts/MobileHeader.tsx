@@ -11,7 +11,7 @@ export const MobileHeader = () => {
     <header className={`${styles.header} mobile-only no-print`}>
       <BrandMark className={styles.headerLogo} />
       <div className={styles.headerText}>
-        <Typography className={styles.headerName}>CrackerBooks</Typography>
+        <Typography className={styles.headerName}>AgniBooks</Typography>
         <Typography noWrap className={styles.headerSubtitle}>{scopeLabel}</Typography>
       </div>
       {isSuperAdmin && <CounterScopeSelect className={styles.headerSelect} />}

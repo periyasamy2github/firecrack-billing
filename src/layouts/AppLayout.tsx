@@ -51,7 +51,7 @@ export const AppLayout = () => {
             <BrandMark className={styles.logoIcon} />
           </div>
           <div className={styles.brandText}>
-            <Typography className={styles.brandName}>CrackerBooks</Typography>
+            <Typography className={styles.brandName}>AgniBooks</Typography>
             <Typography noWrap className={styles.brandSubtitle}>{scopeLabel}</Typography>
           </div>
         </div>

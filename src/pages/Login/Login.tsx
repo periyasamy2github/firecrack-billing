@@ -152,7 +152,7 @@ export const Login = () => {
             onClick={() => { if (canInstall) void install(); else setInstallHelpOpen(true) }}
             className={styles.installButton}
           >
-            Install the CrackerBooks app
+            Install the AgniBooks app
           </Button>
         )}
         {showIosHint && (
