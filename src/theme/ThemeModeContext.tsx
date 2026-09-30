@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { useSelector } from '../redux/store'
+import { THEME_CACHE_KEY } from '../redux/shopSlice'
 import { buildMuiTheme } from './muiTheme'
 import { tokens, type ColorTokens } from './tokens'
 import { resolveTheme, type ThemePreset } from './themePresets'
@@ -39,6 +40,10 @@ export const ThemeModeProvider = ({ children }: { children: ReactNode }) => {
     // Keeps the Android/PWA status bar matched to the rail.
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', preset.railBg)
   }, [preset])
+
+  useEffect(() => {
+    window.localStorage.setItem(THEME_CACHE_KEY, JSON.stringify({ theme: themeName, themeColor, themeRailColor }))
+  }, [themeName, themeColor, themeRailColor])
 
   const activeTokens = useMemo<ColorTokens>(() => ({
     ...tokens,

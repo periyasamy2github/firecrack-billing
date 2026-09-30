@@ -18,11 +18,11 @@
   flex-direction: column;
   gap: 34px;
   padding: 46px 52px;
-  background: linear-gradient(155deg, #1c4066 0%, #14283f 55%, #0b1220 100%);
+  background: linear-gradient(155deg, var(--rail-active) 0%, var(--rail-bg) 55%, #0b1220 100%);
   color: #fff;
 }
 
-/* Two soft lights so the navy has depth instead of reading as a flat block. */
+/* Two soft lights so the dark panel has depth instead of reading as a flat block. */
 .brandPanel::before,
 .brandPanel::after {
   content: '';
@@ -37,7 +37,7 @@
   height: 460px;
   top: -170px;
   right: -140px;
-  background: radial-gradient(circle, rgba(94, 160, 232, 0.28) 0%, rgba(94, 160, 232, 0) 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 30%, transparent) 0%, transparent 68%);
 }
 
 .brandPanel::after {
@@ -128,7 +128,7 @@
   border-radius: 9px;
   display: grid;
   place-items: center;
-  color: #cfe0f4;
+  color: var(--rail-fg);
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
