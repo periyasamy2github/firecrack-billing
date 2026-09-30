@@ -20,7 +20,7 @@ class SettingSeeder extends Seeder
         }
 
         Setting::create([
-            'name' => 'SparkBill',
+            'name' => 'Sivagasi Fireworks',
             'address' => '',
             'phone' => '',
             'gstin' => '',
