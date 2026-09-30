@@ -63,25 +63,54 @@
   font-family: inherit;
 }
 
+.metaRow {
+  display: flex;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.metaLabel {
+  width: 44px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.metaValue {
+  word-break: break-word;
+}
+
 .itemLine {
   display: grid;
-  grid-template-columns: 1fr 68px 56px;
-  gap: 6px;
+  grid-template-columns: 14px 1fr 24px 44px 52px;
+  gap: 4px;
   align-items: start;
   margin-bottom: 3.2px;
 }
 
 .itemHead {
   margin-bottom: 0;
+  font-weight: 700;
 }
 
 .itemName {
   word-break: break-word;
 }
 
-.itemAmount {
+.itemNum {
   text-align: right;
   white-space: nowrap;
+}
+
+.totalBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 700;
+  font-size: 16px;
+  border-top: 3px double #9aa6b6;
+  border-bottom: 3px double #9aa6b6;
+  padding: 3px 0;
+  margin: 6px 0;
 }
 
 .savedLine {
@@ -120,12 +149,19 @@
   }
 
   .row,
+  .metaRow,
   .savedLine {
     font-size: 10.5px;
   }
 
   .rowBold {
     font-size: 14px;
+  }
+
+  .totalBlock {
+    font-size: 17px;
+    border-top-color: #000;
+    border-bottom-color: #000;
   }
 
   .shopAddress,
