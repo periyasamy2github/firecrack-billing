@@ -89,8 +89,8 @@ export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
         </>
       )}
       <Typography className={styles.footerNote}>
-        Goods once sold will not be taken back.
-        <br />Handle fireworks safely. Thank you!
+        {shop.declaration && <>{shop.declaration}<br /></>}
+        Handle fireworks safely. Thank you!
       </Typography>
     </div>
   )

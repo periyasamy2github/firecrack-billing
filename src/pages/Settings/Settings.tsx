@@ -29,14 +29,21 @@ const settingsSchema = z.object({
   phone: z.string().trim().min(1, 'Phone is required'),
   address: z.string().trim().min(1, 'Address is required'),
   gstin: z.string().trim().refine((val) => val === '' || /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(val), 'Enter a valid 15-character GSTIN'),
-  invoicePrefix: z.string().trim().min(1, 'Prefix is required'),
+  invoicePrefix: z.string().trim(),
   declaration: z.string(),
-  nextInvoiceNumber: positiveInteger('Enter a valid invoice number'),
+  nextInvoiceNumber: z.string(),
   numberingMode: z.enum(['shop', 'branch']),
   seasonTarget: positiveInteger('Enter a valid season target'),
   theme: z.enum(['corporate', 'royal', 'teal', 'indigo', 'charcoal', 'custom']),
   themeColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Pick a color'),
   themeRailColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Pick a color'),
+}).superRefine((values, ctx) => {
+  // prefix and next number are only shown, so only checked, in shop mode
+  if (values.numberingMode !== 'shop') return
+  if (!values.invoicePrefix) ctx.addIssue({ code: 'custom', path: ['invoicePrefix'], message: 'Prefix is required' })
+  if (!/^\d+$/.test(values.nextInvoiceNumber) || Number(values.nextInvoiceNumber) < 1) {
+    ctx.addIssue({ code: 'custom', path: ['nextInvoiceNumber'], message: 'Enter a valid invoice number' })
+  }
 })
 
 type SettingsFormValues = z.infer<typeof settingsSchema>
