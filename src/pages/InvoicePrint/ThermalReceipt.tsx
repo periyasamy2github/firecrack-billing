@@ -108,6 +108,7 @@ export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
           <Dash />
         </>
       )}
+      {shop.declaration && <Typography className={styles.footerNote}>{shop.declaration}</Typography>}
       <Typography className={styles.footerNote}>
         … Thank You Visit Again …
         <br />Happy Diwali..!!!

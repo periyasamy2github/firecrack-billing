@@ -61,7 +61,7 @@ export const ProductDialog = ({ mode, open, onClose, product, existingCodes, cou
                 <ProductFormFields index={index} />
               </div>
             ) : (
-              <ProductFormFields key={row.id} index={index} />
+              <ProductFormFields key={row.id} index={index} lockCode />
             )
           ))}
           {isAdd && (

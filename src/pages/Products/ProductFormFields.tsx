@@ -8,9 +8,10 @@ import styles from '../../css/pages/ProductFormFields.module.css'
 
 interface ProductFormFieldsProps {
   index: number
+  lockCode?: boolean
 }
 
-export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
+export const ProductFormFields = ({ index, lockCode = false }: ProductFormFieldsProps) => {
   const { register, control, formState: { errors } } = useFormContext<ProductBatchValues>()
   const rowErrors = errors.products?.[index]
   const products = useSelector((state) => state.products.items)
@@ -30,7 +31,7 @@ export const ProductFormFields = ({ index }: ProductFormFieldsProps) => {
 
   return (
     <div className={styles.grid}>
-      <TextField label="Barcode" {...field('code')} />
+      <TextField label="Barcode" {...field('code')} disabled={lockCode} helperText={lockCode ? 'Barcode cannot be changed after creation' : rowErrors?.code?.message || ' '} />
       <TextField label="Name" {...field('name')} />
       <Controller
         name={`products.${index}.category`}
