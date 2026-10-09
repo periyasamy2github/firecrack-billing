@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
-use App\Models\BillItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -38,12 +37,7 @@ class ProductController extends Controller
 
         $products = Product::query()
             ->with('counter')
-            ->addSelect(['*'])
-            ->addSelect(['sales_count' => BillItem::query()
-                ->join('bills', 'bills.id', '=', 'bill_items.bill_id')
-                ->where('bills.status', 'Paid')
-                ->whereColumn('bill_items.product_id', 'products.id')
-                ->selectRaw('COALESCE(SUM(bill_items.qty), 0)')])
+            ->withSalesCount()
             ->when(!$user->isSuperAdmin(), fn ($query) => $query->where('counter_id', $user->counter_id))
             ->when($user->isSuperAdmin() && $scope && $scope !== 'all', fn ($query) => $query->where('counter_id', $scope))
             ->orderBy('name')
@@ -149,6 +143,6 @@ class ProductController extends Controller
             'reorder_level' => $data['lowStockThreshold'],
         ])->save();
 
-        return $product;
+        return Product::withSalesCount()->with('counter')->find($product->id);
     }
 }
