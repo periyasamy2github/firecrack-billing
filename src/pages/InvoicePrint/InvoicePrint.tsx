@@ -9,6 +9,7 @@ import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { A4Invoice } from './A4Invoice'
 import { ThermalReceipt } from './ThermalReceipt'
+import { DeliverySlip } from './DeliverySlip'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
@@ -52,6 +53,7 @@ export const InvoicePrint = () => {
 
   const [format, setFormat] = useState<PrintFormat>('thermal')
   const [showMrpSaved, setShowMrpSaved] = useState(true)
+  const [withDeliverySlip, setWithDeliverySlip] = useState(false)
 
   if (!bill) {
     if (!notFound) return null
@@ -108,15 +110,24 @@ export const InvoicePrint = () => {
                 </Typography>
               )}
 
-              {totals.hasMrp && (
+              {activeFormat === 'thermal' && (
                 <div className={styles.optionsSection}>
                   <div className={styles.optionsStack}>
+                    {totals.hasMrp && (
+                      <div className={styles.toggleRow}>
+                        <div className={styles.toggleRowText}>
+                          <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
+                          <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
+                        </div>
+                        <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
+                      </div>
+                    )}
                     <div className={styles.toggleRow}>
                       <div className={styles.toggleRowText}>
-                        <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
-                        <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
+                        <Typography className={styles.toggleRowLabel}>Delivery slip</Typography>
+                        <Typography variant="caption">Prints a totals-only ticket after the receipt</Typography>
                       </div>
-                      <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
+                      <Switch size="small" checked={withDeliverySlip} onChange={(e) => setWithDeliverySlip(e.target.checked)} />
                     </div>
                   </div>
                 </div>
@@ -136,7 +147,10 @@ export const InvoicePrint = () => {
             </Typography>
 
             {activeFormat === 'thermal' ? (
-              <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
+              <>
+                <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
+                {withDeliverySlip && <DeliverySlip bill={bill} />}
+              </>
             ) : (
               <div className={styles.a4Wrap}>
                 <A4Invoice bill={bill} />

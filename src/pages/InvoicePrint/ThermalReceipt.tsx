@@ -10,16 +10,16 @@ interface ThermalReceiptProps {
   showMrpSaved: boolean
 }
 
-const Dash = () => <div className={styles.dash} />
+export const Dash = () => <div className={styles.dash} />
 
-const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
+export const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
   <div className={bold ? `${styles.row} ${styles.rowBold}` : styles.row}>
     <span>{label}</span>
     <span>{value}</span>
   </div>
 )
 
-const Meta = ({ label, value }: { label: string; value: string }) => (
+export const Meta = ({ label, value }: { label: string; value: string }) => (
   <div className={styles.metaRow}>
     <span className={styles.metaLabel}>{label}</span>
     <span className={styles.metaValue}>: {value}</span>
@@ -27,7 +27,7 @@ const Meta = ({ label, value }: { label: string; value: string }) => (
 )
 
 // The printer style for a subtracted round-off: "0.50-" instead of "-0.50".
-const trailingMinus = (value: number) => `${formatAmount(Math.abs(value))}${value < 0 ? '-' : ''}`
+export const trailingMinus = (value: number) => `${formatAmount(Math.abs(value))}${value < 0 ? '-' : ''}`
 
 export const ThermalReceipt = ({ bill, showMrpSaved }: ThermalReceiptProps) => {
   const { shop } = useSession()
