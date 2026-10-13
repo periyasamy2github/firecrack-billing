@@ -152,3 +152,25 @@
   text-align: right;
   white-space: nowrap;
 }
+
+.cutLine {
+  max-width: 290px;
+  margin: 12px auto;
+  text-align: center;
+  font-size: 9px;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media print {
+  .cutLine {
+    max-width: none;
+    margin: 4mm 0 0;
+  }
+
+  /* new page = the printer's cut point; the scissors line stays at the foot of the receipt page */
+  .deliverySlip {
+    break-before: page;
+  }
+}

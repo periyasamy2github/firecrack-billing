@@ -10,9 +10,9 @@ interface ThermalReceiptProps {
   showMrpSaved: boolean
 }
 
-const Dash = () => <div className={styles.dash} />
+export const Dash = () => <div className={styles.dash} />
 
-const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
+export const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
   <div className={bold ? `${styles.row} ${styles.rowBold}` : styles.row}>
     <span>{label}</span>
     <span>{value}</span>
