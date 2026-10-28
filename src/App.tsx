@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
 import { RouteProgress, PageLoader } from './components/RouteProgress'
-import { RequireAuth, RequireSuperAdmin } from './components/RouteGuards'
+import { RequireAuth, RequireGuest, RequireSuperAdmin } from './components/RouteGuards'
 import { GlobalToast } from './components/GlobalToast'
 
 const Login = lazy(() => import('./pages/Login/Login'))
@@ -26,7 +26,9 @@ function App() {
       <RouteProgress />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route element={<RequireGuest />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
           <Route element={<RequireAuth />}>
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />

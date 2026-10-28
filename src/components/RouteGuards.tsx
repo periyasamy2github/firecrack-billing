@@ -32,3 +32,6 @@ export const RequireSuperAdmin = () => {
   const { isSuperAdmin } = useSession()
   return isSuperAdmin ? <Outlet /> : <Navigate to={ROUTES.unauthorized} replace />
 }
+
+// signed-in users skip the login page
+export const RequireGuest = () => (getToken() ? <Navigate to={ROUTES.dashboard} replace /> : <Outlet />)
