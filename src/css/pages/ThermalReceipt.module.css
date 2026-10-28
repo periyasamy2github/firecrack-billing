@@ -8,7 +8,7 @@
   justify-content: space-between;
   gap: 8px;
   font-weight: 400;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .rowBold {
@@ -16,16 +16,16 @@
   font-size: 14px;
 }
 
+/* Screen size matches the printed size, so the print page heights can be measured on screen. */
 .sheet {
   background-color: #fff;
   color: #15202e;
-  width: 290px;
+  width: 80mm;
   margin: 0 auto;
-  padding: 14px 12px;
-  border: 1px solid var(--line);
-  box-shadow: 0 2px 4px rgba(16, 26, 43, 0.05), 0 18px 40px -18px rgba(16, 26, 43, 0.28);
+  padding: 2mm 3mm;
+  box-shadow: 0 0 0 1px var(--line), 0 2px 4px rgba(16, 26, 43, 0.05), 0 18px 40px -18px rgba(16, 26, 43, 0.28);
   font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
-  font-size: 10px;
+  font-size: 10.5px;
   line-height: 1.5;
 }
 
@@ -38,13 +38,13 @@
 
 .shopAddress {
   text-align: center;
-  font-size: 9px;
+  font-size: 10px;
   font-family: inherit;
 }
 
 .gstLine {
   text-align: center;
-  font-size: 9px;
+  font-size: 10px;
   font-family: inherit;
 }
 
@@ -58,6 +58,7 @@
 .cancelledBanner {
   text-align: center;
   font-weight: 700;
+  font-size: 13px;
   letter-spacing: 0.2em;
   color: #a93c36;
   font-family: inherit;
@@ -66,7 +67,7 @@
 .metaRow {
   display: flex;
   gap: 4px;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .metaLabel {
@@ -106,7 +107,7 @@
   justify-content: space-between;
   align-items: baseline;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 17px;
   border-top: 3px double #9aa6b6;
   border-bottom: 3px double #9aa6b6;
   padding: 3px 0;
@@ -117,27 +118,23 @@
   text-align: center;
   font-weight: 700;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 
 .footerNote {
   text-align: center;
-  font-size: 9px;
+  font-size: 10px;
   font-family: inherit;
 }
 
 @media print {
   .sheet {
-    /* 80mm roll minus the printer's own edge margin. */
-    width: 72mm;
+    width: 100%;
     margin: 0;
-    padding: 3mm 2mm;
-    border: 0;
     box-shadow: none;
-    /* Thermal heads print 1-bit: pure black and a 10.5px floor stay crisp, greys dither. */
+    /* Thermal heads print 1-bit: pure black stays crisp, greys dither. */
     color: #000;
-    font-size: 10.5px;
   }
 
   .sheet * {
@@ -148,39 +145,9 @@
     border-top-color: #000;
   }
 
-  .row,
-  .metaRow,
-  .savedLine {
-    font-size: 10.5px;
-  }
-
-  .rowBold {
-    font-size: 14px;
-  }
-
   .totalBlock {
-    font-size: 17px;
     border-top-color: #000;
     border-bottom-color: #000;
-  }
-
-  .shopAddress,
-  .gstLine,
-  .footerNote {
-    font-size: 10px;
-  }
-
-  .cancelledBanner {
-    font-size: 13px;
-  }
-}
-
-@media print {
-  .sheet {
-    width: 100%;
-    margin: 0;
-    padding: 2mm 3mm;
-    border: 0;
   }
 }
 
@@ -190,8 +157,8 @@
 }
 
 .cutLine {
-  max-width: 290px;
-  margin: 12px auto;
+  max-width: 80mm;
+  margin: 4mm auto 0;
   text-align: center;
   font-size: 9px;
   color: #000;
@@ -200,11 +167,6 @@
 }
 
 @media print {
-  .cutLine {
-    max-width: none;
-    margin: 4mm 0 0;
-  }
-
   /* new page = the printer's cut point; the scissors line stays at the foot of the receipt page */
   .deliverySlip {
     break-before: page;

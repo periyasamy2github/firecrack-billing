@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Switch, Typography } from '@mui/material'
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined'
@@ -9,7 +10,7 @@ import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { A4Invoice } from './A4Invoice'
 import { ThermalReceipt } from './ThermalReceipt'
-import { DeliverySlip } from './DeliverySlip'
+import { CutLine, DeliverySlip } from './DeliverySlip'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
@@ -34,6 +35,9 @@ const FORMAT_OPTIONS = [
   { key: 'a4' as const, icon: DescriptionOutlinedIcon, title: 'A4 Tax Invoice', desc: 'GST compliant · filing' },
 ]
 
+// whole mm plus 1mm spare, so the content never spills onto an extra page
+const heightInMm = (element: HTMLElement | null) => (element ? Math.ceil((element.getBoundingClientRect().height * 25.4) / 96) + 1 : 0)
+
 export const InvoicePrint = () => {
   const navigate = useNavigate()
   const params = useParams<{ billId: string }>()
@@ -53,7 +57,17 @@ export const InvoicePrint = () => {
 
   const [format, setFormat] = useState<PrintFormat>('thermal')
   const [showMrpSaved, setShowMrpSaved] = useState(true)
-  const [withDeliverySlip, setWithDeliverySlip] = useState(false)
+  const receiptPageRef = useRef<HTMLDivElement>(null)
+  const slipPageRef = useRef<HTMLDivElement>(null)
+  const [pageHeightsMm, setPageHeightsMm] = useState({ receipt: 0, slip: 0 })
+
+  // exact page heights, so the printer cuts right after the bill and after the slip
+  useEffect(() => {
+    const measurePages = () =>
+      flushSync(() => setPageHeightsMm({ receipt: heightInMm(receiptPageRef.current), slip: heightInMm(slipPageRef.current) }))
+    window.addEventListener('beforeprint', measurePages)
+    return () => window.removeEventListener('beforeprint', measurePages)
+  }, [])
 
   if (!bill) {
     if (!notFound) return null
@@ -110,24 +124,15 @@ export const InvoicePrint = () => {
                 </Typography>
               )}
 
-              {activeFormat === 'thermal' && (
+              {activeFormat === 'thermal' && totals.hasMrp && (
                 <div className={styles.optionsSection}>
                   <div className={styles.optionsStack}>
-                    {totals.hasMrp && (
-                      <div className={styles.toggleRow}>
-                        <div className={styles.toggleRowText}>
-                          <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
-                          <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
-                        </div>
-                        <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
-                      </div>
-                    )}
                     <div className={styles.toggleRow}>
                       <div className={styles.toggleRowText}>
-                        <Typography className={styles.toggleRowLabel}>Delivery slip</Typography>
-                        <Typography variant="caption">Prints a totals-only ticket after the receipt</Typography>
+                        <Typography className={styles.toggleRowLabel}>Show amount saved</Typography>
+                        <Typography variant="caption">"You saved ₹{Math.round(totals.mrpValue - totals.gross + totals.billDiscountAmount).toLocaleString('en-IN')}"</Typography>
                       </div>
-                      <Switch size="small" checked={withDeliverySlip} onChange={(e) => setWithDeliverySlip(e.target.checked)} />
+                      <Switch size="small" checked={showMrpSaved} onChange={(e) => setShowMrpSaved(e.target.checked)} />
                     </div>
                   </div>
                 </div>
@@ -139,7 +144,11 @@ export const InvoicePrint = () => {
             </div>
           </Card>
 
-          <style>{`@media print { @page { size: ${activeFormat === 'thermal' ? '80mm auto' : 'A4 portrait'}; margin: 0; } }`}</style>
+          <style>
+            {activeFormat === 'thermal'
+              ? `@media print { @page receipt { size: 80mm ${pageHeightsMm.receipt}mm; } @page slip { size: 80mm ${pageHeightsMm.slip}mm; } }`
+              : '@media print { @page { size: A4 portrait; } }'}
+          </style>
 
           <div className={`${styles.previewCol} print-area`}>
             <Typography variant="caption" className={`${styles.previewCaption} ${PREVIEW_CAPTION_CLASS[activeFormat]}`}>
@@ -148,8 +157,13 @@ export const InvoicePrint = () => {
 
             {activeFormat === 'thermal' ? (
               <>
-                <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
-                {withDeliverySlip && <DeliverySlip bill={bill} />}
+                <div ref={receiptPageRef} className={styles.receiptPage}>
+                  <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
+                  <CutLine />
+                </div>
+                <div ref={slipPageRef} className={styles.slipPage}>
+                  <DeliverySlip bill={bill} />
+                </div>
               </>
             ) : (
               <div className={styles.a4Wrap}>

@@ -87,7 +87,11 @@
 }
 
 .previewCaptionThermal {
-  max-width: 290px;
+  max-width: 80mm;
+}
+
+.slipPage {
+  margin-top: 12px;
 }
 
 .formatNote {
@@ -121,5 +125,15 @@
   .a4Wrap {
     max-width: none;
     width: 100%;
+  }
+
+  /* each piece prints on its own sized page, see the @page rules in InvoicePrint.tsx */
+  .receiptPage {
+    page: receipt;
+  }
+
+  .slipPage {
+    page: slip;
+    margin-top: 0;
   }
 }
