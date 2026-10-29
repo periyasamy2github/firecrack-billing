@@ -10,7 +10,7 @@ import { PageHeader } from '../../components/PageHeader'
 import { PageContent } from '../../components/PageContent'
 import { A4Invoice } from './A4Invoice'
 import { ThermalReceipt } from './ThermalReceipt'
-import { CutLine, DeliverySlip } from './DeliverySlip'
+import { DeliverySlip } from './DeliverySlip'
 import { getBillTotals } from '../../utils/billing'
 import { formatCurrency } from '../../utils/format'
 import { ROUTES } from '../../utils/routes'
@@ -163,7 +163,6 @@ export const InvoicePrint = () => {
               <>
                 <div ref={receiptPageRef} className={styles.receiptPage}>
                   <ThermalReceipt bill={bill} showMrpSaved={showMrpSaved} />
-                  <CutLine />
                 </div>
                 <div ref={slipPageRef} className={styles.slipPage}>
                   <DeliverySlip bill={bill} />
