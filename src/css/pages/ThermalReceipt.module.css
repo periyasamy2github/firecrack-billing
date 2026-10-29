@@ -86,6 +86,7 @@
   gap: 4px;
   align-items: start;
   margin-bottom: 3.2px;
+  font-weight: 700;
 }
 
 .itemHead {
@@ -112,6 +113,10 @@
   border-bottom: 3px double #9aa6b6;
   padding: 3px 0;
   margin: 6px 0;
+}
+
+.deliverySlip .totalBlock {
+  font-size: 18px;
 }
 
 .savedLine {
