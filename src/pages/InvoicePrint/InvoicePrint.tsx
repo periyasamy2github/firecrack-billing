@@ -35,8 +35,12 @@ const FORMAT_OPTIONS = [
   { key: 'a4' as const, icon: DescriptionOutlinedIcon, title: 'A4 Tax Invoice', desc: 'GST compliant · filing' },
 ]
 
+// at least 81mm, just taller than the 80mm width, so Chrome never turns the short slip page sideways
+const MIN_PAGE_HEIGHT_MM = 81
+
 // whole mm plus 1mm spare, so the content never spills onto an extra page
-const heightInMm = (element: HTMLElement | null) => (element ? Math.ceil((element.getBoundingClientRect().height * 25.4) / 96) + 1 : 0)
+const heightInMm = (element: HTMLElement | null) =>
+  element ? Math.max(Math.ceil((element.getBoundingClientRect().height * 25.4) / 96) + 1, MIN_PAGE_HEIGHT_MM) : 0
 
 export const InvoicePrint = () => {
   const navigate = useNavigate()
