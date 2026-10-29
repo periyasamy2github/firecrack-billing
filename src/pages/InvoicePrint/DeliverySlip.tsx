@@ -10,7 +10,7 @@ interface DeliverySlipProps {
   bill: Bill
 }
 
-export const CutLine = () => <div className={styles.cutLine}>✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div>
+export const CutLine = () => <div className={styles.cutLine}>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div>
 
 // Delivery ticket: the receipt header and totals without the item lines, torn off at the cut line.
 export const DeliverySlip = ({ bill }: DeliverySlipProps) => {
