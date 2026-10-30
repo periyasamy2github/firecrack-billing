@@ -14,13 +14,13 @@ export const userSchema = (users: User[], editingId: string | null, isNew: boole
     active: z.boolean(),
   })
     .refine((v) => v.role !== 'Staff' || v.counterId.length > 0, { message: 'Pick a counter', path: ['counterId'] })
-    .refine((v) => !isNew || v.password.length >= 6, { message: 'At least 6 characters', path: ['password'] })
+    .refine((v) => !isNew || v.password.length >= 8, { message: 'At least 8 characters, with letters and numbers', path: ['password'] })
     .refine((v) => !isNew || v.password === v.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
     .refine((v) => !users.some((u) => u.staffId.toLowerCase() === v.staffId.toLowerCase() && u.id !== editingId), { message: 'That staff ID is already in use', path: ['staffId'] })
     .refine((v) => !users.some((u) => u.email.toLowerCase() === v.email.trim().toLowerCase() && u.id !== editingId), { message: 'That email is already in use', path: ['email'] })
 
 export const resetPasswordSchema = z.object({
-  newPassword: z.string().min(6, 'At least 6 characters'),
+  newPassword: z.string().min(8, 'At least 8 characters, with letters and numbers'),
   confirmPassword: z.string(),
 }).refine((v) => v.newPassword === v.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
 
