@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-// No shell on shared hosting — open /optimize/<OPTIMIZE_KEY> after a deploy to clear and rebuild the caches.
-Route::get('/optimize/{key}', function (string $key) {
+// No shell on shared hosting — open /api/optimize/<OPTIMIZE_KEY> after a deploy to clear and rebuild the caches.
+Route::get('/api/optimize/{key}', function (string $key) {
     $expected = (string) config('app.optimize_key');
     abort_unless($expected !== '' && hash_equals($expected, $key), 404);
 
