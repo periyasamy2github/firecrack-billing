@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -39,7 +40,7 @@ class UserController extends Controller
     // Resets the password and revokes the user's tokens.
     public function password(Request $request, User $user): Response
     {
-        $request->validate(['password' => ['required', 'string', 'min:6']]);
+        $request->validate(['password' => ['required', 'string', Password::min(8)->letters()->numbers()]]);
         $user->forceFill(['password' => $request->input('password')])->save();
         $user->tokens()->delete();
 
@@ -54,7 +55,7 @@ class UserController extends Controller
             'staffId' => ['required', 'string', 'max:40', Rule::unique('users', 'staff_id')->ignore($id)],
             'mobile' => ['nullable', 'string', 'max:20'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
-            'password' => [$id ? 'nullable' : 'required', 'string', 'min:6'],
+            'password' => [$id ? 'nullable' : 'required', 'string', Password::min(8)->letters()->numbers()],
             'role' => ['required', Rule::in(['Super Admin', 'Staff'])],
             'counterId' => ['nullable', 'integer', 'exists:counters,id'],
             'active' => ['required', 'boolean'],

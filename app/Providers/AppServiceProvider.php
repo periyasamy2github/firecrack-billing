@@ -22,7 +22,13 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
 
         RateLimiter::for('login', function (Request $request) {
-            return Limit::perMinute(5)->by(Str::lower((string) $request->input('email')).'|'.$request->ip());
+            $email = Str::lower((string) $request->input('email'));
+
+            return [
+                Limit::perMinute(5)->by($email.'|'.$request->ip()),
+                Limit::perMinute(20)->by($email),
+                Limit::perMinute(30)->by($request->ip()),
+            ];
         });
     }
 }

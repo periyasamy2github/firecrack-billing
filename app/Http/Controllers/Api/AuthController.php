@@ -21,13 +21,20 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email:filter'],
             'password' => ['required', 'string'],
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $user) {
+            // same hashing work as a real check, so response time doesn't reveal the email
+            Hash::make($request->password);
+
+            return response()->json(['message' => 'Email or password is wrong'], 401);
+        }
+
+        if (! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Email or password is wrong'], 401);
         }
 

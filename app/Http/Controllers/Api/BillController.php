@@ -149,6 +149,7 @@ class BillController extends Controller
         ]);
 
         $bill = $this->findByNo($request);
+        $this->authorizeCounter($request->user(), $bill->counter_id);
         $oldProductIds = $bill->items()->pluck('product_id')->filter()->all();
         $bill = $this->service->update($request->user(), $bill, $data);
 
@@ -160,7 +161,9 @@ class BillController extends Controller
 
     public function cancel(Request $request): JsonResponse
     {
-        $bill = $this->service->cancel($this->findByNo($request));
+        $bill = $this->findByNo($request);
+        $this->authorizeCounter($request->user(), $bill->counter_id);
+        $bill = $this->service->cancel($bill);
 
         return $this->saleResponse($bill);
     }

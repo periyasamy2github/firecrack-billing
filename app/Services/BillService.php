@@ -53,9 +53,8 @@ class BillService
     // Edits a paid bill, keeping its number.
     public function update(User $user, Bill $bill, array $data): Bill
     {
-        $this->assertStatusIs($bill, 'Paid', "This bill can't be changed.");
-
         return DB::transaction(function () use ($user, $bill, $data) {
+            $bill = $this->lockPaidBill($bill, "This bill can't be changed.");
             $gstApplicable = (bool) ($data['gstApplicable'] ?? false);
             $discount = (float) ($data['discount'] ?? 0);
 
@@ -94,9 +93,8 @@ class BillService
     // Cancels a paid bill and restores its stock.
     public function cancel(Bill $bill): Bill
     {
-        $this->assertStatusIs($bill, 'Paid', "This bill can't be cancelled.");
-
         return DB::transaction(function () use ($bill) {
+            $bill = $this->lockPaidBill($bill, "This bill can't be cancelled.");
             $this->returnStock($bill);
             $bill->status = 'Cancelled';
             $bill->save();
@@ -235,6 +233,15 @@ class BillService
         $bill->bill_no = sprintf('%s-%03d', $counter->code, $number);
         $counter->next_number = $number + 1;
         $counter->save();
+    }
+
+    // Parallel requests wait here, then see the status the first one left.
+    private function lockPaidBill(Bill $bill, string $message): Bill
+    {
+        $locked = Bill::lockForUpdate()->findOrFail($bill->id);
+        $this->assertStatusIs($locked, 'Paid', $message);
+
+        return $locked;
     }
 
     private function assertStatusIs(Bill $bill, string $status, string $message): void
